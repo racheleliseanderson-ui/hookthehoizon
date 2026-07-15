@@ -1,114 +1,146 @@
-# Hook the Horizon Trend-Focus Decisions
+# Hook the Horizon Market-Validated Focus Decisions
 
-**Status:** Active planning addendum  
+**Status:** Provisional pending quantified market validation  
 **Date:** 2026-07-15  
 **Applies to:** HTH-012 through HTH-018 in `CONTENT_STRATEGY_AND_LAUNCH_MAP.md`
 
-## Decision basis
+## Correction to the decision model
 
-The launch should favor content that is broad enough to attract freshwater anglers, specific enough to prove field credibility, and repeatable enough for a small editorial operation to test honestly.
+The prior version treated plausible editorial fit as sufficient to lock launch decisions. That standard is withdrawn.
 
-The strongest intersection is:
+Hook the Horizon will use this order of authority:
 
-- Trout and smallmouth bass
-- Public reservoirs and moving water
-- Bank-accessible and small-craft fishing
-- Medium-light spinning systems
-- Braid-to-leader compatibility
-- Wind, light, clarity, depth, and retrieve decisions
-- Heat, low-flow, closure, handling, and conservation judgment
+1. Quantified market evidence determines what subjects earn coverage.
+2. Current official records determine regulatory, access, safety, and fishery facts.
+3. First-hand field evidence determines how the publication tests and differentiates the selected subject.
+4. Editorial judgment shapes presentation only after the first three layers are documented.
 
-This avoids launching around trophy culture, tournament coverage, expensive electronics, remote destinations, or product-page reviews.
+Contributor preference, retailer merchandising, anecdotal popularity, and personal success are not accepted as proof of market demand.
 
-## Locked launch decisions
+## Required evidence classes
 
-### HTH-012 — Gear Verdict 001
+Every market-led decision must record:
 
-**Focus:** The contributor's most-used 2500-size spinning reel, tested as part of a complete medium-light trout/smallmouth system.
+- National participation size and direction.
+- Freshwater, saltwater, fly-fishing, or other segment relevance.
+- Species or technique demand where reliable data exists.
+- Search demand using documented keyword volumes and trend direction.
+- Commercial value using category sales, expenditure, affiliate, or advertiser evidence.
+- Competitive supply using search-result and publisher coverage counts.
+- Regional accessibility and official fishery relevance.
+- Seasonality and freshness requirements.
+- Evidence date, geography, methodology, and limitations.
 
-**Working title:** `Gear Verdict 001: [Exact Owned 2500-Size Spinning Reel] — Ten-Session Field Test`
+## Source hierarchy
 
-**Why this focus:** A 2500-size spinning reel supports trout, smallmouth bass, finesse presentations, light-to-medium lures, bank fishing, and small-craft fishing. It connects directly to the planned compatibility builder and balanced-spinning-system guide.
+### Tier 1 - Government and regulatory records
 
-**Required evidence:** Exact owned model, setup, test dates, minimum ten sessions or a clearly disclosed shorter test, wind and line behavior, drag performance, line management, maintenance, wear, failures, alternatives, and disclosure.
+Use federal and state agencies for participation surveys, expenditures, licenses, regulations, access, fishery surveys, stocking, closures, and conservation facts.
 
-**Control:** Drive contains no verified equipment inventory. The manufacturer and model must come from the actual field kit; they may not be invented or selected only because a product is popular.
+### Tier 2 - Recognized industry research
 
-### HTH-013 — Gear Verdict 002
+Use RBFF, American Sportfishing Association, Outdoor Industry Association/Foundation, NMMA where relevant, and established research providers with disclosed methods.
 
-**Focus:** The contributor's most-used 10 lb braided main line with an 8 lb fluorocarbon leader.
+### Tier 3 - Platform demand data
 
-**Working title:** `Gear Verdict 002: [Exact Owned 10 lb Braid] With an 8 lb Fluorocarbon Leader`
+Use Google Trends, Google Ads Keyword Planner, Google Search Console after launch, YouTube trend data, Pinterest trend data, and comparable platforms. Record geography, period, query type, and retrieval date.
 
-**Why this focus:** Line and leader performance affects casting, wind knots, guide passage, abrasion, knot selection, sensitivity, lure control, and failure diagnosis. It also supports the planned braid-to-leader technique article and compatibility tool.
+### Tier 4 - Commercial and competitive indicators
 
-**Required evidence:** Exact line and leader products, spool age, knot used, leader length, guide passage, wind behavior, abrasion, break-offs, reties, water clarity, lure-weight range, and limitations. No laboratory-strength claim may be inferred from field use.
+Use retailer category depth, manufacturer product-line breadth, affiliate availability, ad-market evidence, publisher coverage, and SERP competition. These are supporting indicators, not sole proof.
 
-### HTH-015 — Second core species
+### Tier 5 - Field and audience evidence
 
-**Decision:** Smallmouth bass.
+Use documented field tests, reader questions, newsletter behavior, tool usage, internal search, and post-launch analytics to refine treatment. These do not establish the original market size by themselves.
 
-**Working title:** `Species Intelligence 002: Smallmouth Bass`
+## Quantified scoring model
 
-**Why:** Smallmouth bass provides broad freshwater relevance while preserving the publication's water-reading and system-building identity. It supports reservoir structure, wind, light, finesse, spinning gear, seasonal movement, handling, and repeatable field testing. It also complements rainbow trout instead of duplicating it.
+Score each candidate from 0 to 5 on each factor:
 
-### HTH-016 — Field Report 001
+| Factor | Weight |
+|---|---:|
+| Participation and audience size | 20% |
+| Search demand and trend direction | 20% |
+| Commercial value | 15% |
+| Problem frequency and practical utility | 15% |
+| Competitive opportunity | 10% |
+| Regional access and repeatability | 10% |
+| Editorial fit | 5% |
+| Evidence quality and freshness | 5% |
 
-**Decision:** Chatfield Reservoir; summer morning; wind and light transition; smallmouth bass.
+Weighted score = sum of factor score divided by 5, multiplied by its weight.
 
-**Working title:** `Field Report 001: Chatfield Reservoir — Morning Wind and Light Shift — Smallmouth Bass`
+Decision thresholds:
 
-**Field question:** As wind and light change during the morning, does the productive depth, shoreline angle, retrieve speed, or presentation need to change first?
+- 75-100: launch priority
+- 60-74: supporting launch content
+- 45-59: research backlog
+- Below 45: do not prioritize
 
-**Core system:** Medium-light spinning setup with braid-to-fluorocarbon leader. Final lure and technique must reflect the actual session.
+A subject cannot score above 59 unless participation or search demand is supported by a quantifiable source. A subject cannot receive launch-priority status when its evidence-quality score is below 3.
 
-**Capture requirements:** Access mode, start/end time, wind, light, water temperature when relevant, clarity, depth band, structure, lure weight, retrieve, effort, result, failures, and next test.
+## Current external baseline
 
-### HTH-017 — Field Report 002
+The 2022 U.S. Fish and Wildlife Service national survey reported 39.9 million U.S. participants age 16 or older in fishing. Because the survey methodology changed, that result must not be presented as a directly comparable trend line against older survey editions without qualification.
 
-**Decision:** Repeat the Chatfield smallmouth test using the same core system and change one variable only.
+This establishes recreational fishing as a large market, but it does not validate smallmouth bass, a 2500-size reel, a 10-pound braid system, or Chatfield Reservoir as launch priorities. Those narrower decisions require separate evidence.
 
-**Working title:** `Field Report 002: Chatfield Repeat Test — Change One Variable, Keep the System Honest`
+## Revised status of prior decisions
 
-**Preferred variable order:**
+### HTH-012 - Gear Verdict 001
 
-1. Leader length
-2. Lure weight
-3. Retrieve speed
+**Status:** Product and category not selected.
 
-Only one should change in the formal comparison. Weather and water changes must be recorded as uncontrolled conditions rather than ignored.
+A 2500-size spinning reel remains a research candidate only. Before selection, compare spinning-reel demand against other relevant equipment categories using keyword demand, retailer breadth, manufacturer breadth, price range, affiliate availability, and fit with the highest-priority technique clusters.
 
-### HTH-018 — First Water Profile
+An exact product still requires verified ownership and sufficient field use before a verdict can be written.
 
-**Decision:** Chatfield Reservoir.
+### HTH-013 - Gear Verdict 002
 
-**Working title:** `Water Profile 001: Chatfield Reservoir — Access, Water Character, Safety, and Seasonal Decision Points`
+**Status:** Product and line architecture not selected.
 
-**Why:** Chatfield is public, close to the Denver-area operating base, supports multiple access modes, has meaningful wind, water-level, structure, safety, and closure considerations, and receives annual Colorado Parks and Wildlife fishery-survey attention. It can support the smallmouth, conditions, field-report, and spinning-system clusters without exposing a private location.
+A 10-pound braid with an 8-pound fluorocarbon leader remains a test hypothesis, not a market fact. Compare braid, fluorocarbon, monofilament, leader, knot, and line-management demand before selecting the first line-related verdict.
 
-**Required verification before publication:** Current CPW park page, closures, fees, hours, boat inspections, access points, fishing regulations, current fishery survey, seasonal hazards, water conditions, and any temporary restrictions.
+### HTH-015 - Second core species
 
-**Privacy rule:** Public water does not authorize precise catch coordinates, live posting, sensitive structure disclosure, or location metadata in images.
+**Status:** Smallmouth bass is provisional.
 
-## Priority order
+Score smallmouth bass against at least largemouth bass, walleye, crappie, catfish, and the first trout species using national participation proxies, search demand, regional access, commercial relevance, seasonality, and competitive opportunity.
 
-1. Confirm the exact reel, braid, and leader already in the field kit.
-2. Build the Chatfield field-capture sheet and closure-check routine.
-3. Draft the smallmouth-bass source and evidence pack.
-4. Conduct Field Report 001.
-5. Conduct the one-variable repeat test.
-6. Complete the two Gear Verdict evidence packs.
-7. Publish the Chatfield Water Profile after current official verification.
+### HTH-016 and HTH-017 - Field reports
 
-## Current seasonal editorial emphasis
+**Status:** Chatfield sessions are operational pilots, not market-priority proof.
 
-Warm-water stress, low flows, temporary closures, and responsible trout handling should be elevated across the launch. Trout content should never imply that a scheduled article or field session overrides current water temperatures, flows, closures, or fish welfare. Reservoir smallmouth testing is the better first field-report path during periods when cold-water fisheries are stressed.
+The field forms may be used to test the publishing system. The resulting articles should not be treated as launch anchors until the selected species, technique, and equipment relationships pass the market scorecard.
 
-## Non-negotiable evidence gates
+### HTH-018 - Water Profile
 
-- No Gear Verdict from specifications, retailer copy, or borrowed reputation.
-- No field result without date, conditions, effort, limitations, and failure points.
-- No claim that two sessions establish a universal pattern.
-- No regulation or access statement without jurisdiction and review date.
-- No exact product name until the owned kit is verified.
-- No precise catch location, live location, or hidden-spot exposure.
+**Status:** Chatfield Reservoir is a regional pilot candidate.
+
+Selection as the first published Water Profile requires comparison with other accessible Colorado waters using annual angler relevance, official fishery records, search demand, access interest, seasonal utility, source availability, and privacy risk.
+
+## Required research matrix before topics are locked
+
+At minimum, score:
+
+- Species: rainbow trout, smallmouth bass, largemouth bass, walleye, crappie, catfish.
+- Techniques: bank fishing, spinning, finesse, fly fishing, trolling, jigging, topwater, bait fishing.
+- Equipment: spinning reel, spinning rod, line and leader, lures, tackle storage, electronics, waders, safety equipment.
+- Reader problems: setup compatibility, knot failure, casting, retrieve control, seasonal location, water clarity, weather, access, regulations, fish handling.
+- Water profiles: Chatfield plus at least four comparable Colorado public waters.
+
+## Publication controls
+
+No article may state that a subject is popular, growing, best-selling, standard, most used, or preferred without a dated quantifiable source.
+
+No field observation may be generalized into an industry conclusion.
+
+No retailer assortment may be presented as market share.
+
+No search-volume estimate may be presented without geography, period, source, and retrieval date.
+
+No product verdict may be produced from market data alone; market data selects the category, while verified use supports the verdict.
+
+## Next gate
+
+The next deliverable is a completed market-priority matrix with source citations, raw values, normalized scores, weighted totals, confidence ratings, and explicit limitations. Until that matrix is approved, all prior species, equipment, field-report, and water-profile choices remain provisional.
