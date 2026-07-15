@@ -1,0 +1,11 @@
+{
+  "site": "Hook the Horizon",
+  "domain": "https://hookthehorizon.blog",
+  "productionBranch": "production",
+  "wordpress": {
+    "theme": {"source": "theme", "slug": "hook-the-horizon"},
+    "plugin": {"source": "content-plugin", "slug": "hook-content"},
+    "sharedPlugin": {"repository": "racheleliseanderson-ui/Master-of-The-Universe-", "source": "wordpress-plugin/rachel-editorial-core", "slug": "rachel-editorial-core"}
+  },
+  "releasePolicy": "main is staging; production is promoted only after install, activation, backup, privacy, and rollback checks"
+}
