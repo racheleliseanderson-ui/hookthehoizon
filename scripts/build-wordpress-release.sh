@@ -3,8 +3,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST="$ROOT/dist"
-THEME_SRC="$ROOT/wordpress-theme"
-PLUGIN_SRC="$ROOT/wordpress-plugin/hook-content"
+THEME_SRC="$ROOT/theme"
+PLUGIN_SRC="$ROOT/content-plugin"
 THEME_SLUG="hook-the-horizon"
 PLUGIN_SLUG="hook-the-horizon-content"
 THEME_VERSION="$(awk -F': ' '/^Version:/{print $2; exit}' "$THEME_SRC/style.css")"
@@ -30,8 +30,6 @@ for relative in "${required[@]}"; do
   fi
 done
 
-# Documentation may name retired spellings when recording the correction. Deployable
-# theme and plugin source may not contain them.
 if grep -RInE 'Hook the Forizon|hookthehoizon' "$THEME_SRC" "$PLUGIN_SRC"; then
   printf 'Retired or misspelled Hook identifier found in deployable source.\n' >&2
   exit 1
