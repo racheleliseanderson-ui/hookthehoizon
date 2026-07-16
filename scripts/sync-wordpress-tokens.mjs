@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
-const themeRoot = path.join(root, 'theme');
+const themeRoot = path.join(root, 'wordpress-theme');
 const authority = JSON.parse(fs.readFileSync(path.join(themeRoot, 'theme-tokens.json'), 'utf8'));
 const themePath = path.join(themeRoot, 'theme.json');
 const theme = JSON.parse(fs.readFileSync(themePath, 'utf8'));
