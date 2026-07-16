@@ -34,7 +34,7 @@ Every market-led priority must record, where available:
 
 ## Quantified scoring model
 
-Score each candidate from 0 to 5.
+Score each candidate from 0 to 5 on each factor. Multiply each factor score by its weight, sum the results, then multiply by 20 to convert to the 0–100 scale used in the decision thresholds below.
 
 | Factor | Weight |
 |---|---:|
