@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "status": "draft_preview_only",
+  "evidenceStates": ["primary_documentation", "official_data", "reviewed_secondary", "contributor_observation", "user_observation", "inferred", "disputed", "unknown", "do_not_publish"],
+  "sourceStates": ["fresh", "aging", "stale", "unknown", "outage", "unavailable", "migrating"],
+  "privacyClasses": ["public_safe", "private", "local_only", "prohibited"],
+  "waterTypes": ["freestone_river", "tailwater", "reservoir", "natural_lake", "pond", "warmwater_river", "estuary", "coastal", "ice"],
+  "depthBands": ["surface", "film", "shallow", "mid_depth", "deep", "bottom", "unknown"],
+  "structureBands": ["open_water", "vegetation", "wood", "rock", "dropoff", "current_seam", "shoreline", "mixed", "unknown"],
+  "clarityBands": ["clear", "lightly_stained", "stained", "muddy", "unknown"],
+  "lightBands": ["bright", "filtered", "low_light", "dark", "unknown"],
+  "presentationActions": ["drift", "steady", "pause", "hop", "drag", "lift_drop", "swing", "twitch", "burn", "deadstick"],
+  "tripGoals": ["learn", "cover_water", "numbers", "quality", "confidence_building", "test_a_hypothesis"],
+  "observationTypes": ["visible_insect", "rise_form", "forage_seen", "surface_disturbance", "subsurface_activity", "no_observation"],
+  "lifeStages": ["egg", "larva", "nymph", "pupa", "emerger", "dun", "adult", "spinner", "unknown"],
+  "deviceMaturity": ["commercial", "prototype", "research", "patent", "concept", "unknown"],
+  "deviceCapabilityEvidence": ["manufacturer_documented", "independently_validated", "field_tested", "recollected", "inferred", "unknown"],
+  "outcomes": ["positive", "negative", "inconclusive", "not_tested"]
+}
