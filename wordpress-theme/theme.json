@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "appearanceTools": true,
+    "color": {
+      "custom": false,
+      "palette": [
+        {"slug": "water", "name": "Water", "color": "#123f52"},
+        {"slug": "depth", "name": "Depth", "color": "#092532"},
+        {"slug": "mist", "name": "Mist", "color": "#edf2ef"},
+        {"slug": "reed", "name": "Reed", "color": "#66755c"},
+        {"slug": "signal", "name": "Signal", "color": "#d2763c"}
+      ]
+    },
+    "layout": {"contentSize": "760px", "wideSize": "1440px"},
+    "typography": {"fluid": true}
+  },
+  "styles": {"typography": {"lineHeight": "1.65"}}
+}
