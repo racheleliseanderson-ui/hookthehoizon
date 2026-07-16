@@ -5,7 +5,7 @@
 
 Fishing, gear, and field stories from the water ahead.
 
-This monorepo contains the independently deployable WordPress block theme and durable content plugin for Hook the Horizon. The repository slug is retained exactly as supplied; public brand text must always spell **Horizon** correctly.
+This monorepo contains the independently deployable WordPress block theme and durable content plugin for Hook the Horizon. The canonical repository slug is `hookthehorizon`; public brand text must always spell **Hook the Horizon** correctly.
 
 ## Structure
 
