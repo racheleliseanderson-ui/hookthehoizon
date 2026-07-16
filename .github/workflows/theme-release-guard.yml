@@ -5,8 +5,11 @@ on:
     paths:
       - 'wordpress-theme/**'
       - 'wordpress-plugin/hook-content/**'
+      - 'applications/_shared/**'
+      - 'applications/presentation-planner/**'
       - 'scripts/build-wordpress-release.sh'
       - 'scripts/sync-wordpress-tokens.mjs'
+      - 'scripts/sync-presentation-planner-runtime.mjs'
       - 'README.md'
       - '.github/workflows/theme-release-guard.yml'
   push:
@@ -14,8 +17,10 @@ on:
     paths:
       - 'wordpress-theme/**'
       - 'wordpress-plugin/hook-content/**'
+      - 'applications/_shared/**'
+      - 'applications/presentation-planner/**'
       - 'scripts/build-wordpress-release.sh'
-      - 'scripts/sync-wordpress-tokens.mjs'
+      - 'scripts/sync-presentation-planner-runtime.mjs'
       - '.github/workflows/theme-release-guard.yml'
   workflow_dispatch:
 
@@ -45,8 +50,11 @@ jobs:
           test -n "$(find dist -maxdepth 1 -name 'hook-the-horizon-*.zip' -print -quit)"
           test -n "$(find dist -maxdepth 1 -name 'hook-the-horizon-content-*.zip' -print -quit)"
           test -s dist/hook-the-horizon/release-manifest.json
+          test -s dist/hook-the-horizon-content/assets/presentation-planner/runtime-manifest.json
+          test -s dist/hook-the-horizon-content/assets/presentation-planner/preview/index.html
           grep -q '"publication": "Hook the Horizon"' dist/hook-the-horizon/release-manifest.json
           grep -q '"repository": "racheleliseanderson-ui/hookthehorizon"' dist/hook-the-horizon/release-manifest.json
+          grep -q '"applicationId": "HTH-PP-001"' dist/hook-the-horizon-content/assets/presentation-planner/runtime-manifest.json
       - uses: actions/upload-artifact@v4
         with:
           name: hook-the-horizon-wordpress-release
@@ -54,5 +62,6 @@ jobs:
             dist/*.zip
             dist/SHA256SUMS
             dist/hook-the-horizon/release-manifest.json
+            dist/hook-the-horizon-content/assets/presentation-planner/runtime-manifest.json
           if-no-files-found: error
           retention-days: 30

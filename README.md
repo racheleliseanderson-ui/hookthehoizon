@@ -64,6 +64,18 @@ The first preview supports:
 - public-safe share-card export;
 - print and bounded offline PWA behavior.
 
+## WordPress application route
+
+The canonical content plugin exposes Presentation Planner through:
+
+```text
+[hth_presentation_planner]
+```
+
+The `hook-the-horizon/presentation-planner-application` block pattern includes the shortcode and its editorial introduction. During the release build, `scripts/sync-presentation-planner-runtime.mjs` copies the canonical application source into the plugin artifact at `assets/presentation-planner/` and writes a runtime manifest.
+
+The shortcode renders the application in a sandboxed same-origin iframe with no WordPress user identity, post content, precise location, or server-side recommendation state passed into the application. The current implementation remains local-first inside the browser. The route is reversible by removing the shortcode block or restoring the previous plugin artifact.
+
 ## Release authority and automatic progression
 
 The release source is `wordpress-theme/` plus `wordpress-plugin/hook-content/`.
@@ -71,11 +83,12 @@ The release source is `wordpress-theme/` plus `wordpress-plugin/hook-content/`.
 `Hook Theme Release Guard` automatically:
 
 1. synchronizes the canonical `theme-tokens.json` authority into runtime CSS and `theme.json`;
-2. validates PHP and JSON;
-3. rejects missing theme files and retired Hook spellings;
-4. builds exact theme and plugin ZIPs;
-5. produces SHA-256 checksums and a file-level release manifest;
-6. retains the artifacts for staging, parity, deployment, and rollback evidence.
+2. synchronizes the Presentation Planner runtime into the content plugin artifact;
+3. validates PHP, application modules, JSON contracts, and runtime manifests;
+4. rejects missing theme, plugin, and application-runtime files and retired Hook spellings;
+5. builds exact theme and plugin ZIPs;
+6. produces SHA-256 checksums and a file-level release manifest;
+7. retains the artifacts for staging, parity, deployment, and rollback evidence.
 
 `Horizon Intelligence Applications CI` validates the application risk surface: deterministic behavior, privacy controls, local history, knowledge-graph integrity, PWA module syntax, JSON contracts, and WordPress pattern PHP.
 
@@ -91,6 +104,6 @@ The public homepage is field-led and people-free by default. Homepage featured m
 
 The normalized Hook theme includes its canonical field palette, independent light and dark semantic mappings, Hook-owned template parts, a water-intelligence homepage, governed article/archive/search/error routes, accessible focus and target behavior, reduced-motion and forced-colors handling, print behavior, package validation, checksums, manifests, and automated release evidence.
 
-The intelligence application layer now includes shared local-first contracts, recursive sensitive-location controls, explainable Smart Mode ranking, a local knowledge graph, outcome and mastery records, a Presentation Planner PWA preview, Hatch Match record-level evidence governance, Rig Signal device-event contracts, and editorial hub patterns for The Living Fly Bench and Presentation Lab.
+The intelligence application layer includes shared local-first contracts, recursive sensitive-location controls, explainable Smart Mode ranking, a local knowledge graph, outcome and mastery records, a Presentation Planner PWA preview, Hatch Match record-level evidence governance, Rig Signal device-event contracts, editorial hub patterns for The Living Fly Bench and Presentation Lab, and a packaged WordPress shortcode route for Presentation Planner.
 
 Live WordPress parity remains a runtime fact to verify from the exact installed artifact; it is not inferred from a matching version label.
