@@ -1,7 +1,7 @@
 # Hook the Horizon
 
 **Domain:** https://hookthehorizon.blog  
-**Repository:** racheleliseanderson-ui/hookthehoizon
+**Repository:** racheleliseanderson-ui/hookthehorizon
 
 Fishing, gear, and field stories from the water ahead.
 
