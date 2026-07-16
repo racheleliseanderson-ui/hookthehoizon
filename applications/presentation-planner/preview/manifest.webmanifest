@@ -1,0 +1,13 @@
+{
+  "name": "Hook the Horizon Presentation Planner",
+  "short_name": "Horizon Plan",
+  "description": "Local-first, explainable fishing presentation experiments from owned inventory.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#edf2ef",
+  "theme_color": "#123f52",
+  "orientation": "any",
+  "categories": ["sports", "utilities", "education"],
+  "icons": []
+}
