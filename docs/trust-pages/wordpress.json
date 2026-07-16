@@ -1,0 +1,11 @@
+{
+  "runtime_version": "1.0.0",
+  "template_slug": "default",
+  "header_part_slug": "header",
+  "footer_part_slug": "footer",
+  "staging_constant": "RE_EDITORIAL_STAGING",
+  "release_evidence_file": "docs/trust-pages/release-evidence.json",
+  "backup_option": "editorial_trust_pages_backup_v1_1_0",
+  "primary_navigation_slug": "editorial-trust-primary-navigation",
+  "default_action": "install"
+}
