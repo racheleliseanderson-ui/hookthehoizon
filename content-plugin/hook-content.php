@@ -2,13 +2,16 @@
 /**
  * Plugin Name: Hook the Horizon Content
  * Description: Durable content models for Hook the Horizon.
- * Version: 0.1.1
+ * Version: 0.1.2
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Text Domain: hook-the-horizon-content
  */
 declare(strict_types=1);
 defined('ABSPATH') || exit;
+
+const HTH_CONTENT_VERSION = '0.1.2';
+const HTH_REWRITE_VERSION_OPTION = 'hth_content_rewrite_version';
 
 function hth_register_content_types(): void
 {
@@ -49,11 +52,24 @@ function hth_register_content_types(): void
 }
 add_action('init', 'hth_register_content_types');
 
+function hth_maybe_refresh_rewrite_rules(): void
+{
+    if (get_option(HTH_REWRITE_VERSION_OPTION) === HTH_CONTENT_VERSION) {
+        return;
+    }
+
+    flush_rewrite_rules(false);
+    update_option(HTH_REWRITE_VERSION_OPTION, HTH_CONTENT_VERSION, false);
+}
+add_action('init', 'hth_maybe_refresh_rewrite_rules', 99);
+
 register_activation_hook(__FILE__, static function (): void {
     hth_register_content_types();
     flush_rewrite_rules();
+    update_option(HTH_REWRITE_VERSION_OPTION, HTH_CONTENT_VERSION, false);
 });
 
 register_deactivation_hook(__FILE__, static function (): void {
     flush_rewrite_rules();
+    delete_option(HTH_REWRITE_VERSION_OPTION);
 });
