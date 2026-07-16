@@ -1,0 +1,25 @@
+name: System Compatibility CI
+
+on:
+  push:
+    paths:
+      - 'applications/system-compatibility/**'
+      - '.github/workflows/system-compatibility-ci.yml'
+  pull_request:
+    paths:
+      - 'applications/system-compatibility/**'
+      - '.github/workflows/system-compatibility-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node applications/system-compatibility/tests/run.mjs
