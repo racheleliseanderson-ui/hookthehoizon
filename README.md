@@ -39,6 +39,31 @@ Human exception review is limited to A3 conditions, including:
 
 A narrow A3 exception does not pause unrelated work.
 
+Application delivery uses the repository-specific profile in `docs/governance/AUTONOMOUS_APPLICATION_RELEASE_PROFILE.md`. Validation is proportional to the changed risk surface; exhaustive universal QA and generic manual review are not required.
+
+## Intelligence applications
+
+Current governed application paths include:
+
+- `applications/system-compatibility/` — equipment-system compatibility
+- `applications/honey-hole-intelligence/` — privacy-aware water, access, regulation, condition, and conservation intelligence
+- `applications/hatch-match/` — reviewed hatch, forage, pattern, and material intelligence
+- `applications/presentation-planner/` — owned-inventory presentation planning
+- `applications/rig-signal/` — device evidence and sensor-agnostic event contracts
+- `applications/_shared/` — local-first contracts, privacy controls, explainable personalization, and the shared intelligence graph
+
+`HTH-SM-001 Horizon Smart Mode` is the local-first personalization layer for Presentation Planner. It combines broad declared conditions, owned inventory, system compatibility, reviewed evidence, source state, and bounded personal outcome history. It does not collect exact location, promise catches, or let popularity, affiliate value, or raw reporting volume determine rank.
+
+The first preview supports:
+
+- best-supported, contrast, and fallback plans;
+- factor-level explanations;
+- private local profile, inventory, history, and outcomes;
+- negative and inconclusive field-test records;
+- local mastery summaries and an intelligence brief;
+- public-safe share-card export;
+- print and bounded offline PWA behavior.
+
 ## Release authority and automatic progression
 
 The release source is `wordpress-theme/` plus `wordpress-plugin/hook-content/`.
@@ -52,6 +77,8 @@ The release source is `wordpress-theme/` plus `wordpress-plugin/hook-content/`.
 5. produces SHA-256 checksums and a file-level release manifest;
 6. retains the artifacts for staging, parity, deployment, and rollback evidence.
 
+`Horizon Intelligence Applications CI` validates the application risk surface: deterministic behavior, privacy controls, local history, knowledge-graph integrity, PWA module syntax, JSON contracts, and WordPress pattern PHP.
+
 A passing source build may merge automatically when no A3 exception exists. Preview and staging deployment may proceed automatically. Production promotion may proceed automatically only when the exact artifact is installed, backup or rollback is verified, repository-to-runtime parity passes, critical routes and accessibility checks pass, monitoring is active, and no A3 condition exists.
 
 Source merge does not itself publish or activate the WordPress site.
@@ -62,6 +89,8 @@ The public homepage is field-led and people-free by default. Homepage featured m
 
 ## Current implementation
 
-The normalized Hook theme now includes its canonical field palette, independent light and dark semantic mappings, Hook-owned template parts, a water-intelligence homepage, governed article/archive/search/error routes, accessible focus and target behavior, reduced-motion and forced-colors handling, print behavior, package validation, checksums, manifests, and automated release evidence.
+The normalized Hook theme includes its canonical field palette, independent light and dark semantic mappings, Hook-owned template parts, a water-intelligence homepage, governed article/archive/search/error routes, accessible focus and target behavior, reduced-motion and forced-colors handling, print behavior, package validation, checksums, manifests, and automated release evidence.
+
+The intelligence application layer now includes shared local-first contracts, recursive sensitive-location controls, explainable Smart Mode ranking, a local knowledge graph, outcome and mastery records, a Presentation Planner PWA preview, Hatch Match record-level evidence governance, Rig Signal device-event contracts, and editorial hub patterns for The Living Fly Bench and Presentation Lab.
 
 Live WordPress parity remains a runtime fact to verify from the exact installed artifact; it is not inferred from a matching version label.
