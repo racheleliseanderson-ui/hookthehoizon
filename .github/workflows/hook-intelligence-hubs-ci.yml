@@ -1,0 +1,34 @@
+name: Hook Intelligence Hubs CI
+
+on:
+  push:
+    paths:
+      - 'applications/hatch-match/**'
+      - 'applications/presentation-planner/**'
+      - 'applications/rig-signal/**'
+      - '.github/workflows/hook-intelligence-hubs-ci.yml'
+  pull_request:
+    paths:
+      - 'applications/hatch-match/**'
+      - 'applications/presentation-planner/**'
+      - 'applications/rig-signal/**'
+      - '.github/workflows/hook-intelligence-hubs-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Test Hatch Match
+        run: node applications/hatch-match/tests/run.mjs
+      - name: Test Presentation Planner
+        run: node applications/presentation-planner/tests/run.mjs
+      - name: Test Rig Signal
+        run: node applications/rig-signal/tests/run.mjs
