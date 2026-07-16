@@ -30,8 +30,10 @@ for relative in "${required[@]}"; do
   fi
 done
 
-if grep -RInE 'Hook the Forizon|hookthehoizon' "$THEME_SRC" "$ROOT/scripts" "$ROOT/README.md"; then
-  printf 'Retired or misspelled Hook identifier found in active source.\n' >&2
+# Documentation may name retired spellings when recording the correction. Deployable
+# theme and plugin source may not contain them.
+if grep -RInE 'Hook the Forizon|hookthehoizon' "$THEME_SRC" "$PLUGIN_SRC"; then
+  printf 'Retired or misspelled Hook identifier found in deployable source.\n' >&2
   exit 1
 fi
 
