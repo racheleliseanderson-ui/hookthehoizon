@@ -4,7 +4,7 @@
 **Date:** 2026-07-15  
 **Public brand:** Hook the Horizon  
 **Canonical domain:** `hookthehorizon.blog`  
-**Repository:** `racheleliseanderson-ui/hookthehoizon`
+**Repository:** `racheleliseanderson-ui/hookthehorizon`
 
 ## 1. Governing sources
 
@@ -14,7 +14,7 @@ This plan translates the approved Drive authorities into an executable editorial
 - Hook the Horizon — Complete Design Language Bible — 2026-07-15
 - Repository README and approved monorepo boundaries
 
-The public spelling is always **Hook the Horizon**. The repository typo is an implementation locator only.
+The public spelling is always **Hook the Horizon**. The canonical repository locator is `racheleliseanderson-ui/hookthehorizon`.
 
 ## 2. Content decision record
 
@@ -157,7 +157,7 @@ Do not expose a homepage section until its destination contains substantial cont
 
 Each format should use only the modules that perform a real job:
 
-- **Field Note:** timestamp, conditions, observation, limitation, next question.
+- **Field Report:** timestamp, conditions, observation, limitation, next question.
 - **Verdict:** reader problem, evidence basis, best fit, limitations, compatibility, alternatives, affiliate status.
 - **Compatibility Matrix:** required, compatible, conditional, incompatible, with rationale.
 - **Regulation Warning:** jurisdiction, responsible authority, review date, limitation, confirmation instruction.
