@@ -11,7 +11,7 @@ https://drive.google.com/drive/folders/1szyQ3v7S0PN2dNbQk16f4R1SyNXlYZmQ
 
 - Public brand: **Hook the Horizon**
 - Canonical domain: **https://hookthehorizon.blog**
-- Repository: **racheleliseanderson-ui/hookthehoizon**
+- Repository: **racheleliseanderson-ui/hookthehorizon**
 - Theme package: `hook-the-horizon`
 - Content plugin: `hook-the-horizon-content`
 - Code and data prefix: `hth_`
@@ -30,6 +30,6 @@ The complete ZIP contains the modular governance, source reconciliation, discove
 
 ## Architecture authority
 
-The active GitHub repository remains the implementation source. The package records the intended independent block-theme and bounded content-plugin model. The repository slug misspelling is implementation-only and must never appear as the public brand.
+The active GitHub repository remains the implementation source. The package records the intended independent block-theme and bounded content-plugin model. The canonical repository slug is `hookthehorizon`; it must remain consistent across documentation, deployment manifests, and release branches.
 
 This documentation commit does not change theme, plugin, deployment, or production behavior.
