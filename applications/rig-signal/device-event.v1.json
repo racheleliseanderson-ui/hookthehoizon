@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hookthehorizon.blog/contracts/rig-signal-device-event.v1.json",
+  "title": "Rig Signal Device Event",
+  "version": "1.0.0",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "eventId",
+    "deviceProfileId",
+    "eventType",
+    "recordedAt",
+    "source",
+    "quality",
+    "calibrationState",
+    "privacyClass",
+    "locationIncluded"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "eventId": {"type": "string", "minLength": 1},
+    "deviceProfileId": {"type": "string", "minLength": 1},
+    "eventType": {"type": "string", "minLength": 1},
+    "recordedAt": {"type": "string", "format": "date-time"},
+    "deviceMaturity": {"enum": ["commercial", "prototype", "research", "patent", "concept", "unknown"]},
+    "capabilityEvidence": {"enum": ["manufacturer_documented", "independently_validated", "field_tested", "recollected", "inferred", "unknown"]},
+    "value": {},
+    "unit": {"type": ["string", "null"]},
+    "quality": {"enum": ["documented", "validated", "estimated", "unknown", "invalid"]},
+    "calibrationState": {"enum": ["current", "aging", "stale", "unknown", "not_applicable"]},
+    "measurementUncertainty": {"type": ["number", "null"], "minimum": 0},
+    "source": {"enum": ["device_import", "manual_entry", "derived"]},
+    "privacyClass": {"enum": ["public_safe", "private", "local_only", "prohibited"]},
+    "retention": {"enum": ["none", "session", "local_device", "approved_server"]},
+    "locationIncluded": {"const": false},
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false,
+  "x-governance": {
+    "manualBaselineRequired": true,
+    "manufacturerDocumentationDoesNotProveFieldAccuracy": true,
+    "highRiskCapabilities": ["bite_detection", "species_identification", "fight_classification", "catch_prediction"],
+    "highRiskEvidenceMinimum": "independently_validated",
+    "unknownPrivacyClassDisposition": "reject"
+  }
+}
