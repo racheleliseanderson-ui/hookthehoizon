@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Presentation Planner Preview</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --water: #123f52;
+      --depth: #092532;
+      --mist: #edf2ef;
+      --signal: #d2763c;
+      --paper: #fffdf7;
+      --line: #c8d2cf;
+      --danger: #8c2f2f;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--mist); color: var(--depth); line-height: 1.55; }
+    header, main, footer { width: min(72rem, calc(100% - 2rem)); margin-inline: auto; }
+    header { padding-block: 2rem 1rem; }
+    .eyebrow { margin: 0; font-size: .85rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--signal); }
+    h1 { margin: .35rem 0 .5rem; font-size: clamp(2rem, 7vw, 4.5rem); line-height: .95; }
+    .notice { background: var(--paper); border-left: .35rem solid var(--signal); padding: 1rem; }
+    .layout { display: grid; gap: 1.25rem; grid-template-columns: minmax(0, 1fr); padding-block: 1rem 3rem; }
+    .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 1rem; padding: clamp(1rem, 3vw, 1.75rem); box-shadow: 0 .5rem 1.5rem rgb(9 37 50 / .08); }
+    fieldset { border: 0; margin: 0 0 1.25rem; padding: 0; }
+    legend { font-weight: 800; margin-bottom: .55rem; }
+    label { display: block; font-weight: 650; margin-bottom: .35rem; }
+    select, button { min-height: 44px; font: inherit; }
+    select { width: 100%; border: 1px solid var(--line); border-radius: .55rem; padding: .65rem; background: white; color: var(--depth); }
+    .checks { display: grid; gap: .55rem; }
+    .check { display: flex; gap: .6rem; align-items: flex-start; font-weight: 500; }
+    .check input { width: 1.2rem; height: 1.2rem; margin-top: .2rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: .65rem; }
+    button { border: 0; border-radius: 999px; padding: .65rem 1rem; cursor: pointer; font-weight: 750; }
+    button.primary { background: var(--signal); color: white; }
+    button.secondary { background: var(--water); color: white; }
+    button.ghost { background: transparent; border: 1px solid var(--water); color: var(--water); }
+    button:focus-visible, select:focus-visible, input:focus-visible { outline: .2rem solid var(--signal); outline-offset: .15rem; }
+    .status { min-height: 1.5rem; margin-block: .75rem; }
+    .status.error { color: var(--danger); font-weight: 700; }
+    .plan-grid { display: grid; gap: 1rem; }
+    .plan { border: 1px solid var(--line); border-radius: .85rem; padding: 1rem; }
+    .plan h3 { margin: 0 0 .3rem; }
+    .role { display: inline-block; border-radius: 999px; background: var(--water); color: white; padding: .15rem .55rem; font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+    dl { display: grid; grid-template-columns: minmax(7rem, auto) 1fr; gap: .3rem .8rem; }
+    dt { font-weight: 800; }
+    dd { margin: 0; }
+    .unknown { background: #fff3d6; border-radius: .5rem; padding: .7rem; }
+    .empty { padding: 2rem 1rem; text-align: center; color: #435d68; }
+    footer { padding-block: 1rem 3rem; font-size: .9rem; }
+    @media (min-width: 56rem) {
+      .layout { grid-template-columns: minmax(19rem, .72fr) minmax(0, 1.28fr); align-items: start; }
+      .sticky { position: sticky; top: 1rem; }
+    }
+    @media print {
+      body { background: white; }
+      header, main, footer { width: 100%; }
+      .controls, .actions, .notice { display: none !important; }
+      .panel { box-shadow: none; border: 0; padding: 0; }
+      .plan { break-inside: avoid; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="eyebrow">Hook the Horizon · Preview only</p>
+    <h1>Presentation Planner</h1>
+    <p>Build a small, explainable field test from what you already own. This preview does not predict fish activity or guarantee a catch.</p>
+    <div class="notice" role="note">
+      No exact location is requested or stored. The included presentation records are preview seeds for interface and rule testing, not public fishing advice.
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel controls sticky" aria-labelledby="planner-inputs">
+      <h2 id="planner-inputs">Plan the test</h2>
+      <form id="planner-form" novalidate>
+        <fieldset>
+          <legend>Context</legend>
+          <label for="method">Fishing method</label>
+          <select id="method" name="method" required>
+            <option value="freshwater_spinning">Freshwater spinning</option>
+          </select>
+
+          <label for="water-type">Water type</label>
+          <select id="water-type" name="waterType" required>
+            <option value="reservoir">Reservoir</option>
+            <option value="natural_lake">Natural lake</option>
+            <option value="warmwater_river">Warmwater river</option>
+          </select>
+
+          <label for="trip-goal">Trip goal</label>
+          <select id="trip-goal" name="tripGoal" required>
+            <option value="test_a_hypothesis">Test a hypothesis</option>
+            <option value="learn">Learn</option>
+            <option value="cover_water">Cover water</option>
+            <option value="confidence_building">Build confidence</option>
+          </select>
+
+          <label for="structure">Structure</label>
+          <select id="structure" name="structureBand" required>
+            <option value="rock">Rock</option>
+            <option value="dropoff">Drop-off</option>
+            <option value="open_water">Open water</option>
+            <option value="vegetation">Vegetation</option>
+            <option value="mixed">Mixed</option>
+          </select>
+
+          <label for="depth">Target depth</label>
+          <select id="depth" name="depthBand" required>
+            <option value="bottom">Bottom</option>
+            <option value="mid_depth">Mid-depth</option>
+            <option value="shallow">Shallow</option>
+          </select>
+        </fieldset>
+
+        <fieldset>
+          <legend>Conditions</legend>
+          <div class="checks" id="conditions">
+            <label class="check"><input type="checkbox" value="clear"> Clear water</label>
+            <label class="check"><input type="checkbox" value="stained"> Stained water</label>
+            <label class="check"><input type="checkbox" value="bright"> Bright light</label>
+            <label class="check"><input type="checkbox" value="low_light"> Low light</label>
+            <label class="check"><input type="checkbox" value="windy"> Windy</label>
+            <label class="check"><input type="checkbox" value="calm"> Calm</label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Owned inventory</legend>
+          <div class="checks" id="inventory"></div>
+        </fieldset>
+
+        <div class="actions">
+          <button class="primary" type="submit">Build presentation plan</button>
+          <button class="ghost" type="button" id="clear-data">Clear local data</button>
+        </div>
+        <p id="form-status" class="status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="panel" aria-labelledby="planner-results">
+      <h2 id="planner-results">Field-test plan</h2>
+      <div class="actions">
+        <button class="secondary" type="button" id="print-plan" disabled>Print</button>
+        <button class="ghost" type="button" id="copy-plan" disabled>Copy safe summary</button>
+      </div>
+      <p id="result-status" class="status" role="status" aria-live="polite"></p>
+      <div id="results" class="empty">Choose your context and inventory, then build a plan.</div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Draft application surface. No data leaves this browser. External API integrations and WordPress deployment remain blocked pending review.</p>
+  </footer>
+
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>
