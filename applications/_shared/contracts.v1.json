@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hookthehorizon.blog/contracts/horizon-intelligence.v1.json",
+  "version": "1.0.0",
+  "status": "active_preview_contract",
+  "$defs": {
+    "privacy": {
+      "type": "object",
+      "required": ["classification", "retention"],
+      "properties": {
+        "classification": {"enum": ["public_safe", "private", "local_only", "prohibited"]},
+        "retention": {"enum": ["none", "session", "local_device", "approved_server"]},
+        "shareAllowed": {"type": "boolean"},
+        "analyticsAllowed": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "sourceFreshness": {
+      "type": "object",
+      "required": ["reviewedAt", "freshForDays", "availability"],
+      "properties": {
+        "reviewedAt": {"type": "string", "format": "date-time"},
+        "freshForDays": {"type": "integer", "minimum": 1},
+        "agingAfterDays": {"type": "integer", "minimum": 1},
+        "expiresAt": {"type": ["string", "null"], "format": "date-time"},
+        "availability": {"enum": ["available", "outage", "unavailable", "migrating"]}
+      },
+      "additionalProperties": false
+    },
+    "userProfile": {
+      "type": "object",
+      "required": ["profileId", "skillBand", "privacy"],
+      "properties": {
+        "profileId": {"type": "string", "minLength": 1},
+        "preferredSpecies": {"type": "array", "items": {"type": "string"}},
+        "skillBand": {"enum": ["new", "developing", "experienced"]},
+        "tripGoals": {"type": "array", "items": {"type": "string"}},
+        "preferredMethods": {"type": "array", "items": {"type": "string"}},
+        "privacy": {"$ref": "#/$defs/privacy"}
+      },
+      "additionalProperties": false
+    },
+    "inventoryRecord": {
+      "type": "object",
+      "required": ["itemId", "itemType", "label", "privacy"],
+      "properties": {
+        "itemId": {"type": "string", "minLength": 1},
+        "itemType": {"enum": ["fly", "lure", "bait", "terminal", "material", "equipment", "device"]},
+        "label": {"type": "string", "minLength": 1},
+        "quantity": {"type": "number", "minimum": 0},
+        "attributes": {"type": "object"},
+        "privacy": {"$ref": "#/$defs/privacy"}
+      },
+      "additionalProperties": false
+    },
+    "outcomeRecord": {
+      "type": "object",
+      "required": ["outcomeId", "candidateId", "result", "recordedAt", "privacy"],
+      "properties": {
+        "outcomeId": {"type": "string", "minLength": 1},
+        "candidateId": {"type": "string", "minLength": 1},
+        "result": {"enum": ["positive", "negative", "inconclusive", "not_tested"]},
+        "recordedAt": {"type": "string", "format": "date-time"},
+        "exposure": {"type": "integer", "minimum": 1},
+        "changedVariable": {"type": ["string", "null"]},
+        "privacy": {"$ref": "#/$defs/privacy"}
+      },
+      "additionalProperties": false
+    },
+    "recommendationHistory": {
+      "type": "object",
+      "required": ["recommendationId", "createdAt", "candidateIds", "ruleVersion", "privacy"],
+      "properties": {
+        "recommendationId": {"type": "string", "minLength": 1},
+        "createdAt": {"type": "string", "format": "date-time"},
+        "candidateIds": {"type": "array", "items": {"type": "string"}},
+        "ruleVersion": {"type": "string", "minLength": 1},
+        "acceptedCandidateId": {"type": ["string", "null"]},
+        "privacy": {"$ref": "#/$defs/privacy"}
+      },
+      "additionalProperties": false
+    },
+    "knowledgeNode": {
+      "type": "object",
+      "required": ["nodeId", "kind", "label", "privacy"],
+      "properties": {
+        "nodeId": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["condition", "species", "forage", "insect", "pattern", "presentation", "equipment", "device", "source", "outcome"]},
+        "label": {"type": "string", "minLength": 1},
+        "attributes": {"type": "object"},
+        "privacy": {"$ref": "#/$defs/privacy"}
+      },
+      "additionalProperties": false
+    },
+    "knowledgeEdge": {
+      "type": "object",
+      "required": ["edgeId", "from", "to", "relation", "evidenceState"],
+      "properties": {
+        "edgeId": {"type": "string", "minLength": 1},
+        "from": {"type": "string", "minLength": 1},
+        "to": {"type": "string", "minLength": 1},
+        "relation": {"enum": ["supports", "conflicts_with", "resembles", "uses", "requires", "fits", "observed_with", "tested_as", "derived_from"]},
+        "evidenceState": {"enum": ["primary_documentation", "official_data", "reviewed_secondary", "contributor_observation", "user_observation", "inferred", "disputed", "unknown"]},
+        "sourceIds": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "deviceEvent": {
+      "type": "object",
+      "required": ["schemaVersion", "eventId", "deviceProfileId", "eventType", "recordedAt", "source", "privacy", "locationIncluded"],
+      "properties": {
+        "schemaVersion": {"const": "1.0.0"},
+        "eventId": {"type": "string", "minLength": 1},
+        "deviceProfileId": {"type": "string", "minLength": 1},
+        "eventType": {"type": "string", "minLength": 1},
+        "recordedAt": {"type": "string", "format": "date-time"},
+        "value": {},
+        "unit": {"type": ["string", "null"]},
+        "quality": {"enum": ["documented", "validated", "estimated", "unknown", "invalid"]},
+        "calibrationState": {"enum": ["current", "aging", "stale", "unknown", "not_applicable"]},
+        "source": {"enum": ["device_import", "manual_entry", "derived"]},
+        "privacy": {"$ref": "#/$defs/privacy"},
+        "locationIncluded": {"const": false}
+      },
+      "additionalProperties": false
+    }
+  }
+}
