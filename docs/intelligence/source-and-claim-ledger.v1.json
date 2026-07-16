@@ -1,0 +1,81 @@
+{
+  "version": "1.0.0",
+  "status": "draft_preview_only",
+  "owner": "Rachel Anderson",
+  "reviewedAt": "2026-07-16T00:00:00Z",
+  "sources": [
+    {
+      "id": "HTH-SRC-DRIVE-THREE-HUBS",
+      "type": "governing_authority",
+      "title": "Hook the Horizon — Three Intelligence Hubs and Web Applications — Build Extension Specification — v1.0 — 2026-07-16",
+      "location": "https://docs.google.com/document/d/12XhROLpkfAmMA8CwbojKzO374jSaJdOVVnmqbHs4lqE/edit",
+      "authority": "canonical",
+      "freshnessPolicyDays": 365,
+      "availability": "available"
+    },
+    {
+      "id": "HTH-SRC-USGS-WATER-MIGRATION",
+      "type": "official_infrastructure",
+      "title": "USGS water-data migration and service-status authority",
+      "location": "https://waterservices.usgs.gov/",
+      "authority": "official",
+      "freshnessPolicyDays": 30,
+      "availability": "available",
+      "notes": "No adapter may ship until caching, outage, migration, freshness, and stale-state behavior are implemented and reviewed."
+    },
+    {
+      "id": "HTH-SRC-FISHBRAIN-POSITIONING",
+      "type": "official_product_page",
+      "title": "Fishbrain product positioning reference",
+      "location": "https://fishbrain.com/",
+      "authority": "market_reference",
+      "freshnessPolicyDays": 60,
+      "availability": "available"
+    },
+    {
+      "id": "HTH-SRC-ANGLR-POSITIONING",
+      "type": "official_product_page",
+      "title": "ANGLR product positioning reference",
+      "location": "https://www.anglr.com/",
+      "authority": "market_reference",
+      "freshnessPolicyDays": 60,
+      "availability": "available"
+    }
+  ],
+  "claims": [
+    {
+      "id": "HTH-CLM-001",
+      "claim": "The three hubs remain deterministic, explainable, private by default, and useful without an account, purchase, AI, external API, or connected device.",
+      "sourceIds": ["HTH-SRC-DRIVE-THREE-HUBS"],
+      "evidenceState": "primary_documentation",
+      "releaseState": "approved_for_draft_implementation"
+    },
+    {
+      "id": "HTH-CLM-002",
+      "claim": "External water-data adapters remain blocked until caching, outage, migration, freshness, and stale-state behavior pass review.",
+      "sourceIds": ["HTH-SRC-DRIVE-THREE-HUBS", "HTH-SRC-USGS-WATER-MIGRATION"],
+      "evidenceState": "primary_documentation",
+      "releaseState": "implementation_gate"
+    },
+    {
+      "id": "HTH-CLM-003",
+      "claim": "Generated moodboards, decorative charts, and pseudo-text are reference-only and may not be used as production evidence.",
+      "sourceIds": ["HTH-SRC-DRIVE-THREE-HUBS"],
+      "evidenceState": "primary_documentation",
+      "releaseState": "production_control"
+    }
+  ],
+  "biologicalSeedQueue": {
+    "status": "blocked_pending_review",
+    "requiredReview": [
+      "source identity and date",
+      "regional applicability",
+      "life-stage accuracy",
+      "observable confirmation cues",
+      "lookalike and failure notes",
+      "pattern-history versus field-evidence distinction",
+      "conservation and sensitive-location review",
+      "reviewer name and expiry date"
+    ]
+  }
+}
