@@ -1,7 +1,7 @@
 # Hook the Horizon Content Strategy and Launch Map
 
 **Status:** Working implementation map  
-**Date:** 2026-07-15  
+**Date:** 2026-07-16  
 **Public brand:** Hook the Horizon  
 **Canonical domain:** `hookthehorizon.blog`  
 **Repository:** `racheleliseanderson-ui/hookthehorizon`
@@ -13,8 +13,9 @@ This plan translates the approved Drive authorities into an executable editorial
 - Hook the Horizon — Build-Ready Publication Blueprint — 2026-07-15
 - Hook the Horizon — Complete Design Language Bible — 2026-07-15
 - Repository README and approved monorepo boundaries
+- Complete five-brand Editorial Ecosystem governance and shared-system authorities
 
-The public spelling is always **Hook the Horizon**. The canonical repository locator is `racheleliseanderson-ui/hookthehorizon`.
+The public spelling is always **Hook the Horizon**. The canonical repository locator is `racheleliseanderson-ui/hookthehorizon`. Hook the Horizon is the fifth parent publication in the complete Editorial Ecosystem and must not be omitted from shared templates, inventories, schedules, cross-publication systems, or governance.
 
 ## 2. Content decision record
 
@@ -57,7 +58,7 @@ Every article must:
 - Show limitations, compatibility, alternatives, and a non-purchase path.
 - Display review dates for regulations, access, prices, specifications, and availability.
 - Apply location-privacy controls before publication.
-- Complete the fishing answer before any sister-publication handoff.
+- Complete the fishing answer before any Editorial Ecosystem handoff.
 
 ## 4. Primary audience paths
 
@@ -136,7 +137,7 @@ The launch library should form deliberate reader paths rather than a flat post g
 - Species Profiles route to Water Reads, Techniques, handling/stewardship guidance, and official regulation authorities.
 - Field Reports route to the question being tested, not merely to “related posts.”
 - The Water Profile routes to current official access/regulation sources and relevant species/technique content.
-- Cross-publication links appear only after the fishing answer is complete and only when the next task is legitimate.
+- Cross-ecosystem links appear only after the fishing answer is complete and only when the next reader task is legitimate.
 
 ## 9. Homepage content mapping
 
