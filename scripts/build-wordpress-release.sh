@@ -12,20 +12,47 @@ PLUGIN_VERSION="$(awk -F': ' '/^ \* Version:/{print $2; exit}' "$PLUGIN_SRC/hook
 COMMIT_SHA="$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || printf 'unknown')"
 
 node "$ROOT/scripts/sync-wordpress-tokens.mjs"
+node "$ROOT/scripts/sync-presentation-planner-runtime.mjs"
 php -l "$THEME_SRC/functions.php" >/dev/null
 php -l "$PLUGIN_SRC/hook-content.php" >/dev/null
+php -l "$THEME_SRC/patterns/living-fly-bench-hub.php" >/dev/null
+php -l "$THEME_SRC/patterns/presentation-lab-hub.php" >/dev/null
+php -l "$THEME_SRC/patterns/presentation-planner-application.php" >/dev/null
 node -e "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))" "$THEME_SRC/theme.json"
 node -e "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))" "$THEME_SRC/theme-tokens.json"
+node -e "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))" "$PLUGIN_SRC/assets/presentation-planner/runtime-manifest.json"
+node --check "$PLUGIN_SRC/assets/presentation-planner/preview/app.mjs"
+node --check "$PLUGIN_SRC/assets/presentation-planner/preview/sw.js"
 
 required=(
   style.css theme.json functions.php theme-tokens.json assets/tokens.css
   templates/index.html templates/front-page.html templates/page.html templates/single.html
   templates/archive.html templates/search.html templates/404.html
   parts/header.html parts/footer.html
+  patterns/living-fly-bench-hub.php patterns/presentation-lab-hub.php
+  patterns/presentation-planner-application.php
 )
 for relative in "${required[@]}"; do
   if [[ ! -f "$THEME_SRC/$relative" ]]; then
     printf 'Missing required Hook theme file: %s\n' "$relative" >&2
+    exit 1
+  fi
+done
+
+plugin_required=(
+  hook-content.php
+  assets/presentation-planner/runtime-manifest.json
+  assets/presentation-planner/preview/index.html
+  assets/presentation-planner/preview/app.mjs
+  assets/presentation-planner/preview/sw.js
+  assets/presentation-planner/preview/manifest.webmanifest
+  assets/presentation-planner/data/seed-presentations.mjs
+  assets/presentation-planner/_shared/personalization.mjs
+  assets/presentation-planner/_shared/privacy.mjs
+)
+for relative in "${plugin_required[@]}"; do
+  if [[ ! -f "$PLUGIN_SRC/$relative" ]]; then
+    printf 'Missing required Hook plugin file: %s\n' "$relative" >&2
     exit 1
   fi
 done
@@ -82,6 +109,13 @@ NODE
 for relative in "${required[@]}" release-manifest.json; do
   unzip -Z1 "$DIST/$THEME_SLUG-$THEME_VERSION.zip" | grep -Fxq "$THEME_SLUG/$relative" || {
     printf 'Hook release ZIP omitted required file: %s\n' "$relative" >&2
+    exit 1
+  }
+done
+
+for relative in "${plugin_required[@]}"; do
+  unzip -Z1 "$DIST/$PLUGIN_SLUG-$PLUGIN_VERSION.zip" | grep -Fxq "$PLUGIN_SLUG/$relative" || {
+    printf 'Hook plugin release ZIP omitted required file: %s\n' "$relative" >&2
     exit 1
   }
 done
