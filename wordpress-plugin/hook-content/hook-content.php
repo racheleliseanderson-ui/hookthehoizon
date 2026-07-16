@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Hook the Horizon Content
- * Description: Durable content models and bounded application routes for Hook the Horizon.
- * Version: 0.1.3
+ * Description: Durable content models, bounded application routes, publication visibility, and sensitive-location safeguards for Hook the Horizon.
+ * Version: 0.2.0
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Text Domain: hook-the-horizon-content
@@ -10,8 +10,10 @@
 declare(strict_types=1);
 defined('ABSPATH') || exit;
 
-const HTH_CONTENT_VERSION = '0.1.3';
+const HTH_CONTENT_VERSION = '0.2.0';
 const HTH_REWRITE_VERSION_OPTION = 'hth_content_rewrite_version';
+
+require_once __DIR__ . '/includes/publication-visibility.php';
 
 function hth_register_content_types(): void
 {
@@ -121,6 +123,38 @@ function hth_maybe_refresh_rewrite_rules(): void
     update_option(HTH_REWRITE_VERSION_OPTION, HTH_CONTENT_VERSION, false);
 }
 add_action('init', 'hth_maybe_refresh_rewrite_rules', 99);
+
+/** Remove geographic EXIF fields before WordPress stores attachment metadata. */
+add_filter('wp_read_image_metadata', static function ($metadata) {
+    if (!is_array($metadata)) {
+        return $metadata;
+    }
+    foreach (['latitude', 'longitude', 'location', 'gps', 'GPSLatitude', 'GPSLongitude', 'GPSPosition'] as $key) {
+        unset($metadata[$key]);
+    }
+    return $metadata;
+}, 10, 1);
+
+/** Prevent geographic image metadata from being exposed through the media REST response. */
+add_filter('rest_prepare_attachment', static function (WP_REST_Response $response): WP_REST_Response {
+    $data = $response->get_data();
+    if (isset($data['media_details']['image_meta']) && is_array($data['media_details']['image_meta'])) {
+        foreach (['latitude', 'longitude', 'location', 'gps', 'GPSLatitude', 'GPSLongitude', 'GPSPosition'] as $key) {
+            unset($data['media_details']['image_meta'][$key]);
+        }
+        $response->set_data($data);
+    }
+    return $response;
+});
+
+RE_Publication_Visibility::boot([
+    'name' => 'Hook the Horizon',
+    'domain' => 'https://hookthehorizon.blog/',
+    'description' => 'Field-led fishing intelligence covering water, conditions, technique, equipment, species, destinations, safety, and stewardship.',
+    'text_domain' => 'hook-the-horizon-content',
+    'post_types' => ['post', 'page', 'hth_field_report', 'hth_gear_verdict'],
+    'article_types' => ['post', 'hth_field_report', 'hth_gear_verdict'],
+]);
 
 register_activation_hook(__FILE__, static function (): void {
     hth_register_content_types();
