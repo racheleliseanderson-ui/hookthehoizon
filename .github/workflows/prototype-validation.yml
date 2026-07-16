@@ -3,57 +3,84 @@ name: Prototype validation and staging package
 on:
   push:
     branches: [rebuild/prototype-review]
+  pull_request:
+    paths:
+      - 'wordpress-theme/**'
+      - 'content-plugin/**'
+      - '.github/workflows/prototype-validation.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
+
+env:
+  THEME_DIR: wordpress-theme
+  CONTENT_PLUGIN_DIR: content-plugin
 
 jobs:
   validate-package:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Verify prototype package roots
+        run: |
+          test -d "$THEME_DIR"
+          test -f "$THEME_DIR/style.css"
+          test -d "$CONTENT_PLUGIN_DIR"
+          if [ -d theme ]; then
+            echo "::warning::A second theme root exists at theme/. This workflow packages wordpress-theme/ because that is the prototype source changed by this pull request. Canonical source selection remains a review gate."
+          fi
       - name: Install validation tools
         run: sudo apt-get update && sudo apt-get install -y php-cli jq zip
       - name: Validate PHP
-        run: find theme content-plugin -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+        run: find "$THEME_DIR" "$CONTENT_PLUGIN_DIR" -type f -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Validate JSON
-        run: find theme content-plugin -type f -name '*.json' -print0 | xargs -0 -n1 jq empty
+        run: find "$THEME_DIR" "$CONTENT_PLUGIN_DIR" -type f -name '*.json' -print0 | xargs -0 -n1 jq empty
       - name: Validate block markup balance
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re, sys
-          bad=[]
-          for p in list(Path('theme/templates').glob('*.html'))+list(Path('theme/parts').glob('*.html'))+list(Path('theme/patterns').glob('*.php')):
-              s=p.read_text(errors='ignore')
-              opens=len(re.findall(r'<!--\s+wp:[^/][^>]*-->',s))
-              closes=len(re.findall(r'<!--\s+/wp:',s))
-              selfs=len(re.findall(r'<!--\s+wp:[^>]+/-->',s))
-              if opens-selfs != closes: bad.append((str(p),opens,selfs,closes))
+          import os
+          import re
+          import sys
+
+          theme = Path(os.environ['THEME_DIR'])
+          files = (
+              list((theme / 'templates').glob('*.html'))
+              + list((theme / 'parts').glob('*.html'))
+              + list((theme / 'patterns').glob('*.php'))
+          )
+          bad = []
+          for path in files:
+              source = path.read_text(errors='ignore')
+              opens = len(re.findall(r'<!--\s+wp:[^/][^>]*-->', source))
+              closes = len(re.findall(r'<!--\s+/wp:', source))
+              self_closing = len(re.findall(r'<!--\s+wp:[^>]+/-->', source))
+              if opens - self_closing != closes:
+                  bad.append((str(path), opens, self_closing, closes))
           if bad:
-              print('Unbalanced block comments:',bad)
+              print('Unbalanced block comments:', bad)
               sys.exit(1)
-          print('Block comment balance passed')
+          print(f'Block comment balance passed for {len(files)} files')
           PY
       - name: Protected-location static leak scan
         run: |
-          ! grep -RInE '(exact[_ -]?location|private[_ -]?access|gps|latitude|longitude)' theme content-plugin --exclude='*.md' --exclude='*.txt' || {
+          ! grep -RInE '(exact[_ -]?location|private[_ -]?access|gps|latitude|longitude)' "$THEME_DIR" "$CONTENT_PLUGIN_DIR" --exclude='*.md' --exclude='*.txt' || {
             echo 'Potential protected-location identifier found; review required.'
             exit 1
           }
       - name: Build staging ZIPs and checksums
         run: |
           rm -rf dist && mkdir -p dist/hook-the-horizon dist/hook-content
-          cp -R theme/. dist/hook-the-horizon/
-          cp -R content-plugin/. dist/hook-content/
+          cp -R "$THEME_DIR"/. dist/hook-the-horizon/
+          cp -R "$CONTENT_PLUGIN_DIR"/. dist/hook-content/
           printf 'STAGING ONLY - NOT APPROVED FOR PRODUCTION\n' > dist/hook-the-horizon/STAGING-ONLY.txt
           printf 'STAGING ONLY - NOT APPROVED FOR PRODUCTION\n' > dist/hook-content/STAGING-ONLY.txt
           cd dist
           zip -qr hook-the-horizon-prototype.zip hook-the-horizon
           zip -qr hook-content-prototype.zip hook-content
           sha256sum *.zip > SHA256SUMS.txt
-          printf '{"publication":"Hook the Horizon","status":"staging-only","branch":"rebuild/prototype-review"}\n' > manifest.json
+          printf '{"publication":"Hook the Horizon","status":"staging-only","branch":"rebuild/prototype-review","theme_source":"wordpress-theme","commit":"%s"}\n' "$GITHUB_SHA" > manifest.json
       - uses: actions/upload-artifact@v4
         with:
           name: hook-the-horizon-prototype-review
