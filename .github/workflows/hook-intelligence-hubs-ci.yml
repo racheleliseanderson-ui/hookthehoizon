@@ -3,15 +3,25 @@ name: Hook Intelligence Hubs CI
 on:
   push:
     paths:
+      - 'applications/_shared/**'
       - 'applications/hatch-match/**'
       - 'applications/presentation-planner/**'
       - 'applications/rig-signal/**'
+      - 'docs/intelligence/**'
+      - 'docs/qa/**'
+      - 'theme/patterns/living-fly-bench-hub.php'
+      - 'theme/patterns/presentation-lab-hub.php'
       - '.github/workflows/hook-intelligence-hubs-ci.yml'
   pull_request:
     paths:
+      - 'applications/_shared/**'
       - 'applications/hatch-match/**'
       - 'applications/presentation-planner/**'
       - 'applications/rig-signal/**'
+      - 'docs/intelligence/**'
+      - 'docs/qa/**'
+      - 'theme/patterns/living-fly-bench-hub.php'
+      - 'theme/patterns/presentation-lab-hub.php'
       - '.github/workflows/hook-intelligence-hubs-ci.yml'
 
 permissions:
@@ -26,9 +36,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Test shared contracts, privacy, and source states
+        run: node applications/_shared/tests/run.mjs
       - name: Test Hatch Match
         run: node applications/hatch-match/tests/run.mjs
       - name: Test Presentation Planner
         run: node applications/presentation-planner/tests/run.mjs
+      - name: Check Presentation Planner preview module
+        run: node --check applications/presentation-planner/preview/app.mjs
       - name: Test Rig Signal
         run: node applications/rig-signal/tests/run.mjs
