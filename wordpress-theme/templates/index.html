@@ -1,0 +1,18 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:group {"tagName":"main","align":"wide","className":"hth-shell hth-preview-section","layout":{"type":"constrained"}} -->
+<main id="wp--skip-link--target" class="wp-block-group alignwide hth-shell hth-preview-section"><!-- wp:query-title {"type":"archive","showPrefix":false,"level":1} /-->
+<!-- wp:query {"query":{"perPage":10,"inherit":true},"className":"hth-log"} -->
+<div class="wp-block-query hth-log"><!-- wp:post-template -->
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:post-title {"isLink":true,"level":2} /--><!-- wp:post-excerpt /--><!-- wp:post-date /--></div>
+<!-- /wp:group -->
+<!-- /wp:post-template -->
+<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"space-between"}} --><!-- wp:query-pagination-previous /--><!-- wp:query-pagination-numbers /--><!-- wp:query-pagination-next /--><!-- /wp:query-pagination -->
+<!-- wp:query-no-results --><!-- wp:group {"className":"hth-empty-state","layout":{"type":"constrained"}} -->
+<div class="wp-block-group hth-empty-state"><!-- wp:heading {"level":2} --><h2 class="wp-block-heading">No governed records are available on this route.</h2><!-- /wp:heading --><!-- wp:paragraph --><p>This preview does not create placeholder articles or fake destinations. Return to the homepage and use only routes that have completed editorial, privacy, accessibility, safety, and conservation review.</p><!-- /wp:paragraph --></div>
+<!-- /wp:group --><!-- /wp:query-no-results --></div>
+<!-- /wp:query --></main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->
