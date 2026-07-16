@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hookthehorizon.blog/contracts/shared-contracts.v1.json",
+  "version": "1.0.0",
+  "status": "draft_preview_only",
+  "definitions": {
+    "evidenceRecord": {
+      "type": "object",
+      "required": ["id", "sourceId", "evidenceState", "reviewedAt", "claimScope"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "sourceId": {"type": "string", "minLength": 1},
+        "evidenceState": {"enum": ["primary_documentation", "official_data", "reviewed_secondary", "contributor_observation", "user_observation", "inferred", "disputed", "unknown", "do_not_publish"]},
+        "reviewedAt": {"type": "string", "format": "date-time"},
+        "claimScope": {"type": "string", "minLength": 1},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 100},
+        "limitations": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "sourceFreshnessRecord": {
+      "type": "object",
+      "required": ["sourceId", "reviewedAt", "freshForDays"],
+      "properties": {
+        "sourceId": {"type": "string", "minLength": 1},
+        "reviewedAt": {"type": "string", "format": "date-time"},
+        "freshForDays": {"type": "integer", "minimum": 1},
+        "agingAfterDays": {"type": "integer", "minimum": 1},
+        "expiresAt": {"type": ["string", "null"], "format": "date-time"},
+        "availability": {"enum": ["available", "outage", "unavailable", "migrating"]}
+      },
+      "additionalProperties": false
+    },
+    "privacyClassification": {
+      "type": "object",
+      "required": ["classification", "retention"],
+      "properties": {
+        "classification": {"enum": ["public_safe", "private", "local_only", "prohibited"]},
+        "retention": {"enum": ["none", "session", "local_device", "approved_server"]},
+        "shareAllowed": {"type": "boolean"},
+        "analyticsAllowed": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "inventoryRecord": {
+      "type": "object",
+      "required": ["id", "itemType", "label", "privacy"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "itemType": {"enum": ["lure", "fly", "bait", "terminal", "material", "equipment", "device"]},
+        "label": {"type": "string", "minLength": 1},
+        "quantity": {"type": "number", "minimum": 0},
+        "attributes": {"type": "object"},
+        "privacy": {"$ref": "#/$defs/privacyClassification"}
+      },
+      "additionalProperties": false
+    },
+    "outcomeRecord": {
+      "type": "object",
+      "required": ["id", "applicationId", "result", "recordedAt", "privacy"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "applicationId": {"enum": ["HTH-HM-001", "HTH-PP-001", "HTH-RS-001", "HTH-SC-001"]},
+        "result": {"enum": ["positive", "negative", "inconclusive", "not_tested"]},
+        "recordedAt": {"type": "string", "format": "date-time"},
+        "exposureCount": {"type": "integer", "minimum": 0},
+        "notes": {"type": "string"},
+        "privacy": {"$ref": "#/$defs/privacyClassification"}
+      },
+      "additionalProperties": false
+    },
+    "fieldExperimentRecord": {
+      "type": "object",
+      "required": ["id", "hypothesis", "variableChanged", "heldConstant", "outcome"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "hypothesis": {"type": "string", "minLength": 1},
+        "variableChanged": {"type": "string", "minLength": 1},
+        "heldConstant": {"type": "array", "items": {"type": "string"}},
+        "outcome": {"$ref": "#/$defs/outcomeRecord"},
+        "confounders": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "deviceProfile": {
+      "type": "object",
+      "required": ["id", "category", "identityEvidence", "maturity", "privacy"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "category": {"type": "string", "minLength": 1},
+        "identityEvidence": {"enum": ["primary_documentation", "contributor_recollection", "inferred", "unknown"]},
+        "maturity": {"enum": ["commercial", "prototype", "research", "patent", "concept", "unknown"]},
+        "firmwareVersion": {"type": ["string", "null"]},
+        "exportMethod": {"type": ["string", "null"]},
+        "privacy": {"$ref": "#/$defs/privacyClassification"}
+      },
+      "additionalProperties": false
+    },
+    "deviceEvent": {
+      "type": "object",
+      "required": ["schemaVersion", "eventId", "deviceProfileId", "eventType", "recordedAt", "source", "privacy"],
+      "properties": {
+        "schemaVersion": {"const": "1.0.0"},
+        "eventId": {"type": "string", "minLength": 1},
+        "deviceProfileId": {"type": "string", "minLength": 1},
+        "eventType": {"type": "string", "minLength": 1},
+        "recordedAt": {"type": "string", "format": "date-time"},
+        "value": {},
+        "unit": {"type": ["string", "null"]},
+        "quality": {"enum": ["documented", "validated", "estimated", "unknown", "invalid"]},
+        "calibrationState": {"enum": ["current", "aging", "stale", "unknown", "not_applicable"]},
+        "source": {"enum": ["device_import", "manual_entry", "derived"]},
+        "privacy": {"$ref": "#/$defs/privacyClassification"},
+        "locationIncluded": {"const": false}
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "privacyClassification": {
+      "type": "object",
+      "required": ["classification", "retention"],
+      "properties": {
+        "classification": {"enum": ["public_safe", "private", "local_only", "prohibited"]},
+        "retention": {"enum": ["none", "session", "local_device", "approved_server"]},
+        "shareAllowed": {"type": "boolean"},
+        "analyticsAllowed": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "outcomeRecord": {
+      "type": "object",
+      "required": ["id", "applicationId", "result", "recordedAt", "privacy"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "applicationId": {"enum": ["HTH-HM-001", "HTH-PP-001", "HTH-RS-001", "HTH-SC-001"]},
+        "result": {"enum": ["positive", "negative", "inconclusive", "not_tested"]},
+        "recordedAt": {"type": "string", "format": "date-time"},
+        "privacy": {"$ref": "#/$defs/privacyClassification"}
+      },
+      "additionalProperties": false
+    }
+  }
+}
