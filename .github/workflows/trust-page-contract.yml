@@ -1,0 +1,17 @@
+name: Trust page contract
+on:
+  push:
+    paths: ["docs/trust-pages/**", "scripts/validate-trust-pages.mjs", ".github/workflows/trust-page-contract.yml"]
+  pull_request:
+    paths: ["docs/trust-pages/**", "scripts/validate-trust-pages.mjs"]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: node scripts/validate-trust-pages.mjs

@@ -1,0 +1,22 @@
+{
+  "footer": {
+    "activation_rule": "Activate only links whose destinations return a successful response and contain the expected canonical page identity.",
+    "groups": [
+      {"label":"Publication","links":[["About","/about/"],["Contact","/contact/"],["Editorial Standards","/editorial-standards/"],["Corrections","/corrections/"]]},
+      {"label":"Disclosure and access","links":[["Disclosure","/disclosure/"],["AI Use","/ai-disclosure/"],["Privacy","/privacy/"],["Terms","/terms/"],["Accessibility","/accessibility/"]]},
+      {"label":"Editorial Ecosystem","links":[["Plan the gathering","https://tangledthistle.blog"],["Build the gear room","https://dramaroom.blog"],["Cook and pour","https://saltnotes.blog"],["Question the product claim","https://vanityvice.blog"]]}
+    ]
+  },
+  "navigation": {
+    "activation_rule": "A planned route enters production navigation only after destination, title, canonical, indexing posture, accessibility, and mobile checks pass.",
+    "planned_primary": [
+      {"label":"Read the Water","path":"/read-the-water/"},
+      {"label":"Gear & Systems","path":"/gear-systems/"},
+      {"label":"Field Notes","path":"/field-notes/"},
+      {"label":"Honey Hole Intelligence","path":"/honey-hole-intelligence/"},
+      {"label":"Conservation","path":"/conservation/"},
+      {"label":"Start Here","path":"/start-here/"}
+    ],
+    "trust_utility": [{"label":"About","path":"/about/"},{"label":"Standards","path":"/editorial-standards/"},{"label":"Contact","path":"/contact/"}]
+  }
+}
