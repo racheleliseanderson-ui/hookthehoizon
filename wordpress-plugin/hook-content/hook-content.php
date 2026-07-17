@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hook the Horizon Content
  * Description: Durable content models, bounded application routes, publication visibility, and sensitive-location safeguards for Hook the Horizon.
- * Version: 0.2.0
+ * Version: 0.2.2
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Text Domain: hook-the-horizon-content
@@ -10,7 +10,7 @@
 declare(strict_types=1);
 defined('ABSPATH') || exit;
 
-const HTH_CONTENT_VERSION = '0.2.0';
+const HTH_CONTENT_VERSION = '0.2.2';
 const HTH_REWRITE_VERSION_OPTION = 'hth_content_rewrite_version';
 
 require_once __DIR__ . '/includes/publication-visibility.php';
