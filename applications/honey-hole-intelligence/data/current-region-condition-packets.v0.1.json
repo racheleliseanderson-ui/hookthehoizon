@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "0.1.0",
+  "applicationId": "HHI-001",
+  "generatedAt": "2026-07-17T07:10:00Z",
+  "publicationBoundary": "Broad-region condition packets are time-bounded authority snapshots. They do not authorize a trip, disclose precise locations, guarantee access or safety, or replace same-day official verification.",
+  "packets": [
+    {
+      "id": "HHI-COND-001",
+      "publicRegion": "Washington State",
+      "conditionType": "regulation_baseline",
+      "sourceAuthority": "Washington Department of Fish and Wildlife",
+      "officialSourceUrl": "https://wdfw.wa.gov/fishing/regulations",
+      "retrievedAt": "2026-07-17T07:10:00Z",
+      "effectiveWindow": {"start": "2026-07-01", "end": "2027-06-30"},
+      "nextReviewAt": "2026-07-24",
+      "status": "current_authority_snapshot",
+      "facts": [
+        {"fieldKey": "regulation", "status": "verified_current", "claim": "WDFW identifies the 2026-2027 sport fishing rules as covering July 1, 2026 through June 30, 2027.", "sourceUrl": "https://wdfw.wa.gov/fishing/regulations"},
+        {"fieldKey": "verification_process", "status": "verified_current", "claim": "WDFW directs anglers to review the annual rules and check emergency rule changes before fishing.", "sourceUrl": "https://wdfw.wa.gov/fishing/regulations"}
+      ],
+      "criticalUnknowns": ["specific waterbody rule", "species-specific rule", "current emergency amendment", "access route", "weather and fire conditions"],
+      "privacy": {"classification": "public_region_only", "preciseLocationIncluded": false},
+      "publicationEligibility": "eligible_until_review"
+    },
+    {
+      "id": "HHI-COND-002",
+      "publicRegion": "Washington freshwater and saltwater fisheries",
+      "conditionType": "emergency_rule_snapshot",
+      "sourceAuthority": "Washington Department of Fish and Wildlife",
+      "officialSourceUrl": "https://wdfw.wa.gov/fishing/regulations/emergency-rules",
+      "retrievedAt": "2026-07-17T07:10:00Z",
+      "effectiveWindow": {"start": "2026-06-01", "end": "2026-10-15"},
+      "nextReviewAt": "2026-07-18",
+      "status": "volatile_current_authority_snapshot",
+      "facts": [
+        {"fieldKey": "regulation", "status": "verified_current", "claim": "The current emergency-rule index lists multiple active 2026 changes affecting Puget Sound, Skagit, Columbia River, coastal marine areas, and other fisheries.", "sourceUrl": "https://wdfw.wa.gov/fishing/regulations/emergency-rules"},
+        {"fieldKey": "closure", "status": "verified_current", "claim": "The emergency-rule index includes active closures or delayed openings for some fisheries and requires waterbody-specific review.", "sourceUrl": "https://wdfw.wa.gov/fishing/regulations/emergency-rules"}
+      ],
+      "criticalUnknowns": ["rules effective for intended date", "waterbody and species match", "new rule issued after retrieval", "current access and hazards"],
+      "privacy": {"classification": "public_region_only", "preciseLocationIncluded": false},
+      "publicationEligibility": "eligible_until_review"
+    },
+    {
+      "id": "HHI-COND-003",
+      "publicRegion": "North Cascades National Park Service Complex",
+      "conditionType": "park_regulation_reference",
+      "sourceAuthority": "National Park Service",
+      "officialSourceUrl": "https://www.nps.gov/noca/planyourvisit/fishing-regulations.htm",
+      "retrievedAt": "2026-07-17T07:10:00Z",
+      "effectiveWindow": {"start": "2026-07-17", "end": "2026-07-24"},
+      "nextReviewAt": "2026-07-18",
+      "status": "current_reference_requires_alert_check",
+      "facts": [
+        {"fieldKey": "regulation", "status": "verified_current", "claim": "NPS publishes park-specific fishing regulations and directs visitors to applicable state and federal requirements.", "sourceUrl": "https://www.nps.gov/noca/planyourvisit/fishing-regulations.htm"}
+      ],
+      "criticalUnknowns": ["same-day park alert", "road and trail access", "fire restriction", "water condition", "specific fishery status"],
+      "privacy": {"classification": "public_region_only", "preciseLocationIncluded": false},
+      "publicationEligibility": "eligible_until_review"
+    }
+  ]
+}
