@@ -27,8 +27,11 @@ jobs:
       - name: Validate modules
         run: |
           node --check applications/honey-hole-intelligence/evaluate.mjs
+          node --check applications/honey-hole-intelligence/core-integration.mjs
           node --check applications/honey-hole-intelligence/preview/app.mjs
       - name: Test privacy and trip-readiness boundaries
         run: node applications/honey-hole-intelligence/tests/run.mjs
+      - name: Test exact-pinned Core integration
+        run: node applications/honey-hole-intelligence/tests/core-integration.run.mjs
       - name: Test preview contracts
         run: node applications/honey-hole-intelligence/preview/tests/run.mjs
