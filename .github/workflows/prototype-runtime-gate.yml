@@ -1,0 +1,136 @@
+name: Prototype runtime gate
+
+on:
+  pull_request:
+    paths:
+      - 'wordpress-theme/**'
+      - 'content-plugin/**'
+      - 'wordpress-plugin/**'
+      - '.wp-env.json'
+      - '.github/workflows/prototype-runtime-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  disposable-wordpress:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install wp-env
+        run: npm install --no-save @wordpress/env@latest
+      - name: Start disposable WordPress
+        run: npx wp-env start
+      - name: Activate governed packages and seed routes
+        run: |
+          set -euxo pipefail
+          npx wp-env run cli wp theme activate wordpress-theme
+          npx wp-env run cli wp plugin activate content-plugin
+          npx wp-env run cli wp plugin activate honey-hole-condition-route
+          npx wp-env run cli wp option update blogname 'Hook Prototype Runtime'
+          npx wp-env run cli wp post create --post_type=page --post_title='Compatibility Builder' --post_name='compatibility-builder' --post_status=publish
+          npx wp-env run cli wp post create --post_type=page --post_title='Compatibility Result' --post_name='compatibility-result' --post_status=publish
+      - name: Exercise activation, switching and persistence
+        run: |
+          npx wp-env run cli wp theme status wordpress-theme | grep -qi active
+          npx wp-env run cli wp plugin status content-plugin | grep -qi active
+          npx wp-env run cli wp plugin status honey-hole-condition-route | grep -qi active
+          npx wp-env run cli wp plugin deactivate content-plugin
+          npx wp-env run cli wp plugin activate content-plugin
+          npx wp-env run cli wp theme activate twentytwentyfour
+          npx wp-env run cli wp theme activate wordpress-theme
+          npx wp-env run cli wp option get blogname | grep -F 'Hook Prototype Runtime'
+      - name: Runtime protected-data leak matrix
+        run: |
+          mkdir -p evidence/privacy
+          routes=(
+            'http://localhost:8888/'
+            'http://localhost:8888/compatibility-builder/'
+            'http://localhost:8888/compatibility-result/'
+            'http://localhost:8888/wp-json/wp/v2/pages'
+            'http://localhost:8888/feed/'
+            'http://localhost:8888/wp-sitemap.xml'
+          )
+          for url in "${routes[@]}"; do
+            file="evidence/privacy/$(printf '%s' "$url" | sha256sum | cut -d' ' -f1).txt"
+            curl --fail --retry 20 --retry-delay 3 "$url" -o "$file"
+          done
+          if grep -RInE '([+-]?[0-9]{1,2}\.[0-9]{4,}[,;][[:space:]]*[+-]?[0-9]{1,3}\.[0-9]{4,}|"(latitude|longitude|exact_location|private_access)"[[:space:]]*:)' evidence/privacy; then
+            echo 'Protected location material detected in a public runtime surface.' >&2
+            exit 1
+          fi
+      - name: Verify public output retains privacy language
+        run: grep -RqiE 'privacy|protected|exact location|restricted access' evidence/privacy
+      - name: Check WordPress debug log
+        if: always()
+        run: npx wp-env run cli bash -lc 'test ! -f wp-content/debug.log || ! grep -Ei "PHP (Fatal|Parse) error" wp-content/debug.log'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hook-runtime-privacy-evidence-${{ github.sha }}
+          path: evidence/privacy/
+          if-no-files-found: warn
+      - name: Stop disposable WordPress
+        if: always()
+        run: npx wp-env stop
+
+  browser-matrix:
+    needs: disposable-wordpress
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install browser tools
+        run: |
+          npm install --no-save @wordpress/env@latest playwright@latest @axe-core/playwright@latest lighthouse@latest
+          npx playwright install --with-deps chromium
+      - name: Start and seed WordPress
+        run: |
+          npx wp-env start
+          npx wp-env run cli wp theme activate wordpress-theme
+          npx wp-env run cli wp plugin activate content-plugin
+          npx wp-env run cli wp plugin activate honey-hole-condition-route
+          npx wp-env run cli wp post create --post_type=page --post_title='Compatibility Builder' --post_name='compatibility-builder' --post_status=publish
+          npx wp-env run cli wp post create --post_type=page --post_title='Compatibility Result' --post_name='compatibility-result' --post_status=publish
+      - name: Accessibility, responsive, reduced-motion and print checks
+        run: |
+          mkdir -p evidence/browser
+          cat > /tmp/browser-gate.mjs <<'JS'
+          import { chromium } from 'playwright';
+          import AxeBuilder from '@axe-core/playwright';
+          const browser = await chromium.launch();
+          for (const route of ['compatibility-builder','compatibility-result']) {
+            for (const viewport of [{name:'mobile',width:390,height:844},{name:'desktop',width:1440,height:1000}]) {
+              const page = await browser.newPage({ viewport });
+              await page.emulateMedia({ reducedMotion: 'reduce' });
+              await page.goto(`http://localhost:8888/${route}/`, { waitUntil: 'networkidle' });
+              const result = await new AxeBuilder({ page }).analyze();
+              if (result.violations.length) throw new Error(`${route}/${viewport.name}: ${result.violations.map(v=>v.id).join(',')}`);
+              await page.screenshot({ path: `evidence/browser/${route}-${viewport.name}.png`, fullPage: true });
+              await page.emulateMedia({ media: 'print' });
+              await page.pdf({ path: `evidence/browser/${route}.pdf`, format: 'Letter', printBackground: true });
+              await page.close();
+            }
+          }
+          await browser.close();
+          JS
+          node /tmp/browser-gate.mjs
+      - name: Lighthouse performance baseline
+        run: |
+          npx lighthouse http://localhost:8888/compatibility-builder/ --chrome-flags='--headless --no-sandbox' --only-categories=performance,accessibility --output=json --output-path=evidence/browser/lighthouse-compatibility-builder.json --quiet
+          node -e "const r=require('./evidence/browser/lighthouse-compatibility-builder.json'); const p=r.categories.performance.score; const a=r.categories.accessibility.score; if(p<0.70||a<0.90){console.error({p,a});process.exit(1)}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hook-browser-evidence-${{ github.sha }}
+          path: evidence/browser/
+          if-no-files-found: error
+      - name: Stop disposable WordPress
+        if: always()
+        run: npx wp-env stop
