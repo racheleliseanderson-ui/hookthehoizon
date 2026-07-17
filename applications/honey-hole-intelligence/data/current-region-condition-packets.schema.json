@@ -5,31 +5,50 @@
   "additionalProperties": true,
   "required": ["schemaVersion", "applicationId", "generatedAt", "publicationBoundary", "packets"],
   "properties": {
+    "schemaVersion": {"const": "0.1.0"},
     "applicationId": {"const": "HHI-001"},
     "generatedAt": {"type": "string", "format": "date-time"},
     "publicationBoundary": {"type": "string", "minLength": 30},
+    "lastAutomatedCheckAt": {"type": "string", "format": "date-time"},
     "packets": {
       "type": "array",
       "minItems": 3,
       "items": {
         "type": "object",
+        "additionalProperties": true,
         "required": ["id", "publicRegion", "conditionType", "sourceAuthority", "officialSourceUrl", "retrievedAt", "effectiveWindow", "nextReviewAt", "status", "facts", "criticalUnknowns", "privacy", "publicationEligibility"],
         "properties": {
           "id": {"type": "string", "pattern": "^HHI-COND-[0-9]{3}$"},
+          "publicRegion": {"type": "string", "minLength": 2},
+          "conditionType": {"type": "string", "minLength": 2},
+          "sourceAuthority": {"type": "string", "minLength": 2},
           "officialSourceUrl": {"type": "string", "format": "uri", "pattern": "^https://"},
           "retrievedAt": {"type": "string", "format": "date-time"},
+          "effectiveWindow": {"type": ["string", "object"]},
           "nextReviewAt": {"type": "string", "format": "date"},
+          "status": {"type": "string", "minLength": 2},
           "facts": {"type": "array", "minItems": 1},
           "criticalUnknowns": {"type": "array", "minItems": 1},
           "privacy": {
             "type": "object",
+            "additionalProperties": true,
             "required": ["classification", "preciseLocationIncluded"],
             "properties": {
               "classification": {"const": "public_region_only"},
               "preciseLocationIncluded": {"const": false}
             }
           },
-          "publicationEligibility": {"enum": ["eligible_until_review", "expired_requires_official_refresh"]}
+          "publicationEligibility": {"enum": ["eligible_until_review", "expired_requires_official_refresh"]},
+          "refresh": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["checkedAt", "status", "sameDayVerificationRequired"],
+            "properties": {
+              "checkedAt": {"type": "string", "format": "date-time"},
+              "status": {"enum": ["current_within_review_window", "expired_requires_official_refresh"]},
+              "sameDayVerificationRequired": {"const": true}
+            }
+          }
         }
       }
     }
