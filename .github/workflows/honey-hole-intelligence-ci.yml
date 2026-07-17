@@ -1,0 +1,34 @@
+name: Honey Hole Intelligence CI
+
+on:
+  push:
+    paths:
+      - 'applications/honey-hole-intelligence/**'
+      - 'applications/_shared/privacy.mjs'
+      - '.github/workflows/honey-hole-intelligence-ci.yml'
+  pull_request:
+    paths:
+      - 'applications/honey-hole-intelligence/**'
+      - 'applications/_shared/privacy.mjs'
+      - '.github/workflows/honey-hole-intelligence-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  public-safe-readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate modules
+        run: |
+          node --check applications/honey-hole-intelligence/evaluate.mjs
+          node --check applications/honey-hole-intelligence/preview/app.mjs
+      - name: Test privacy and trip-readiness boundaries
+        run: node applications/honey-hole-intelligence/tests/run.mjs
+      - name: Test preview contracts
+        run: node applications/honey-hole-intelligence/preview/tests/run.mjs
