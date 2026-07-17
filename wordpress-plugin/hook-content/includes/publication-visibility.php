@@ -16,6 +16,9 @@ final class RE_Publication_Visibility {
             'text_domain' => 'default',
             'post_types' => ['post', 'page'],
             'article_types' => ['post'],
+            'author_name' => '',
+            'author_url' => '',
+            'default_social_image' => '',
         ]);
         add_action('init', [self::class, 'register_meta'], 30);
         add_action('add_meta_boxes', [self::class, 'add_box']);
@@ -25,6 +28,9 @@ final class RE_Publication_Visibility {
         add_filter('wp_sitemaps_posts_query_args', [self::class, 'sitemap_args'], 10, 2);
         foreach (['wpseo_title','rank_math/frontend/title','aioseo_title','seopress_titles_title'] as $hook) add_filter($hook, [self::class, 'title']);
         foreach (['wpseo_metadesc','rank_math/frontend/description','aioseo_description','seopress_titles_desc'] as $hook) add_filter($hook, [self::class, 'description_filter']);
+
+        // Use one canonical source. The rebuilt sites do not consistently emit WordPress core's singular canonical.
+        remove_action('wp_head', 'rel_canonical');
         add_action('wp_head', [self::class, 'head'], 2);
     }
 
@@ -110,17 +116,23 @@ final class RE_Publication_Visibility {
         $url = self::canonical(); if ($url === '') return;
         $title = wp_get_document_title(); $description = self::description(); $image = self::image();
         echo "\n<!-- Editorial Ecosystem publication visibility fallback -->\n";
-        if (!is_singular()) printf("<link rel=\"canonical\" href=\"%s\">\n", esc_url($url));
+        printf("<link rel=\"canonical\" href=\"%s\">\n", esc_url($url));
         if ($description !== '') printf("<meta name=\"description\" content=\"%s\">\n", esc_attr($description));
         foreach (['og:site_name' => (string) self::$c['name'], 'og:title' => $title, 'og:url' => $url, 'og:type' => is_singular() ? 'article' : 'website'] as $property => $value) {
             printf("<meta property=\"%s\" content=\"%s\">\n", esc_attr($property), esc_attr($value));
         }
         if ($description !== '') printf("<meta property=\"og:description\" content=\"%s\">\n", esc_attr($description));
-        if ($image !== '') printf("<meta property=\"og:image\" content=\"%s\">\n", esc_url($image));
+        if ($image !== '') {
+            printf("<meta property=\"og:image\" content=\"%s\">\n", esc_url($image));
+            printf("<meta property=\"og:image:alt\" content=\"%s\">\n", esc_attr((string) self::$c['name']));
+        }
         printf("<meta name=\"twitter:card\" content=\"%s\">\n", $image !== '' ? 'summary_large_image' : 'summary');
         printf("<meta name=\"twitter:title\" content=\"%s\">\n", esc_attr($title));
         if ($description !== '') printf("<meta name=\"twitter:description\" content=\"%s\">\n", esc_attr($description));
-        if ($image !== '') printf("<meta name=\"twitter:image\" content=\"%s\">\n", esc_url($image));
+        if ($image !== '') {
+            printf("<meta name=\"twitter:image\" content=\"%s\">\n", esc_url($image));
+            printf("<meta name=\"twitter:image:alt\" content=\"%s\">\n", esc_attr((string) self::$c['name']));
+        }
         printf("<script type=\"application/ld+json\">%s</script>\n", wp_json_encode(self::schema($url, $title, $description, $image), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
@@ -134,10 +146,35 @@ final class RE_Publication_Visibility {
         ];
         if (is_singular() && in_array((string) get_post_type(), self::article_types(), true)) {
             $id = (int) get_queried_object_id(); $author = (int) get_post_field('post_author', $id);
-            $article = ['@type' => get_post_type($id) === 'post' ? 'BlogPosting' : 'Article', '@id' => $url . '#article', 'headline' => $title, 'description' => $description, 'mainEntityOfPage' => ['@id' => $url . '#webpage'], 'datePublished' => get_the_date(DATE_W3C, $id), 'dateModified' => get_the_modified_date(DATE_W3C, $id), 'author' => ['@type' => 'Person', 'name' => get_the_author_meta('display_name', $author), 'url' => get_author_posts_url($author)], 'publisher' => ['@id' => $org], 'inLanguage' => get_bloginfo('language')];
+            $article = ['@type' => get_post_type($id) === 'post' ? 'BlogPosting' : 'Article', '@id' => $url . '#article', 'headline' => $title, 'description' => $description, 'mainEntityOfPage' => ['@id' => $url . '#webpage'], 'datePublished' => get_the_date(DATE_W3C, $id), 'dateModified' => get_the_modified_date(DATE_W3C, $id), 'author' => self::author($author), 'publisher' => ['@id' => $org], 'inLanguage' => get_bloginfo('language')];
             if ($image !== '') $article['image'] = [$image]; $graph[] = $article;
         }
         return ['@context' => 'https://schema.org', '@graph' => $graph];
+    }
+
+    /** @return array<string,string> */
+    private static function author(int $authorId): array {
+        $name = trim((string) get_the_author_meta('display_name', $authorId));
+        $url = $authorId > 0 ? esc_url_raw((string) get_author_posts_url($authorId)) : '';
+        $path = (string) wp_parse_url($url, PHP_URL_PATH);
+        $hasUsableArchive = $url !== '' && preg_match('#/author/?$#', $path) !== 1;
+
+        if ($name !== '' && $hasUsableArchive) {
+            return ['@type' => 'Person', 'name' => $name, 'url' => $url];
+        }
+
+        $configuredName = trim((string) self::$c['author_name']);
+        $configuredUrl = self::configured_author_url();
+        if ($configuredName !== '') {
+            return ['@type' => 'Person', 'name' => $configuredName, 'url' => $configuredUrl];
+        }
+
+        return ['@type' => 'Organization', 'name' => trim((string) self::$c['name']) . ' Editorial Team', 'url' => $configuredUrl];
+    }
+
+    private static function configured_author_url(): string {
+        $configured = esc_url_raw((string) self::$c['author_url']);
+        return $configured !== '' ? $configured : trailingslashit((string) self::$c['domain']);
     }
 
     private static function description(): string {
@@ -162,8 +199,32 @@ final class RE_Publication_Visibility {
     }
 
     private static function image(): string {
-        if (is_singular() && has_post_thumbnail()) { $url = wp_get_attachment_image_url((int) get_post_thumbnail_id(), 'full'); if (is_string($url)) return $url; }
-        return esc_url_raw((string) get_option('re_default_social_image', ''));
+        if (is_singular() && has_post_thumbnail()) {
+            $url = wp_get_attachment_image_url((int) get_post_thumbnail_id(), 'full');
+            if (is_string($url) && $url !== '') return $url;
+        }
+
+        foreach ([get_option('re_default_social_image', ''), self::$c['default_social_image']] as $candidate) {
+            $url = self::resolve_image($candidate);
+            if ($url !== '') return $url;
+        }
+
+        $logoId = (int) get_theme_mod('custom_logo');
+        if ($logoId > 0) {
+            $url = wp_get_attachment_image_url($logoId, 'full');
+            if (is_string($url) && $url !== '') return $url;
+        }
+
+        return esc_url_raw((string) get_site_icon_url(512));
+    }
+
+    /** @param mixed $candidate */
+    private static function resolve_image($candidate): string {
+        if (is_numeric($candidate) && (int) $candidate > 0) {
+            $url = wp_get_attachment_image_url((int) $candidate, 'full');
+            return is_string($url) ? $url : '';
+        }
+        return esc_url_raw(trim((string) $candidate));
     }
 
     private static function noindex(): bool {
