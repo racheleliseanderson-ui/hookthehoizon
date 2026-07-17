@@ -2,19 +2,23 @@
 
 **Status:** Active application-specific implementation authority  
 **Effective date:** 2026-07-16  
+**Last updated:** 2026-07-17  
 **Parent authority:** Editorial Ecosystem AI Autonomy and Exception Governance Standard v1.2
 
 ## Decision
 
-Hook the Horizon applications use proportional validation and exception-only human review. Exhaustive QA matrices, universal manual reviews, duplicate Drive approvals, and generic “human approval required” gates are superseded.
+Hook the Horizon applications use proportional validation and exception-only human review. Exhaustive QA matrices, universal manual reviews, duplicate Drive approvals, generic “human approval required” gates, and mandatory paid staging subscriptions are superseded.
 
 The operating sequence is:
 
 1. implement the bounded increment;
 2. run checks that cover the changed risk surface;
 3. repair failures and rerun;
-4. record the result and rollback reference;
-5. merge or release automatically when no Tier 3 exception exists.
+4. confirm the current owner-managed backup and record the rollback reference;
+5. deploy the exact reversible artifact through the connected WordPress write surface;
+6. verify installed versions, critical routes, and rendered behavior immediately;
+7. roll back from the existing backup or deactivate the affected artifact if verification fails;
+8. record the result.
 
 ## Application risk profile
 
@@ -32,7 +36,7 @@ The operating sequence is:
 - deterministic rule changes;
 - local persistence and offline behavior;
 - source merges;
-- preview or staging releases;
+- preview releases and disposable-runtime validation;
 - nonbreaking schema additions;
 - public-safe export formats;
 - reversible WordPress theme or content-plugin integration;
@@ -59,7 +63,7 @@ Stop only the affected action for:
 - binding legal, privacy, sponsorship, partnership, advertising, or financial commitments outside an approved envelope;
 - unsupported regulation, safety, conservation, biological, hardware-performance, or professional claims with plausible material harm;
 - irreversible deletion, destructive migration, domain or DNS ownership change, or an action without a recovery path;
-- materially unresolved critical risk that cannot be reduced through source research, automated testing, simulation, staging, or rollback.
+- materially unresolved critical risk that cannot be reduced through source research, automated testing, simulation, disposable-runtime validation, direct readback, or rollback.
 
 The exception must name the exact risk, affected record or action, threshold, and smallest decision needed. Unrelated work continues.
 
@@ -95,15 +99,28 @@ Draft status is a development state, not a permanent permission gate. Pull reque
 
 ## WordPress boundary
 
-Source merge does not itself prove or activate production runtime. Preview and staging may proceed automatically. Production promotion may proceed automatically only when the exact artifact, checksum, backup or rollback package, critical routes, repository-to-runtime parity, and monitoring pass. A narrow Tier 3 exception blocks only the affected promotion.
+Source merge does not itself prove or activate production runtime. A separate paid staging environment is not required and is not planned for the near future.
+
+The accepted WordPress release model is **backup-backed, reversible direct production promotion**:
+
+- use the owner’s existing backups as the recovery control;
+- confirm that a current backup exists before the write;
+- record the exact artifact version and SHA-256 checksum;
+- make only the bounded, reversible change;
+- preserve the active theme unless the authorized change specifically concerns it;
+- verify installed plugin/theme versions, critical URLs, rendered output, privacy boundaries, and error states immediately after the write;
+- deactivate the affected plugin, revert the page, or restore the existing backup if verification fails;
+- record the runtime evidence and rollback path in the repository-to-live register.
+
+The absence of a separate staging subscription must not be recorded as a blocker, missing dependency, or incomplete owner input. Disposable WordPress and browser validation remain the pre-production test layer. Production parity is established only by direct installed-runtime verification after the controlled write.
 
 ## Current application decisions
 
-- `HTH-SM-001 Horizon Smart Mode`: Tier 1 local-first preview; automatic progression after shared tests and preview syntax checks.
-- `HTH-PP-001 Presentation Planner`: Tier 1 deterministic application; automatic progression after affected rule, persistence, share, and accessibility-critical checks.
+- `HTH-SM-001 Horizon Smart Mode`: Tier 1 local-first application; automatic progression after shared tests, disposable-runtime validation, backup confirmation, controlled installation, and direct route verification.
+- `HTH-PP-001 Presentation Planner`: Tier 1 deterministic application; automatic progression after affected rule, persistence, share, accessibility-critical checks, backup confirmation, and direct runtime verification.
 - `HTH-HM-001 Hatch Match`: taxonomy and preview work are Tier 0/1; individual records escalate only when a defined Tier 3 biological, conservation, safety, or location risk exists.
 - `HTH-RS-001 Rig Signal`: contracts and preview work are Tier 0/1; credentials, protected telemetry, unsupported high-risk capability claims, and binding manufacturer commitments are Tier 3.
 
 ## Final rule
 
-Proceed, test what changed, repair failures, record the result, and continue. Do not require exhaustive QA or a person merely because the work is visible or multi-step.
+Proceed, test what changed, confirm the available backup, make the smallest reversible production change, verify immediately, repair or roll back on failure, record the result, and continue. Do not require a paid staging environment that the owner has explicitly rejected.
