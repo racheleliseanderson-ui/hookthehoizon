@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "0.1.0",
+  "applicationId": "HHI-001",
+  "generatedAt": "2026-07-17T05:30:00Z",
+  "publicationBoundary": "Public-region reference evidence only. No precise fishing location, access route, sensitive species location, live condition, legal conclusion, or catch prediction is created by these records.",
+  "records": [
+    {
+      "id": "HHI-SRC-001",
+      "title": "National Park Service fishing regulations framework",
+      "sourceUrl": "https://www.nps.gov/subjects/fishing/fishing-regulations.htm",
+      "sourceAuthority": "U.S. National Park Service",
+      "authorityTier": "primary_government",
+      "sourceType": "official_regulatory_framework",
+      "retrievedAt": "2026-07-17T05:30:00Z",
+      "applicability": {"scope": "Regulation hierarchy and official-verification questions for fishing in National Park units", "geography": "United States National Park units", "liveTripProof": false, "preciseLocationIncluded": false},
+      "freshness": {"volatility": "high", "reviewWindowDays": 7, "nextReviewAt": "2026-07-24"},
+      "evidence": [
+        {"fieldKey": "regulation", "status": "verified_reference", "claim": "Park fishing can be governed by servicewide rules, non-conflicting state rules, park-specific rules, and superintendent restrictions.", "limitations": "The applicable current rule set must be checked for the specific park and date."},
+        {"fieldKey": "closure", "status": "verified_reference", "claim": "Temporary or emergency restrictions may be issued by park authorities.", "limitations": "This record does not state whether any closure is active now."}
+      ],
+      "unknowns": ["specific park", "current superintendent restrictions", "state rule interaction", "active closure"],
+      "contradictions": [],
+      "privacyClassification": "public_region_reference",
+      "publicationEligibility": "eligible_with_limits",
+      "preciseLocationIncluded": false
+    },
+    {
+      "id": "HHI-SRC-002",
+      "title": "North Cascades National Park fishing regulations",
+      "sourceUrl": "https://www.nps.gov/noca/planyourvisit/fishing-regulations.htm",
+      "sourceAuthority": "U.S. National Park Service — North Cascades National Park",
+      "authorityTier": "primary_government",
+      "sourceType": "official_park_regulation_page",
+      "retrievedAt": "2026-07-17T05:30:00Z",
+      "applicability": {"scope": "Broad-region regulation handoff and current-source verification for North Cascades National Park", "geography": "North Cascades National Park, Washington", "liveTripProof": false, "preciseLocationIncluded": false},
+      "freshness": {"volatility": "high", "reviewWindowDays": 7, "nextReviewAt": "2026-07-24"},
+      "evidence": [
+        {"fieldKey": "regulation", "status": "verified_reference", "claim": "The park directs anglers to current Washington fishing regulations and identifies park-specific regulation context.", "limitations": "Licensing, season, species, water-specific rules, emergency changes, and current access still require direct verification."},
+        {"fieldKey": "access", "status": "verified_reference", "claim": "Park jurisdiction and current park guidance are relevant to legal trip planning.", "limitations": "The source does not verify a particular trailhead, road, shoreline, or water access point."}
+      ],
+      "unknowns": ["current state pamphlet", "specific water rule", "road and trail status", "weather and hazard status"],
+      "contradictions": [],
+      "privacyClassification": "public_region_reference",
+      "publicationEligibility": "eligible_with_limits",
+      "preciseLocationIncluded": false
+    }
+  ]
+}
