@@ -100,25 +100,83 @@ jobs:
           npx wp-env run cli wp post create --post_type=page --post_title='Compatibility Result' --post_name='compatibility-result' --post_status=publish
       - name: Accessibility, responsive, reduced-motion and print checks
         run: |
+          set -euo pipefail
           mkdir -p evidence/browser
           cat > /tmp/browser-gate.mjs <<'JS'
+          import fs from 'node:fs/promises';
           import { chromium } from 'playwright';
           import AxeBuilder from '@axe-core/playwright';
+
           const browser = await chromium.launch();
-          for (const route of ['compatibility-builder','compatibility-result']) {
-            for (const viewport of [{name:'mobile',width:390,height:844},{name:'desktop',width:1440,height:1000}]) {
-              const page = await browser.newPage({ viewport });
-              await page.emulateMedia({ reducedMotion: 'reduce' });
-              await page.goto(`http://localhost:8888/${route}/`, { waitUntil: 'networkidle' });
-              const result = await new AxeBuilder({ page }).analyze();
-              if (result.violations.length) throw new Error(`${route}/${viewport.name}: ${result.violations.map(v=>v.id).join(',')}`);
-              await page.screenshot({ path: `evidence/browser/${route}-${viewport.name}.png`, fullPage: true });
-              await page.emulateMedia({ media: 'print' });
-              await page.pdf({ path: `evidence/browser/${route}.pdf`, format: 'Letter', printBackground: true });
-              await page.close();
+          const failures = [];
+
+          try {
+            for (const route of ['compatibility-builder', 'compatibility-result']) {
+              for (const viewport of [
+                { name: 'mobile', width: 390, height: 844 },
+                { name: 'desktop', width: 1440, height: 1000 },
+              ]) {
+                const label = `${route}-${viewport.name}`;
+                const page = await browser.newPage({ viewport });
+
+                try {
+                  await page.emulateMedia({ reducedMotion: 'reduce' });
+                  const response = await page.goto(`http://localhost:8888/${route}/`, {
+                    waitUntil: 'domcontentloaded',
+                    timeout: 60000,
+                  });
+
+                  if (!response || !response.ok()) {
+                    throw new Error(`${label}: route returned ${response?.status() ?? 'no response'}`);
+                  }
+
+                  await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+                  const result = await new AxeBuilder({ page }).analyze();
+                  await fs.writeFile(
+                    `evidence/browser/${label}-axe.json`,
+                    JSON.stringify(result, null, 2),
+                  );
+                  await page.screenshot({
+                    path: `evidence/browser/${label}.png`,
+                    fullPage: true,
+                  });
+
+                  if (viewport.name === 'desktop') {
+                    await page.emulateMedia({ media: 'print', reducedMotion: 'reduce' });
+                    await page.pdf({
+                      path: `evidence/browser/${route}.pdf`,
+                      format: 'Letter',
+                      printBackground: true,
+                    });
+                  }
+
+                  if (result.violations.length) {
+                    failures.push({
+                      label,
+                      violations: result.violations.map(({ id, impact, help, nodes }) => ({
+                        id,
+                        impact,
+                        help,
+                        nodes: nodes.map(({ target, failureSummary }) => ({ target, failureSummary })),
+                      })),
+                    });
+                  }
+                } catch (error) {
+                  failures.push({ label, runtimeError: String(error?.stack || error) });
+                } finally {
+                  await page.close();
+                }
+              }
             }
+          } finally {
+            await browser.close();
           }
-          await browser.close();
+
+          await fs.writeFile('evidence/browser/browser-gate-summary.json', JSON.stringify(failures, null, 2));
+          if (failures.length) {
+            console.error(JSON.stringify(failures, null, 2));
+            process.exit(1);
+          }
           JS
           node /tmp/browser-gate.mjs
       - name: Lighthouse performance baseline
