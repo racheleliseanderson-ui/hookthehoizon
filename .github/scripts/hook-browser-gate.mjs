@@ -12,7 +12,8 @@ for (const route of ['compatibility-builder', 'compatibility-result']) {
     { name: 'desktop', width: 1440, height: 1000 },
   ]) {
     const label = `${route}-${viewport.name}`;
-    const page = await browser.newPage({ viewport });
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
     try {
       await page.emulateMedia({ reducedMotion: 'reduce' });
       const response = await page.goto(`http://localhost:8888/${route}/`, {
@@ -59,7 +60,7 @@ for (const route of ['compatibility-builder', 'compatibility-result']) {
     } catch (error) {
       failures.push({ phase: 'runtime', label, error: String(error?.stack || error) });
     } finally {
-      await page.close();
+      await context.close();
     }
   }
 }
