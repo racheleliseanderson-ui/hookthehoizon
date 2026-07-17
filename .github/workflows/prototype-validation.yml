@@ -1,0 +1,92 @@
+name: Prototype validation and staging package
+
+on:
+  push:
+    branches: [rebuild/prototype-review-reconciled-v4]
+  pull_request:
+    paths:
+      - 'wordpress-theme/**'
+      - 'content-plugin/**'
+      - '.github/workflows/prototype-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  THEME_DIR: wordpress-theme
+  CONTENT_PLUGIN_DIR: content-plugin
+
+jobs:
+  validate-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify prototype package roots
+        run: |
+          test -d "$THEME_DIR"
+          test -f "$THEME_DIR/style.css"
+          test -d "$CONTENT_PLUGIN_DIR"
+      - name: Install validation tools
+        run: sudo apt-get update && sudo apt-get install -y php-cli jq zip
+      - name: Validate PHP
+        run: find "$THEME_DIR" "$CONTENT_PLUGIN_DIR" -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Validate JSON
+        run: find "$THEME_DIR" "$CONTENT_PLUGIN_DIR" -type f -name '*.json' -print0 | xargs -0 -n1 jq empty
+      - name: Validate block markup balance
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,re,sys
+          theme=Path(os.environ['THEME_DIR'])
+          files=list((theme/'templates').glob('*.html'))+list((theme/'parts').glob('*.html'))+list((theme/'patterns').glob('*.php'))
+          bad=[]
+          for path in files:
+              source=path.read_text(errors='ignore')
+              opens=len(re.findall(r'<!--\s+wp:[^/][^>]*-->',source))
+              closes=len(re.findall(r'<!--\s+/wp:',source))
+              selfs=len(re.findall(r'<!--\s+wp:[^>]+/-->',source))
+              if opens-selfs!=closes: bad.append((str(path),opens,selfs,closes))
+          if bad:
+              print('Unbalanced block comments:',bad);sys.exit(1)
+          print(f'Block comment balance passed for {len(files)} files')
+          PY
+      - name: Protected-location static leak scan
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os,re,sys
+          roots=[Path(os.environ['THEME_DIR']),Path(os.environ['CONTENT_PLUGIN_DIR'])]
+          suffixes={'.php','.js','.mjs','.json','.html','.css','.svg'}
+          pair=re.compile(r'(?<![\d.])[+-]?\d{1,2}\.\d{4,}\s*[,;]\s*[+-]?\d{1,3}\.\d{4,}(?![\d.])')
+          assignment=re.compile(r'(?i)(latitude|longitude|\blat\b|\blng\b)\s*["\']?\s*[:=]\s*["\']?[+-]?\d{1,3}\.\d{4,}')
+          findings=[]
+          for root in roots:
+              for path in root.rglob('*'):
+                  if path.is_file() and path.suffix.lower() in suffixes:
+                      for n,line in enumerate(path.read_text(errors='ignore').splitlines(),1):
+                          if pair.search(line) or assignment.search(line): findings.append((str(path),n,line.strip()[:240]))
+          if findings:
+              print('Potential literal coordinate data found:',findings);sys.exit(1)
+          print('No likely literal coordinate values found.')
+          PY
+      - name: Build staging ZIPs and checksums
+        run: |
+          rm -rf dist && mkdir -p dist/hook-the-horizon dist/hook-content
+          cp -R "$THEME_DIR"/. dist/hook-the-horizon/
+          cp -R "$CONTENT_PLUGIN_DIR"/. dist/hook-content/
+          printf 'STAGING ONLY - NOT APPROVED FOR PRODUCTION\n' > dist/hook-the-horizon/STAGING-ONLY.txt
+          printf 'STAGING ONLY - NOT APPROVED FOR PRODUCTION\n' > dist/hook-content/STAGING-ONLY.txt
+          cd dist
+          zip -qr hook-the-horizon-prototype.zip hook-the-horizon
+          zip -qr hook-content-prototype.zip hook-content
+          sha256sum *.zip > SHA256SUMS.txt
+          printf '{"publication":"Hook the Horizon","status":"staging-only","branch":"rebuild/prototype-review-reconciled-v4","commit":"%s"}\n' "$GITHUB_SHA" > manifest.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hook-the-horizon-prototype-review
+          path: |
+            dist/*.zip
+            dist/SHA256SUMS.txt
+            dist/manifest.json
+          if-no-files-found: error
