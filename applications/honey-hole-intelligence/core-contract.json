@@ -1,0 +1,9 @@
+{
+  "applicationId": "HHI-001",
+  "coreVersion": "0.2.0",
+  "coreCommit": "83e2d80efa8125aed986be5317b3b43a06884bbc",
+  "floatingMainAllowed": false,
+  "productionApproved": false,
+  "sharedServices": ["resultEnvelope","evidenceStatus","unknowns","privacy","analyticsAllowlist","provenance"],
+  "localServices": ["tripReadiness","accessRules","conservationRules","locationProtection","officialQuestions"]
+}
