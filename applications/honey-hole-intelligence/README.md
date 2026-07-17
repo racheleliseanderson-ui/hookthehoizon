@@ -1,42 +1,45 @@
 # Honey Hole Intelligence
 
-Status: **draft scaffold only**
+Application ID: `HHI-001`  
+Status: **privacy-enforced public-region trip-readiness prototype (`0.1.0`)**
 
-Owner: Hook the Horizon
-
+Owner: Hook the Horizon  
 Canonical repository path: `racheleliseanderson-ui/hookthehorizon/applications/honey-hole-intelligence`
 
 ## Purpose
 
-Honey Hole Intelligence is the bounded trip-planning and field-decision derivative for legal access, current regulations, seasonal suitability, water and weather context, physical access, hazards, conservation sensitivity, gear readiness, and backup planning.
+Honey Hole Intelligence supports public-region trip preparation using current official regulation, closure, access, weather, water, hazard, permit, ownership, and conservation facts. It is designed to protect location privacy while making critical unknowns visible.
 
-## Current authority
+## Implemented slice
 
-- Google Drive remains the governance source of truth.
-- The Master Intelligence Directive v1.0 and Shared Intelligence SDK govern intelligence records, evidence, verification, review, monitoring, and run manifests.
-- This scaffold reserves repository ownership; it does not authorize exact-location publication, live deployment, catch guarantees, or production data collection.
+- uses Hook's recursive location-privacy inspection and public-output sanitization;
+- rejects precise or inference-enabling location input before evaluation;
+- field-specific freshness windows for all critical trip facts;
+- visible unknown, stale, contradicted, and missing-source fields;
+- scoped stop, verify, preparation-incomplete, and ready-with-controls states;
+- public-safe backup planning and official-source questions;
+- accessible local preview with invalid, privacy-rejection, stop, unknown, stale, source, backup, print, mobile, forced-colors, reduced-motion, and no-JavaScript states;
+- canonical outcome events: `official_regulation_opened`, `trip_safety_check_complete`, `conservation_controls_acknowledged`, and `public_safe_location_used`;
+- analytics events exclude region text, source URLs, and free-form location details;
+- deterministic tests and CI.
 
-## Initial bounded scope
+## Boundaries
 
-The first prototype may evaluate non-sensitive trip-readiness inputs and return official-source questions, freshness warnings, access and hazard checks, conservation constraints, confidence limits, and safer alternatives.
+- No precise or private location disclosure.
+- No fabricated visit, catch, regulation, closure, condition, ownership, access, or personal experience.
+- No guarantee of legality, access, conditions, safety, or catch.
+- Critical facts must be checked against the current official authority before departure.
+- A narrow access, closure, hazard, or conservation stop does not block unrelated work.
 
-## Prohibited behavior
+## Run tests
 
-- No exposure of private-water coordinates, vulnerable locations, sensitive species, or access details likely to cause harm.
-- No fabricated field visit, catch, regulation, closure, condition, or personal experience.
-- No guarantee of fish, safety, access, legality, or conditions.
-- No automatic production release, public map, or WordPress activation.
+```bash
+node --check applications/honey-hole-intelligence/evaluate.mjs
+node applications/honey-hole-intelligence/tests/run.mjs
+node --check applications/honey-hole-intelligence/preview/app.mjs
+node applications/honey-hole-intelligence/preview/tests/run.mjs
+```
 
-## Required before implementation review
+## Next implementation slice
 
-1. Define exact-location sensitivity tiers and redaction rules.
-2. Define authoritative regulations, closure, access, weather, and water-source precedence.
-3. Add freshness, contradiction, correction, and emergency stop conditions.
-4. Add experience-status labels and conservation-review escalation.
-5. Add privacy, accessibility, mobile, analytics, and abuse-case acceptance criteria.
-6. Test that sensitive coordinates and protected details cannot appear in public outputs.
-7. Validate applicable Shared Intelligence SDK contracts.
-
-## Release state
-
-Draft-only. Human approval and recorded conservation review are required before merge, deployment, public release, map output, or material scope change.
+Attach a bounded official-source fixture set using broad public geography; integrate the exact approved Intelligence Core evidence, result, provenance, and analytics services; package the preview through Hook's governed WordPress route; and complete scoped conservation/access, browser, assistive-technology, installed-artifact, and rollback evidence before production activation.
