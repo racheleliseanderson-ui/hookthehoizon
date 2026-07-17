@@ -33,5 +33,7 @@ jobs:
         run: node applications/honey-hole-intelligence/tests/run.mjs
       - name: Test exact-pinned Core integration
         run: node applications/honey-hole-intelligence/tests/core-integration.run.mjs
+      - name: Validate bounded source records
+        run: node applications/honey-hole-intelligence/tests/reference-records.run.mjs
       - name: Test preview contracts
         run: node applications/honey-hole-intelligence/preview/tests/run.mjs
