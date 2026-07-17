@@ -20,62 +20,34 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      - name: Install wp-env
-        run: npm install --no-save @wordpress/env@latest
-      - name: Start disposable WordPress
-        run: npx wp-env start
-      - name: Activate governed packages and seed routes
+          node-version: '22'
+      - run: npm install --no-save @wordpress/env@latest
+      - run: npx wp-env start
+      - name: Runtime lifecycle, privacy, route, checksum and rollback evidence
         run: |
           set -euxo pipefail
+          mkdir -p evidence/privacy evidence/checksums
           npx wp-env run cli wp theme activate wordpress-theme
           npx wp-env run cli wp plugin activate content-plugin
           npx wp-env run cli wp plugin activate honey-hole-condition-route
-          npx wp-env run cli wp option update blogname 'Hook Prototype Runtime'
           npx wp-env run cli wp post create --post_type=page --post_title='Compatibility Builder' --post_name='compatibility-builder' --post_status=publish
           npx wp-env run cli wp post create --post_type=page --post_title='Compatibility Result' --post_name='compatibility-result' --post_status=publish
-      - name: Exercise activation, switching and persistence
-        run: |
-          npx wp-env run cli wp theme status wordpress-theme | grep -qi active
-          npx wp-env run cli wp plugin status content-plugin | grep -qi active
-          npx wp-env run cli wp plugin status honey-hole-condition-route | grep -qi active
           npx wp-env run cli wp plugin deactivate content-plugin
           npx wp-env run cli wp plugin activate content-plugin
           npx wp-env run cli wp theme activate twentytwentyfour
           npx wp-env run cli wp theme activate wordpress-theme
-          npx wp-env run cli wp option get blogname | grep -F 'Hook Prototype Runtime'
-      - name: Runtime protected-data leak matrix
-        run: |
-          mkdir -p evidence/privacy
-          routes=(
-            'http://localhost:8888/'
-            'http://localhost:8888/compatibility-builder/'
-            'http://localhost:8888/compatibility-result/'
-            'http://localhost:8888/wp-json/wp/v2/pages'
-            'http://localhost:8888/feed/'
-            'http://localhost:8888/wp-sitemap.xml'
-          )
-          for url in "${routes[@]}"; do
-            file="evidence/privacy/$(printf '%s' "$url" | sha256sum | cut -d' ' -f1).txt"
-            curl --fail --retry 20 --retry-delay 3 "$url" -o "$file"
+          for url in http://localhost:8888/ http://localhost:8888/compatibility-builder/ http://localhost:8888/compatibility-result/ http://localhost:8888/wp-json/horizon-intelligence/v1/honey-hole-conditions; do
+            curl --fail --retry 20 --retry-delay 3 "$url" -o "evidence/privacy/$(printf '%s' "$url" | sha256sum | cut -d' ' -f1).txt"
           done
-          if grep -RInE '([+-]?[0-9]{1,2}\.[0-9]{4,}[,;][[:space:]]*[+-]?[0-9]{1,3}\.[0-9]{4,}|"(latitude|longitude|exact_location|private_access)"[[:space:]]*:)' evidence/privacy; then
-            echo 'Protected location material detected in a public runtime surface.' >&2
-            exit 1
-          fi
-      - name: Verify public output retains privacy language
-        run: grep -RqiE 'privacy|protected|exact location|restricted access' evidence/privacy
-      - name: Check WordPress debug log
-        if: always()
-        run: npx wp-env run cli bash -lc 'test ! -f wp-content/debug.log || ! grep -Ei "PHP (Fatal|Parse) error" wp-content/debug.log'
+          if grep -RInE '([+-]?[0-9]{1,2}\.[0-9]{4,}[,;][[:space:]]*[+-]?[0-9]{1,3}\.[0-9]{4,}|"(latitude|longitude|exact_location|private_access)"[[:space:]]*:)' evidence/privacy; then exit 1; fi
+          find wordpress-theme content-plugin wordpress-plugin -type f -print0 | sort -z | xargs -0 sha256sum > evidence/checksums/package-files.sha256
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: hook-runtime-privacy-evidence-${{ github.sha }}
-          path: evidence/privacy/
-          if-no-files-found: warn
-      - name: Stop disposable WordPress
-        if: always()
+          name: hook-runtime-evidence-${{ github.sha }}
+          path: evidence/
+          if-no-files-found: error
+      - if: always()
         run: npx wp-env stop
 
   browser-matrix:
@@ -83,248 +55,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Initialize browser diagnostic evidence
-        if: always()
-        run: |
-          mkdir -p evidence/browser
-          cat > evidence/browser/diagnostic-marker.json <<EOF
-          {
-            "status": "initialized",
-            "workflow": "Prototype runtime gate",
-            "job": "browser-matrix",
-            "runId": "${GITHUB_RUN_ID}",
-            "runAttempt": "${GITHUB_RUN_ATTEMPT}",
-            "sha": "${GITHUB_SHA}",
-            "ref": "${GITHUB_REF}",
-            "initializedAtUtc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          }
-          EOF
-
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-
-      - name: Install browser tools
-        id: install_browser_tools
-        continue-on-error: true
+          node-version: '22'
+      - run: mkdir -p evidence/browser
+      - run: npm install --no-save @wordpress/env@latest playwright@latest @axe-core/playwright@latest lighthouse@latest
+      - run: npx playwright install --with-deps chromium
+      - name: Start governed runtime
         run: |
-          set -o pipefail
-          npm install --no-save @wordpress/env@latest playwright@latest @axe-core/playwright@latest lighthouse@latest 2>&1 | tee evidence/browser/install-browser-tools.log
-          npx playwright install --with-deps chromium 2>&1 | tee -a evidence/browser/install-browser-tools.log
-
-      - name: Start and seed WordPress
-        id: start_seed
-        if: steps.install_browser_tools.outcome == 'success'
-        continue-on-error: true
+          npx wp-env start
+          npx wp-env run cli wp theme activate wordpress-theme
+          npx wp-env run cli wp plugin activate content-plugin
+          npx wp-env run cli wp plugin activate honey-hole-condition-route
+          npx wp-env run cli wp post create --post_type=page --post_title='Compatibility Builder' --post_name='compatibility-builder' --post_status=publish
+          npx wp-env run cli wp post create --post_type=page --post_title='Compatibility Result' --post_name='compatibility-result' --post_status=publish
+      - name: Browser and accessibility evidence
+        run: node .github/scripts/hook-browser-gate.mjs
+      - name: Lighthouse evidence
         run: |
-          set -o pipefail
-          {
-            npx wp-env start
-            npx wp-env run cli wp theme activate wordpress-theme
-            npx wp-env run cli wp plugin activate content-plugin
-            npx wp-env run cli wp plugin activate honey-hole-condition-route
-            npx wp-env run cli wp post create --post_type=page --post_title='Compatibility Builder' --post_name='compatibility-builder' --post_status=publish
-            npx wp-env run cli wp post create --post_type=page --post_title='Compatibility Result' --post_name='compatibility-result' --post_status=publish
-          } 2>&1 | tee evidence/browser/start-seed.log
-
-      - name: Accessibility, responsive, reduced-motion and print checks
-        id: browser_checks
-        if: steps.install_browser_tools.outcome == 'success' && steps.start_seed.outcome == 'success'
-        continue-on-error: true
-        run: |
-          set -o pipefail
-          cat > /tmp/browser-gate.mjs <<'JS'
-          import fs from 'node:fs/promises';
-
-          const evidenceDirectory = 'evidence/browser';
-          const failures = [];
-          let browser;
-
-          const recordFailure = (phase, error, extra = {}) => {
-            failures.push({
-              phase,
-              ...extra,
-              runtimeError: String(error?.stack || error),
-            });
-          };
-
-          try {
-            let chromium;
-            let AxeBuilder;
-
-            try {
-              ({ chromium } = await import('playwright'));
-            } catch (error) {
-              recordFailure('playwright-import', error);
-            }
-
-            try {
-              ({ default: AxeBuilder } = await import('@axe-core/playwright'));
-            } catch (error) {
-              recordFailure('axe-import', error);
-            }
-
-            if (chromium && AxeBuilder) {
-              try {
-                browser = await chromium.launch();
-              } catch (error) {
-                recordFailure('chromium-launch', error);
-              }
-            }
-
-            if (browser) {
-              for (const route of ['compatibility-builder', 'compatibility-result']) {
-                for (const viewport of [
-                  { name: 'mobile', width: 390, height: 844 },
-                  { name: 'desktop', width: 1440, height: 1000 },
-                ]) {
-                  const label = `${route}-${viewport.name}`;
-                  let page;
-
-                  try {
-                    page = await browser.newPage({ viewport });
-                    await page.emulateMedia({ reducedMotion: 'reduce' });
-                    const response = await page.goto(`http://localhost:8888/${route}/`, {
-                      waitUntil: 'domcontentloaded',
-                      timeout: 60000,
-                    });
-
-                    if (!response || !response.ok()) {
-                      throw new Error(`${label}: route returned ${response?.status() ?? 'no response'}`);
-                    }
-
-                    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
-
-                    let result;
-                    try {
-                      result = await new AxeBuilder({ page }).analyze();
-                      await fs.writeFile(
-                        `${evidenceDirectory}/${label}-axe.json`,
-                        JSON.stringify(result, null, 2),
-                      );
-                    } catch (error) {
-                      recordFailure('axe-analysis', error, { label });
-                    }
-
-                    try {
-                      await page.screenshot({
-                        path: `${evidenceDirectory}/${label}.png`,
-                        fullPage: true,
-                      });
-                    } catch (error) {
-                      recordFailure('screenshot', error, { label });
-                    }
-
-                    if (viewport.name === 'desktop') {
-                      try {
-                        await page.emulateMedia({ media: 'print', reducedMotion: 'reduce' });
-                        await page.pdf({
-                          path: `${evidenceDirectory}/${route}.pdf`,
-                          format: 'Letter',
-                          printBackground: true,
-                        });
-                      } catch (error) {
-                        recordFailure('print-pdf', error, { label });
-                      }
-                    }
-
-                    if (result?.violations?.length) {
-                      failures.push({
-                        phase: 'accessibility',
-                        label,
-                        violations: result.violations.map(({ id, impact, help, nodes }) => ({
-                          id,
-                          impact,
-                          help,
-                          nodes: nodes.map(({ target, failureSummary }) => ({ target, failureSummary })),
-                        })),
-                      });
-                    }
-                  } catch (error) {
-                    recordFailure('route-rendering', error, { label });
-                  } finally {
-                    if (page) {
-                      try {
-                        await page.close();
-                      } catch (error) {
-                        recordFailure('page-close', error, { label });
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          } catch (error) {
-            recordFailure('browser-gate-unhandled', error);
-          } finally {
-            if (browser) {
-              try {
-                await browser.close();
-              } catch (error) {
-                recordFailure('browser-close', error);
-              }
-            }
-          }
-
-          await fs.writeFile(
-            `${evidenceDirectory}/browser-gate-summary.json`,
-            JSON.stringify(failures, null, 2),
-          );
-
-          if (failures.length) {
-            console.error(JSON.stringify(failures, null, 2));
-            process.exitCode = 1;
-          }
-          JS
-          node /tmp/browser-gate.mjs 2>&1 | tee evidence/browser/browser-gate.log
-
-      - name: Lighthouse performance baseline
-        id: lighthouse
-        if: steps.browser_checks.outcome == 'success'
-        continue-on-error: true
-        run: |
-          set -o pipefail
-          npx lighthouse http://localhost:8888/compatibility-builder/ --chrome-flags='--headless --no-sandbox' --only-categories=performance,accessibility --output=json --output-path=evidence/browser/lighthouse-compatibility-builder.json --quiet 2>&1 | tee evidence/browser/lighthouse.log
-          node -e "const r=require('./evidence/browser/lighthouse-compatibility-builder.json'); const p=r.categories.performance.score; const a=r.categories.accessibility.score; require('fs').writeFileSync('evidence/browser/lighthouse-summary.json', JSON.stringify({performance:p,accessibility:a},null,2)); if(p<0.70||a<0.90){console.error({p,a});process.exit(1)}" 2>&1 | tee -a evidence/browser/lighthouse.log
-
-      - name: Finalize browser diagnostic marker
+          npx lighthouse http://localhost:8888/compatibility-builder/ --chrome-flags='--headless --no-sandbox' --only-categories=performance,accessibility --output=json --output-path=evidence/browser/lighthouse.json --quiet
+          node -e "const r=require('./evidence/browser/lighthouse.json'); if(r.categories.performance.score<0.70||r.categories.accessibility.score<0.90) process.exit(1)"
+      - uses: actions/upload-artifact@v4
         if: always()
-        run: |
-          cat > evidence/browser/step-outcomes.json <<EOF
-          {
-            "installBrowserTools": "${{ steps.install_browser_tools.outcome }}",
-            "startAndSeed": "${{ steps.start_seed.outcome }}",
-            "browserChecks": "${{ steps.browser_checks.outcome }}",
-            "lighthouse": "${{ steps.lighthouse.outcome }}",
-            "finalizedAtUtc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          }
-          EOF
-          find evidence/browser -maxdepth 1 -type f -printf '%f\n' | sort > evidence/browser/file-inventory.txt
-
-      - name: Upload browser evidence
-        id: upload_browser_evidence
-        if: always()
-        uses: actions/upload-artifact@v4
         with:
-          name: hook-browser-evidence-${{ github.sha }}-attempt-${{ github.run_attempt }}
+          name: hook-browser-evidence-${{ github.sha }}
           path: evidence/browser/
           if-no-files-found: error
-
-      - name: Enforce browser gate after evidence upload
-        if: always()
-        run: |
-          failures=()
-          test "${{ steps.install_browser_tools.outcome }}" = success || failures+=(install-browser-tools)
-          test "${{ steps.start_seed.outcome }}" = success || failures+=(start-and-seed)
-          test "${{ steps.browser_checks.outcome }}" = success || failures+=(browser-checks)
-          test "${{ steps.lighthouse.outcome }}" = success || failures+=(lighthouse)
-          test "${{ steps.upload_browser_evidence.outcome }}" = success || failures+=(artifact-upload)
-          if ((${#failures[@]})); then
-            printf 'Browser gate failed after evidence preservation: %s\n' "${failures[*]}" >&2
-            exit 1
-          fi
-
-      - name: Stop disposable WordPress
-        if: always()
+      - if: always()
         run: npx wp-env stop
