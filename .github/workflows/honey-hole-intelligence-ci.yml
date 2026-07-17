@@ -24,11 +24,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Install JSON Schema validator
+        run: npm install --no-save ajv@8.17.1 ajv-formats@3.0.1
       - name: Validate modules
         run: |
           node --check applications/honey-hole-intelligence/evaluate.mjs
           node --check applications/honey-hole-intelligence/core-integration.mjs
           node --check applications/honey-hole-intelligence/preview/app.mjs
+          node --check applications/honey-hole-intelligence/scripts/refresh-current-region-packets.mjs
       - name: Test privacy and trip-readiness boundaries
         run: node applications/honey-hole-intelligence/tests/run.mjs
       - name: Test exact-pinned Core integration
@@ -37,5 +40,7 @@ jobs:
         run: node applications/honey-hole-intelligence/tests/reference-records.run.mjs
       - name: Validate current broad-region condition packets
         run: node applications/honey-hole-intelligence/tests/current-region-condition-packets.mjs
+      - name: Validate full JSON Schema contract
+        run: node applications/honey-hole-intelligence/tests/full-json-schema-validation.mjs
       - name: Test preview contracts
         run: node applications/honey-hole-intelligence/preview/tests/run.mjs

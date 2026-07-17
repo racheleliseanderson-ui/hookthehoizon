@@ -1,0 +1,37 @@
+name: Honey Hole Daily Condition Refresh
+
+on:
+  schedule:
+    - cron: '17 12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  refresh-expiry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Evaluate packet freshness
+        id: refresh
+        continue-on-error: true
+        run: node applications/honey-hole-intelligence/scripts/refresh-current-region-packets.mjs
+      - name: Validate packet contract
+        run: node applications/honey-hole-intelligence/tests/current-region-condition-packets.mjs
+      - name: Open refresh issue when a packet expires
+        if: steps.refresh.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'Refresh expired Honey Hole condition packets';
+            const existing = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: 'condition-refresh' });
+            if (!existing.data.some(issue => issue.title === title)) {
+              await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, labels: ['condition-refresh'], body: 'One or more public-region condition packets passed their next-review date. Recheck WDFW emergency rules, the annual regulation baseline, NPS alerts, access, hazards, and conservation notices. Do not publish or authorize a trip from stale packets.' });
+            }
+            core.setFailed('Expired packets require official-source refresh.');
