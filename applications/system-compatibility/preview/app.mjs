@@ -186,3 +186,4 @@ resetButton.addEventListener('click', () => {
 });
 
 restoreForm();
+document.documentElement.dataset.appReady = 'true';
