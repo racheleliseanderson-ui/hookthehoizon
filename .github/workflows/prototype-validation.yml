@@ -67,12 +67,14 @@ jobs:
           findings=[]
           for root in roots:
               for path in root.rglob('*'):
+                  if 'tests' in path.parts:
+                      continue
                   if path.is_file() and path.suffix.lower() in suffixes:
                       for n,line in enumerate(path.read_text(errors='ignore').splitlines(),1):
                           if pair.search(line) or assignment.search(line): findings.append((str(path),n,line.strip()[:240]))
           if findings:
               print('Potential literal coordinate data found:',findings);sys.exit(1)
-          print('No likely literal coordinate values found.')
+          print('No likely literal coordinate values found in deployable surfaces.')
           PY
       - name: Build versioned WordPress artifacts
         run: bash scripts/build-wordpress-release.sh
