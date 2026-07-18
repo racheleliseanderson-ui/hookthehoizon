@@ -96,7 +96,7 @@ function hth_render_local_application_frame(string $application, string $title, 
                 height="<?php echo esc_attr((string) $height); ?>"
                 loading="lazy"
                 referrerpolicy="no-referrer"
-                sandbox="allow-scripts allow-same-origin allow-downloads"
+                sandbox="allow-scripts allow-same-origin allow-downloads allow-forms"
             ></iframe>
         </div>
         <noscript>
