@@ -15,6 +15,11 @@ for (const route of ['compatibility-builder', 'compatibility-result']) {
     const label = `${route}-${viewport.name}`;
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
+    const browserErrors = [];
+    page.on('pageerror', (error) => browserErrors.push(String(error?.stack || error)));
+    page.on('console', (message) => {
+      if (message.type() === 'error') browserErrors.push(`console: ${message.text()}`);
+    });
     try {
       await page.emulateMedia({ reducedMotion: 'reduce' });
       const response = await page.goto(`http://localhost:8888/${route}/`, {
@@ -57,7 +62,7 @@ for (const route of ['compatibility-builder', 'compatibility-result']) {
             failures.push({ phase: 'application-frame', label, error: 'Compatibility iframe did not load.' });
           } else {
             await frame.locator('#compatibility-form').waitFor({ state: 'visible' });
-            await frame.waitForTimeout(1000);
+            await frame.locator('html[data-app-ready="true"]').waitFor({ state: 'attached', timeout: 10000 });
             await frame.locator('button[type="submit"]').click();
             await frame.locator('#result:not([hidden])').waitFor({ state: 'visible', timeout: 10000 });
             const resultText = await frame.locator('#result-heading').textContent();
@@ -68,13 +73,14 @@ for (const route of ['compatibility-builder', 'compatibility-result']) {
         }
       }
 
+      if (browserErrors.length) failures.push({ phase: 'browser-errors', label, errors: browserErrors });
       await page.screenshot({ path: `${output}/${label}.png`, fullPage: true });
       if (viewport.name === 'desktop') {
         await page.emulateMedia({ media: 'print', reducedMotion: 'reduce' });
         await page.pdf({ path: `${output}/${route}.pdf`, format: 'Letter', printBackground: true });
       }
     } catch (error) {
-      failures.push({ phase: 'runtime', label, error: String(error?.stack || error) });
+      failures.push({ phase: 'runtime', label, error: String(error?.stack || error), browserErrors });
     } finally {
       await context.close();
     }
