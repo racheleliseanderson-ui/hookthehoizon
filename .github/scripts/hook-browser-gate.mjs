@@ -57,8 +57,9 @@ for (const route of ['compatibility-builder', 'compatibility-result']) {
             failures.push({ phase: 'application-frame', label, error: 'Compatibility iframe did not load.' });
           } else {
             await frame.locator('#compatibility-form').waitFor({ state: 'visible' });
+            await frame.waitForTimeout(1000);
             await frame.locator('button[type="submit"]').click();
-            await frame.locator('#result:not([hidden])').waitFor({ state: 'visible' });
+            await frame.locator('#result:not([hidden])').waitFor({ state: 'visible', timeout: 10000 });
             const resultText = await frame.locator('#result-heading').textContent();
             if (!resultText?.trim()) failures.push({ phase: 'deterministic-result', label, error: 'No result heading after submit.' });
             const appOverflow = await frame.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
