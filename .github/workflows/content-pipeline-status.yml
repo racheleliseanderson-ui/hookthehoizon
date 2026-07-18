@@ -1,0 +1,25 @@
+name: Content Pipeline Status
+
+on:
+  schedule:
+    - cron: '45 14 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect pipeline controls
+        run: |
+          set -euo pipefail
+          test -f docs/content-production/industrial-article-pipeline.md
+          test -f content/templates/article-template.md
+          grep -q 'publication_status: draft-only' content/templates/article-template.md
+          count=$(find content/articles -maxdepth 1 -type f -name 'HTH-CB-*.md' 2>/dev/null | wc -l | tr -d ' ')
+          echo '# Hook the Horizon Pipeline Status' >> "$GITHUB_STEP_SUMMARY"
+          echo "Canonical article files: $count" >> "$GITHUB_STEP_SUMMARY"
+          echo 'No WordPress or publication action is performed.' >> "$GITHUB_STEP_SUMMARY"
