@@ -56,3 +56,5 @@ jobs:
           else
             gh release create "$RELEASE_TAG" dist/hook-the-horizon-*.zip dist/hook-the-horizon-content-*.zip dist/SHA256SUMS --target "$GITHUB_SHA" --title "Hook runtime synchronization — 2026-07-18" --notes "$notes"
           fi
+
+# Controlled rerun marker: 2026-07-18T18:08Z
