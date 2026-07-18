@@ -80,7 +80,7 @@ if grep -RInE 'Hook the Forizon|hookthehoizon' "$THEME_SRC" "$PLUGIN_SRC"; then
 fi
 
 # The compatibility runtime must not contain protected location collection fields.
-if grep -RInE 'name=["'"'](exact.?location|coordinates?|latitude|longitude|private.?water|access.?code|gate.?code)["'"']' "$PLUGIN_SRC/assets/system-compatibility"; then
+if grep -RInE 'name="(exact.?location|coordinates?|latitude|longitude|private.?water|access.?code|gate.?code)"' "$PLUGIN_SRC/assets/system-compatibility"; then
   printf 'Protected location input found in compatibility runtime.\n' >&2
   exit 1
 fi
