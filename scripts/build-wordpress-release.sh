@@ -72,16 +72,15 @@ for relative in "${plugin_required[@]}"; do
   fi
 done
 
-# Documentation may name retired spellings when recording the correction. Deployable
-# theme and plugin source may not contain them.
 if grep -RInE 'Hook the Forizon|hookthehoizon' "$THEME_SRC" "$PLUGIN_SRC"; then
   printf 'Retired or misspelled Hook identifier found in deployable source.\n' >&2
   exit 1
 fi
 
-# The compatibility runtime must not contain protected location collection fields.
-if grep -RInE 'name="(exact.?location|coordinates?|latitude|longitude|private.?water|access.?code|gate.?code)"' "$PLUGIN_SRC/assets/system-compatibility"; then
-  printf 'Protected location input found in compatibility runtime.\n' >&2
+# Keep this list aligned with applications/system-compatibility/evaluate.mjs.
+PROTECTED_LOCATION_KEYS='exact.?location|coordinates?|coordinate|latitude|longitude|lat|lng|private.?water|private.?access|access.?code|gate.?code|map.?link|gps'
+if grep -RInE "name=[\"'](${PROTECTED_LOCATION_KEYS})[\"']|[\"'](${PROTECTED_LOCATION_KEYS})[\"'][[:space:]]*:" "$PLUGIN_SRC/assets/system-compatibility"; then
+  printf 'Protected location field or key found in compatibility runtime.\n' >&2
   exit 1
 fi
 
