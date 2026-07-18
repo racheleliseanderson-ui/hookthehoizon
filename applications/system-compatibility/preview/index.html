@@ -15,6 +15,7 @@
       --mist: #eaf1ef;
       --line: #becdca;
       --signal: #c96036;
+      --signal-strong: #9d3f22;
       --safe: #276749;
       --warn: #8a5709;
       --stop: #8b2d2d;
@@ -28,7 +29,7 @@
     button, input, select { min-height: 44px; }
     header, main, footer { width: min(82rem, calc(100% - 2rem)); margin-inline: auto; }
     header { padding-block: clamp(2.5rem, 8vw, 6rem) 1.5rem; }
-    .eyebrow { margin: 0; color: var(--signal); font-size: .78rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+    .eyebrow { margin: 0; color: var(--signal-strong); font-size: .78rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
     h1 { max-width: 12ch; margin: .4rem 0 .9rem; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.8rem, 8vw, 6.4rem); line-height: .9; letter-spacing: -.045em; }
     .lede { max-width: 52rem; color: #234956; font-size: clamp(1.08rem, 2.4vw, 1.42rem); }
     .status-strip { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1.1rem; }
@@ -45,10 +46,10 @@
     label { font-weight: 720; }
     .hint { color: var(--muted); font-size: .82rem; }
     input, select { width: 100%; border: 1px solid #9fb3af; border-radius: .62rem; background: white; color: var(--deep); padding: .65rem .72rem; }
-    input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-visible { outline: .2rem solid var(--signal); outline-offset: .14rem; }
+    input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-visible { outline: .2rem solid var(--signal-strong); outline-offset: .14rem; }
     .actions { display: flex; flex-wrap: wrap; gap: .6rem; }
     button { border: 0; border-radius: 999px; padding: .68rem 1rem; font-weight: 820; cursor: pointer; }
-    .primary { background: var(--signal); color: white; }
+    .primary { background: var(--signal-strong); color: white; }
     .secondary { background: var(--water); color: white; }
     .ghost { border: 1px solid var(--water); background: transparent; color: var(--water); }
     .status { min-height: 1.4rem; margin: .75rem 0 0; color: var(--muted); }
@@ -91,7 +92,7 @@
   </style>
 </head>
 <body>
-  <header>
+  <header aria-label="Compatibility Builder introduction">
     <p class="eyebrow">Hook the Horizon · deterministic field tool</p>
     <h1>Find the weak link before the water does.</h1>
     <p class="lede">Check the rod, reel, line, leader, terminal weight, and broad field conditions as one system. Hard rating conflicts stop the result; unknowns remain visible.</p>
@@ -101,7 +102,7 @@
     <div class="notice" role="note">Compatibility is not a catch forecast or a safety guarantee. Confirm manufacturer specifications, current regulations, access, weather, water, and personal capability before use.</div>
   </header>
 
-  <main class="layout">
+  <main class="layout" aria-label="Compatibility Builder workspace">
     <section class="panel controls sticky" aria-labelledby="builder-heading">
       <h2 id="builder-heading">Build the system</h2>
       <form id="compatibility-form" novalidate>
@@ -158,7 +159,7 @@
     </section>
   </main>
 
-  <footer>Results stay in this browser unless you download or print them. The export excludes exact-location fields because the application does not collect them.</footer>
+  <footer aria-label="Compatibility Builder privacy and storage notice">Results stay in this browser unless you download or print them. The export excludes exact-location fields because the application does not collect them.</footer>
   <script type="module" src="./app.mjs"></script>
 </body>
 </html>
