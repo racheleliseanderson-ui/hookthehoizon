@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/wp-env.json",
+  "core": "WordPress/WordPress#6.6",
+  "phpVersion": "8.1",
+  "themes": ["./wordpress-theme"],
+  "plugins": ["./wordpress-plugin/hook-content", "./wordpress-plugin/honey-hole-condition-route"],
+  "config": {
+    "WP_DEBUG": true,
+    "WP_DEBUG_LOG": true,
+    "SCRIPT_DEBUG": true,
+    "RE_EDITORIAL_STAGING": true
+  }
+}
