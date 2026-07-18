@@ -1,22 +1,74 @@
 const IDENTITY_STATES = new Set(['primary_evidence', 'contributor_recollection', 'inferred', 'unknown']);
+const PROHIBITED_LOCATION_KEYS = /^(exact.?location|coordinates?|latitude|longitude|lat|lng|private.?water|access.?code|gate.?code)$/i;
 
 function finite(value) {
   return Number.isFinite(value);
+}
+
+function nonNegative(value) {
+  return finite(value) && value >= 0;
 }
 
 function within(value, min, max) {
   return finite(value) && finite(min) && finite(max) && value >= min && value <= max;
 }
 
+function addRangeError(errors, object, minKey, maxKey, label) {
+  const min = object?.[minKey];
+  const max = object?.[maxKey];
+  if (min == null && max == null) return;
+  if (!nonNegative(min) || !nonNegative(max)) {
+    errors.push(`${label} must use non-negative numeric minimum and maximum values`);
+    return;
+  }
+  if (min > max) errors.push(`${label} minimum cannot exceed maximum`);
+}
+
+function findProtectedLocationData(value, path = []) {
+  const findings = [];
+  if (!value || typeof value !== 'object') return findings;
+
+  for (const [key, child] of Object.entries(value)) {
+    const nextPath = [...path, key];
+    if (PROHIBITED_LOCATION_KEYS.test(key) && child !== null && child !== '' && child !== false) {
+      findings.push(nextPath.join('.'));
+    }
+    if (child && typeof child === 'object') findings.push(...findProtectedLocationData(child, nextPath));
+  }
+  return findings;
+}
+
+function makeCheck(key, passed, detail, consequence = 'review') {
+  return { key, passed, detail, consequence };
+}
+
 export function evaluateSystemCompatibility(input) {
   const errors = [];
+  if (!input || typeof input !== 'object') return { status: 'invalid', errors: ['input object is required'] };
   if (!input.useClass) errors.push('useClass is required');
   if (!input.rod) errors.push('rod properties are required');
   if (!input.reel) errors.push('reel properties are required');
   if (!input.mainLine) errors.push('mainLine properties are required');
   if (!input.terminal) errors.push('terminal or lure properties are required');
   if (!IDENTITY_STATES.has(input.identityEvidence)) errors.push('identityEvidence must be declared');
-  if (input.exactLocation || input.coordinates || input.latitude || input.longitude) errors.push('exact location data is prohibited');
+
+  addRangeError(errors, input.rod, 'lureMinOz', 'lureMaxOz', 'rod lure rating');
+  addRangeError(errors, input.rod, 'lineMinLb', 'lineMaxLb', 'rod line rating');
+
+  for (const [label, value] of [
+    ['main line strength', input.mainLine?.strengthLb],
+    ['leader strength', input.leader?.strengthLb],
+    ['terminal weight', input.terminal?.weightOz],
+    ['reel capacity', input.reel?.capacityYards],
+    ['required line', input.requiredLineYards],
+  ]) {
+    if (value != null && !nonNegative(value)) errors.push(`${label} must be a non-negative number`);
+  }
+
+  const protectedLocationPaths = findProtectedLocationData(input);
+  if (protectedLocationPaths.length) {
+    errors.push(`exact location data is prohibited (${protectedLocationPaths.join(', ')})`);
+  }
   if (errors.length) return { status: 'invalid', errors };
 
   const checks = [];
@@ -33,26 +85,26 @@ export function evaluateSystemCompatibility(input) {
 
   if (finite(terminal.weightOz) && finite(rod.lureMinOz) && finite(rod.lureMaxOz)) {
     const passed = within(terminal.weightOz, rod.lureMinOz, rod.lureMaxOz);
-    checks.push({ key: 'rod_lure_rating', passed, detail: `${terminal.weightOz} oz against ${rod.lureMinOz}-${rod.lureMaxOz} oz` });
+    checks.push(makeCheck('rod_lure_rating', passed, `${terminal.weightOz} oz against ${rod.lureMinOz}-${rod.lureMaxOz} oz`, 'stop'));
     if (!passed) failures.push('terminal_weight_outside_rod_rating');
   } else unknowns.push('rod_lure_rating');
 
   if (finite(main.strengthLb) && finite(rod.lineMinLb) && finite(rod.lineMaxLb)) {
     const passed = within(main.strengthLb, rod.lineMinLb, rod.lineMaxLb);
-    checks.push({ key: 'rod_line_rating', passed, detail: `${main.strengthLb} lb against ${rod.lineMinLb}-${rod.lineMaxLb} lb` });
+    checks.push(makeCheck('rod_line_rating', passed, `${main.strengthLb} lb against ${rod.lineMinLb}-${rod.lineMaxLb} lb`, 'stop'));
     if (!passed) failures.push('main_line_outside_rod_rating');
   } else unknowns.push('rod_line_rating');
 
   if (finite(reel.capacityYards) && finite(input.requiredLineYards)) {
     const passed = reel.capacityYards >= input.requiredLineYards;
-    checks.push({ key: 'reel_capacity', passed, detail: `${reel.capacityYards} yd capacity against ${input.requiredLineYards} yd requirement` });
+    checks.push(makeCheck('reel_capacity', passed, `${reel.capacityYards} yd capacity against ${input.requiredLineYards} yd requirement`, 'stop'));
     if (!passed) failures.push('reel_capacity_insufficient');
   } else unknowns.push('reel_capacity_requirement');
 
-  if (finite(leader.strengthLb) && finite(main.strengthLb)) {
+  if (finite(leader.strengthLb) && finite(main.strengthLb) && main.strengthLb > 0) {
     const ratio = leader.strengthLb / main.strengthLb;
     const passed = ratio >= 0.5 && ratio <= 2;
-    checks.push({ key: 'line_leader_ratio', passed, detail: `leader/main strength ratio ${ratio.toFixed(2)}` });
+    checks.push(makeCheck('line_leader_ratio', passed, `leader/main strength ratio ${ratio.toFixed(2)}`, 'review'));
     if (!passed) conditions.push('line_leader_strength_ratio_requires_connection_and_breakpoint_review');
   } else unknowns.push('line_leader_relationship');
 
@@ -88,12 +140,14 @@ export function evaluateSystemCompatibility(input) {
   return {
     status: 'evaluated',
     applicationId: 'HTH-SC-001',
+    schemaVersion: '0.2.0',
+    ruleVersion: '0.2.0',
     tier,
     identity: {
       evidenceState: input.identityEvidence,
       useExactModelSpecifications: input.identityEvidence === 'primary_evidence',
       qualification: input.identityEvidence === 'primary_evidence'
-        ? 'Exact identity may be used if the recorded properties match the primary source.'
+        ? 'Exact identity may be used only when the recorded properties match the primary source.'
         : 'Evaluation uses only declared properties; exact model specifications are not assumed.'
     },
     checks,
@@ -104,11 +158,24 @@ export function evaluateSystemCompatibility(input) {
     fieldTestSequence: [
       'Verify labels, manuals, spool markings, and connection details before field use.',
       'Test drag, line lay, connection security, and casting with a safe low-load setup.',
-      'Increase distance/load gradually and inspect line, leader, knot, guide, and terminal behavior.',
+      'Increase distance or load gradually and inspect line, leader, knot, guides, and terminal behavior.',
       'Record conditions, duration, failures, and changes before forming a gear verdict.'
     ],
-    confidence: { score: confidenceScore, band: confidenceBand, explanation: 'Confidence reflects known equipment properties, primary identity evidence, and condition completeness; it does not guarantee performance or catch results.' },
-    locationData: 'not_collected',
-    futureRoute: 'Honey Hole Intelligence remains blocked until the shared Stability Gate is approved.'
+    confidence: {
+      score: confidenceScore,
+      band: confidenceBand,
+      explanation: 'Confidence reflects known equipment properties, primary identity evidence, and condition completeness; it does not guarantee performance, safety, legal compliance, or catch results.'
+    },
+    privacy: {
+      locationData: 'not_collected',
+      protectedFieldsRejected: true,
+      publicOutput: 'broad conditions and equipment facts only'
+    },
+    limitations: [
+      'Confirm manufacturer specifications before loading or use.',
+      'Confirm current regulations, access, weather, water, and safety conditions separately.',
+      'A compatible rating does not guarantee casting behavior, durability, landing success, or a catch.'
+    ],
+    relatedRoutes: ['honey-hole-intelligence', 'presentation-planner']
   };
 }

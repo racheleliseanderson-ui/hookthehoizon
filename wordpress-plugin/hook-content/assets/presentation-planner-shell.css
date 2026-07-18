@@ -25,7 +25,7 @@
 
 .hth-application-embed__eyebrow {
   margin: 0;
-  color: var(--re-accent-signal, #d85b3f);
+  color: #f4b4a3;
   font-family: var(--wp--preset--font-family--ui, system-ui, sans-serif);
   font-size: 0.8rem;
   font-weight: 800;
