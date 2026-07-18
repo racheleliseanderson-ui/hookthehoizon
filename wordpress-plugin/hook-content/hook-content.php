@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hook the Horizon Content
  * Description: Durable content models, bounded application routes, publication visibility, and sensitive-location safeguards for Hook the Horizon.
- * Version: 0.2.2
+ * Version: 0.3.0
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Text Domain: hook-the-horizon-content
@@ -10,7 +10,7 @@
 declare(strict_types=1);
 defined('ABSPATH') || exit;
 
-const HTH_CONTENT_VERSION = '0.2.2';
+const HTH_CONTENT_VERSION = '0.3.0';
 const HTH_REWRITE_VERSION_OPTION = 'hth_content_rewrite_version';
 
 require_once __DIR__ . '/includes/publication-visibility.php';
@@ -57,7 +57,7 @@ add_action('init', 'hth_register_content_types');
 function hth_register_application_assets(): void
 {
     wp_register_style(
-        'hth-presentation-planner-shell',
+        'hth-application-shell',
         plugins_url('assets/presentation-planner-shell.css', __FILE__),
         [],
         HTH_CONTENT_VERSION
@@ -66,32 +66,27 @@ function hth_register_application_assets(): void
 add_action('wp_enqueue_scripts', 'hth_register_application_assets');
 
 /**
- * Render the local-first Presentation Planner in an isolated application frame.
+ * Render a local application in an isolated frame.
  *
- * The iframe asset is packaged from the canonical applications source during the
- * release build. It does not receive WordPress cookies, user identity, precise
- * location, post content, or server-side state from this shortcode.
+ * The application receives no WordPress cookies, user identity, precise location,
+ * post content, or server-side state from this helper.
  */
-function hth_render_presentation_planner_shortcode(array $attributes = []): string
+function hth_render_local_application_frame(string $application, string $title, int $height, string $description, string $no_script): string
 {
-    $attributes = shortcode_atts([
-        'title' => __('Horizon Smart Mode Presentation Planner', 'hook-the-horizon-content'),
-        'height' => '980',
-    ], $attributes, 'hth_presentation_planner');
+    $height = max(640, min(2200, $height));
+    $source = plugins_url(sprintf('assets/%s/preview/index.html', $application), __FILE__);
 
-    $height = max(640, min(1800, absint($attributes['height'])));
-    $title = sanitize_text_field((string) $attributes['title']);
-    $source = plugins_url('assets/presentation-planner/preview/index.html', __FILE__);
+    wp_enqueue_style('hth-application-shell');
 
-    wp_enqueue_style('hth-presentation-planner-shell');
+    $heading_id = sprintf('hth-%s-heading', sanitize_html_class($application));
 
     ob_start();
     ?>
-    <section class="hth-application-embed" aria-labelledby="hth-presentation-planner-heading">
+    <section class="hth-application-embed" aria-labelledby="<?php echo esc_attr($heading_id); ?>">
         <header class="hth-application-embed__header">
             <p class="hth-application-embed__eyebrow"><?php esc_html_e('Hook the Horizon application', 'hook-the-horizon-content'); ?></p>
-            <h2 id="hth-presentation-planner-heading"><?php echo esc_html($title); ?></h2>
-            <p><?php esc_html_e('The planner runs locally in your browser. It does not request exact location, create an account, or send inventory and outcome history to WordPress.', 'hook-the-horizon-content'); ?></p>
+            <h2 id="<?php echo esc_attr($heading_id); ?>"><?php echo esc_html($title); ?></h2>
+            <p><?php echo esc_html($description); ?></p>
         </header>
         <div class="hth-application-embed__frame-wrap">
             <iframe
@@ -105,13 +100,46 @@ function hth_render_presentation_planner_shortcode(array $attributes = []): stri
             ></iframe>
         </div>
         <noscript>
-            <p class="hth-application-embed__notice"><?php esc_html_e('Presentation Planner requires JavaScript for its local deterministic calculations. No external analytics or recommendation service is required.', 'hook-the-horizon-content'); ?></p>
+            <p class="hth-application-embed__notice"><?php echo esc_html($no_script); ?></p>
         </noscript>
     </section>
     <?php
     return (string) ob_get_clean();
 }
+
+function hth_render_presentation_planner_shortcode(array $attributes = []): string
+{
+    $attributes = shortcode_atts([
+        'title' => __('Horizon Smart Mode Presentation Planner', 'hook-the-horizon-content'),
+        'height' => '980',
+    ], $attributes, 'hth_presentation_planner');
+
+    return hth_render_local_application_frame(
+        'presentation-planner',
+        sanitize_text_field((string) $attributes['title']),
+        absint($attributes['height']),
+        __('The planner runs locally in your browser. It does not request exact location, create an account, or send inventory and outcome history to WordPress.', 'hook-the-horizon-content'),
+        __('Presentation Planner requires JavaScript for its local deterministic calculations. No external analytics or recommendation service is required.', 'hook-the-horizon-content')
+    );
+}
 add_shortcode('hth_presentation_planner', 'hth_render_presentation_planner_shortcode');
+
+function hth_render_system_compatibility_shortcode(array $attributes = []): string
+{
+    $attributes = shortcode_atts([
+        'title' => __('Rod, Reel, Line, Leader, and Lure Compatibility Builder', 'hook-the-horizon-content'),
+        'height' => '1320',
+    ], $attributes, 'hth_system_compatibility');
+
+    return hth_render_local_application_frame(
+        'system-compatibility',
+        sanitize_text_field((string) $attributes['title']),
+        absint($attributes['height']),
+        __('The builder runs locally and evaluates only the ratings and broad conditions you enter. It rejects exact-location fields and does not use affiliate status in the result.', 'hook-the-horizon-content'),
+        __('System Compatibility requires JavaScript for its local deterministic checks. Use manufacturer ratings and the printable worksheet when JavaScript is unavailable.', 'hook-the-horizon-content')
+    );
+}
+add_shortcode('hth_system_compatibility', 'hth_render_system_compatibility_shortcode');
 
 function hth_maybe_refresh_rewrite_rules(): void
 {
