@@ -69,6 +69,19 @@ for (const route of ['compatibility-builder', 'compatibility-result']) {
             if (!resultText?.trim()) failures.push({ phase: 'deterministic-result', label, error: 'No result heading after submit.' });
             const appOverflow = await frame.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
             if (appOverflow) failures.push({ phase: 'application-reflow', label });
+
+            if (viewport.name === 'desktop') {
+              await frame.evaluate(() => {
+                Object.defineProperty(window, 'localStorage', {
+                  configurable: true,
+                  get() { throw new DOMException('Storage unavailable', 'SecurityError'); }
+                });
+              });
+              await frame.locator('button[type="submit"]').click();
+              await frame.locator('#result:not([hidden])').waitFor({ state: 'visible', timeout: 10000 });
+              const storageStatus = (await frame.locator('#form-status').textContent()) || '';
+              if (!/not saved|storage unavailable/i.test(storageStatus)) failures.push({ phase: 'storage-resilience', label, status: storageStatus });
+            }
           }
         }
       }
