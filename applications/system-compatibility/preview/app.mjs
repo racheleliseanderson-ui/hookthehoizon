@@ -92,9 +92,22 @@ function renderInvalid(errors) {
   statusRoot.className = 'status error';
 }
 
-function renderResult(result, input) {
+function resultExplanation(result) {
+  if (result.failures.length) return `The setup stopped on ${result.failures.length} manufacturer-rating mismatch${result.failures.length === 1 ? '' : 'es'}. Correct those before field testing.`;
+  if (result.unknowns.length) return `${result.checks.filter((check) => check.passed).length} declared checks passed, but ${result.unknowns.length} unknown${result.unknowns.length === 1 ? '' : 's'} limit the conclusion.`;
+  if (result.conditions.length) return `Declared ratings align, with ${result.conditions.length} condition-sensitive trade-off${result.conditions.length === 1 ? '' : 's'} to test before use.`;
+  return 'All supported declared rating checks passed; field testing and current safety conditions still control actual use.';
+}
+
+function renderResult(result, input, saved) {
   const evaluatedAt = new Date().toISOString();
-  const exportRecord = { evaluatedAt, input, result };
+  const exportRecord = {
+    portableFormat: 'hook-the-horizon-compatibility-setup',
+    portableFormatVersion: 1,
+    evaluatedAt,
+    input,
+    result
+  };
   emptyRoot.hidden = true;
   resultRoot.hidden = false;
 
@@ -104,8 +117,8 @@ function renderResult(result, input) {
 
   resultRoot.innerHTML = `
     <div class="result-head">
-      <div><span class="badge" data-tier="${escapeHtml(result.tier)}">${escapeHtml(result.tier.replaceAll('_', ' '))}</span><h2 id="result-heading" class="result-tier">${escapeHtml(tierLabels[result.tier] || result.tier)}</h2></div>
-      <div class="actions"><button class="secondary" type="button" id="print-result">Print setup card</button><button class="ghost" type="button" id="download-result">Download JSON</button></div>
+      <div><span class="badge" data-tier="${escapeHtml(result.tier)}">${escapeHtml(result.tier.replaceAll('_', ' '))}</span><h2 id="result-heading" class="result-tier">${escapeHtml(tierLabels[result.tier] || result.tier)}</h2><p><strong>Why:</strong> ${escapeHtml(resultExplanation(result))}</p></div>
+      <div class="actions"><button class="secondary" type="button" id="print-result">Print setup card</button><button class="ghost" type="button" id="download-result">Download portable setup</button></div>
     </div>
     <p>${escapeHtml(result.identity.qualification)}</p>
     <div class="metric-grid">
@@ -134,13 +147,20 @@ function renderResult(result, input) {
     URL.revokeObjectURL(url);
   });
 
-  statusRoot.textContent = `Compatibility check complete: ${tierLabels[result.tier] || result.tier}. Inputs were saved locally for return use.`;
+  statusRoot.textContent = saved
+    ? `Compatibility check complete: ${tierLabels[result.tier] || result.tier}. Inputs were saved locally for return use.`
+    : `Compatibility check complete: ${tierLabels[result.tier] || result.tier}. Local storage is unavailable, so inputs were not saved.`;
   statusRoot.className = 'status';
 }
 
 function saveForm() {
-  const values = Object.fromEntries(new FormData(form).entries());
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
+  try {
+    const values = Object.fromEntries(new FormData(form).entries());
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function restoreForm() {
@@ -153,7 +173,7 @@ function restoreForm() {
     }
     statusRoot.textContent = 'Saved setup inputs restored from this browser.';
   } catch {
-    localStorage.removeItem(STORAGE_KEY);
+    statusRoot.textContent = 'Local storage is unavailable. The builder still works, but inputs will not persist on this device.';
   }
 }
 
@@ -170,13 +190,13 @@ form.addEventListener('submit', (event) => {
     renderInvalid(evaluation.errors);
     return;
   }
-  saveForm();
-  renderResult(evaluation, input);
+  const saved = saveForm();
+  renderResult(evaluation, input, saved);
 });
 
 resetButton.addEventListener('click', () => {
   form.reset();
-  localStorage.removeItem(STORAGE_KEY);
+  try { localStorage.removeItem(STORAGE_KEY); } catch {}
   resultRoot.hidden = true;
   resultRoot.replaceChildren();
   emptyRoot.hidden = false;
