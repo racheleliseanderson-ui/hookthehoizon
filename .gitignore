@@ -1,7 +1,0 @@
-**/vendor/
-**/node_modules/
-**/build/
-**/dist/
-*.zip
-.env
-.DS_Store

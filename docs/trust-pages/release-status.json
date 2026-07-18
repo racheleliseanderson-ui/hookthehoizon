@@ -1,9 +1,0 @@
-{
-  "contract_branch": "wave1/trust-pages",
-  "merged_to_main": true,
-  "main_commit": "25080e8f7f28cdd50a3881381e5a9b33cb58167d",
-  "repository_validation": "passed",
-  "wordpress_draft_installation": "queued_until_staging_connected",
-  "production_release": "gated_by_site_configuration_and_staging_checks",
-  "recorded_at": "2026-07-16"
-}
