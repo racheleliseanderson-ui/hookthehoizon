@@ -1,0 +1,168 @@
+name: Hook the Horizon Workflow Control
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Preview the task plan or generate GitHub issues'
+        required: true
+        type: choice
+        default: preview
+        options:
+          - preview
+          - generate
+      approval_phrase:
+        description: 'For generate mode, enter exactly: APPROVE HOOK WORK'
+        required: false
+        type: string
+      priority:
+        description: 'Priority applied to generated task titles'
+        required: true
+        type: choice
+        default: P0
+        options:
+          - P0
+          - P1
+          - P2
+      due_cycle:
+        description: 'Planning cycle or target date, for example 2026-07-31'
+        required: true
+        type: string
+        default: '2026-07-31'
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: hth-workflow-control
+  cancel-in-progress: false
+
+jobs:
+  validate-request:
+    runs-on: ubuntu-latest
+    outputs:
+      approved: ${{ steps.approval.outputs.approved }}
+    steps:
+      - name: Validate operator request
+        id: approval
+        shell: bash
+        env:
+          MODE: ${{ inputs.mode }}
+          APPROVAL: ${{ inputs.approval_phrase }}
+        run: |
+          set -euo pipefail
+          if [[ "$MODE" == "generate" && "$APPROVAL" != "APPROVE HOOK WORK" ]]; then
+            echo 'Generation blocked. Enter the exact approval phrase: APPROVE HOOK WORK'
+            exit 1
+          fi
+          if [[ "$MODE" == "generate" ]]; then
+            echo 'approved=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'approved=false' >> "$GITHUB_OUTPUT"
+          fi
+
+  preview-plan:
+    needs: validate-request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Display proposed work items
+        shell: bash
+        env:
+          PRIORITY: ${{ inputs.priority }}
+          DUE_CYCLE: ${{ inputs.due_cycle }}
+        run: |
+          cat <<EOF
+          Hook the Horizon proposed task package
+          Priority: $PRIORITY
+          Target cycle: $DUE_CYCLE
+
+          1. Complete evidence, preservation, and product inventory
+          2. Configure monthly source freshness and safety review
+          3. Validate GitHub, Drive, Notion, n8n, and WordPress parity
+          4. Complete mobile, offline, and field-use assessment
+          5. Reconcile application, route, evaluator, and evidence ownership
+          6. Produce workflow acceptance and runtime evidence
+          EOF
+
+  generate-issues:
+    needs: validate-request
+    if: inputs.mode == 'generate' && needs.validate-request.outputs.approved == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate missing Hook workflow issues
+        uses: actions/github-script@v7
+        env:
+          PRIORITY: ${{ inputs.priority }}
+          DUE_CYCLE: ${{ inputs.due_cycle }}
+        with:
+          script: |
+            const priority = process.env.PRIORITY;
+            const dueCycle = process.env.DUE_CYCLE;
+            const tasks = [
+              {
+                key: 'HTH-WF-001',
+                title: 'Complete evidence, preservation, and product inventory',
+                body: 'Inventory every Hook the Horizon application, intelligence system, route, evaluator, repository path, field workbook, content system, evidence pack, and preservation requirement.'
+              },
+              {
+                key: 'HTH-WF-002',
+                title: 'Configure monthly source freshness and safety review',
+                body: 'Establish the recurring review for regulations, access, closures, conservation, safety, source freshness, sensitive-location controls, and review dates.'
+              },
+              {
+                key: 'HTH-WF-003',
+                title: 'Validate cross-system workflow parity',
+                body: 'Validate authority and status parity across Google Drive, GitHub, Notion, n8n, and WordPress without treating any mirror as a replacement for its governing source.'
+              },
+              {
+                key: 'HTH-WF-004',
+                title: 'Complete mobile, offline, and field-use assessment',
+                body: 'Assess PWA, offline, weak-connectivity, print, local-first storage, field safety, and mobile interaction requirements for all Hook applications.'
+              },
+              {
+                key: 'HTH-WF-005',
+                title: 'Reconcile application and evidence ownership',
+                body: 'Map Honey Hole Intelligence, System Compatibility, Hatch Match, Presentation Planner, Rig Signal, shared contracts, WordPress routes, and evidence authorities to named owners and review triggers.'
+              },
+              {
+                key: 'HTH-WF-006',
+                title: 'Produce workflow acceptance and runtime evidence',
+                body: 'Record test results, issue links, source hashes, release artifacts, runtime parity, accessibility checks, rollback evidence, exceptions, and final acceptance status.'
+              }
+            ];
+
+            for (const task of tasks) {
+              const fullTitle = `[${priority}] [${task.key}] ${task.title}`;
+              const query = `repo:${context.repo.owner}/${context.repo.repo} in:title "[${task.key}]" is:issue`;
+              const existing = await github.rest.search.issuesAndPullRequests({ q: query });
+              if (existing.data.total_count > 0) {
+                core.info(`Skipped existing task ${task.key}`);
+                continue;
+              }
+
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: fullTitle,
+                body: `${task.body}\n\n## Governing records\n- Hook the Horizon complete ecosystem integration standard\n- Editorial Ecosystem preservation-first research protocol\n\n## Target cycle\n${dueCycle}\n\n## Required completion evidence\n- source links and authority state\n- owner and next action\n- evidence confidence\n- preservation requirements\n- validation results\n- review trigger and next review date\n\nGenerated through the manually approved Hook the Horizon Workflow Control.`,
+              });
+              core.info(`Created ${task.key}`);
+            }
+
+  summary:
+    needs: [validate-request, preview-plan, generate-issues]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write operator summary
+        shell: bash
+        run: |
+          echo '## Hook the Horizon Workflow Control' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Mode: `${{ inputs.mode }}`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Priority: `${{ inputs.priority }}`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Target cycle: `${{ inputs.due_cycle }}`' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Generation approval: `${{ needs.validate-request.outputs.approved }}`' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Preview mode makes no issues. Generate mode creates only missing task IDs and requires the exact approval phrase.' >> "$GITHUB_STEP_SUMMARY"
