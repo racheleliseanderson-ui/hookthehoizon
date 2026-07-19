@@ -1,0 +1,88 @@
+name: Hook the Horizon Ecosystem Integration Guard
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'applications/**'
+      - 'wordpress-theme/**'
+      - 'wordpress-plugin/**'
+      - '.github/workflows/**'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'applications/**'
+      - 'wordpress-theme/**'
+      - 'wordpress-plugin/**'
+  schedule:
+    - cron: '17 13 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integration-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate canonical Hook integration files
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            README.md
+            docs/governance/HOOK_THE_HORIZON_ECOSYSTEM_INTEGRATION.md
+            wordpress-theme
+            wordpress-plugin/hook-content
+            applications
+          )
+          for path in "${required[@]}"; do
+            test -e "$path" || { echo "Missing required path: $path"; exit 1; }
+          done
+
+      - name: Reject stale four-publication authority language
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RInE --exclude-dir=.git --exclude='*.lock' \
+            '(all four publications|four-publication ecosystem|four-site ecosystem)' \
+            README.md docs .github applications wordpress-theme wordpress-plugin 2>/dev/null; then
+            echo 'Stale four-publication authority language found. Use the governed five-publication model.'
+            exit 1
+          fi
+
+      - name: Validate canonical identity and systems of record
+        shell: bash
+        run: |
+          set -euo pipefail
+          contract='docs/governance/HOOK_THE_HORIZON_ECOSYSTEM_INTEGRATION.md'
+          grep -q 'Fifth independent peer publication' "$contract"
+          grep -q 'Google Drive' "$contract"
+          grep -q 'GitHub' "$contract"
+          grep -q 'Notion' "$contract"
+          grep -q 'n8n' "$contract"
+          grep -q 'WordPress' "$contract"
+          grep -q 'Honey Hole Intelligence' "$contract"
+          grep -q 'sensitive-location' "$contract"
+          grep -q 'Review cadence' "$contract"
+
+      - name: Validate application inventory paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          for app in system-compatibility honey-hole-intelligence hatch-match presentation-planner rig-signal _shared; do
+            test -d "applications/$app" || { echo "Missing governed application path: applications/$app"; exit 1; }
+          done
+
+      - name: Emit monthly review reminder
+        if: github.event_name == 'schedule'
+        shell: bash
+        run: |
+          echo 'Monthly Hook the Horizon review due:'
+          echo '- regulations, access, closures, safety, conservation, and source freshness'
+          echo '- active P0/P1 application evidence and market changes'
+          echo '- privacy, sensitive-location, accessibility, release, and runtime parity status'

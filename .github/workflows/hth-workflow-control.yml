@@ -1,0 +1,84 @@
+name: Hook the Horizon Autonomous Work Orchestrator
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'applications/**'
+      - 'wordpress-theme/**'
+      - 'wordpress-plugin/**'
+      - '.github/workflows/**'
+  schedule:
+    - cron: '17 13 * * *'
+  workflow_dispatch:
+    inputs:
+      cycle:
+        description: 'Optional planning cycle override'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: hth-autonomous-work-orchestrator
+  cancel-in-progress: false
+
+jobs:
+  policy-and-task-generation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate autonomous operating authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'Routine governed work proceeds automatically' README.md
+          grep -q 'Human exception review is limited to A3 conditions' README.md
+          test -f docs/governance/HOOK_THE_HORIZON_ECOSYSTEM_INTEGRATION.md
+
+      - name: Generate or refresh governed work items
+        uses: actions/github-script@v7
+        env:
+          CYCLE: ${{ inputs.cycle || 'rolling-current-cycle' }}
+        with:
+          script: |
+            const cycle = process.env.CYCLE;
+            const tasks = [
+              ['HTH-WF-001','P0','Complete evidence, preservation, and product inventory','Inventory every application, intelligence system, route, evaluator, repository path, field workbook, content system, evidence pack, authority state, and preservation requirement.'],
+              ['HTH-WF-002','P0','Run source freshness, regulation, access, safety, and conservation review','Review official sources, closures, access, safety, conservation, source freshness, sensitive-location controls, and next-review dates.'],
+              ['HTH-WF-003','P0','Maintain GitHub, Drive, Notion, n8n, and WordPress workflow parity','Detect authority or status drift across systems and create bounded correction work without replacing a governing source with a mirror.'],
+              ['HTH-WF-004','P1','Advance mobile, offline, and field-use implementation','Assess and implement bounded PWA, offline, weak-connectivity, print, local-first storage, field-safety, and mobile interaction improvements.'],
+              ['HTH-WF-005','P0','Reconcile application, route, evaluator, and evidence ownership','Keep Honey Hole Intelligence, System Compatibility, Hatch Match, Presentation Planner, Rig Signal, shared contracts, WordPress routes, and evidence authorities mapped to owners and review triggers.'],
+              ['HTH-WF-006','P0','Maintain workflow acceptance and runtime evidence','Record tests, source hashes, release artifacts, runtime parity, accessibility checks, rollback evidence, exceptions, and acceptance state.']
+            ];
+
+            for (const [key, priority, title, scope] of tasks) {
+              const q = `repo:${context.repo.owner}/${context.repo.repo} in:title "[${key}]" is:issue`;
+              const found = await github.rest.search.issuesAndPullRequests({q});
+              if (found.data.total_count === 0) {
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: `[${priority}] [${key}] ${title}`,
+                  body: `${scope}\n\n## Autonomous authority\nRoutine, reversible work is self-approved under the Editorial Ecosystem AI Autonomy and Exception Governance Standard. Research, documentation, branches, commits, tests, previews, evidence updates, source synchronization, retries, and bounded corrections proceed without owner approval.\n\n## Stop and escalate only for A3 exceptions\n- contributor identity, image, voice, exact age, routine, or minor-safety exposure\n- exact or sensitive location disclosure or protected conservation data\n- unsupported regulation, safety, medical, legal, or professional claims\n- credentials, account authority, privacy-policy changes, or protected data handling\n- contracts, sponsorships, advertising, payments, or spending outside an approved envelope\n- destructive, irreversible, domain/DNS ownership, or unrecoverable production actions\n- materially unresolved risk that cannot be reduced through research, testing, staging, or rollback\n\n## Cycle\n${cycle}\n\n## Completion evidence\n- governing source links and authority state\n- work performed and validation results\n- preservation impact and evidence confidence\n- runtime or publication status\n- open exceptions and next review date\n- rollback or recovery path where applicable\n\nGenerated and governed automatically by the Hook the Horizon Autonomous Work Orchestrator.`
+                });
+                core.info(`Created ${key}`);
+              } else {
+                core.info(`Existing governed task ${key} retained`);
+              }
+            }
+
+      - name: Emit autonomous operations summary
+        shell: bash
+        run: |
+          echo '## Hook the Horizon Autonomous Work Orchestrator' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Routine work: self-approved and automatically generated' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Duplicate control: stable HTH-WF task identifiers' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Human review: A3 exceptions only' >> "$GITHUB_STEP_SUMMARY"
+          echo '- WordPress publication or destructive production action: not performed by this workflow' >> "$GITHUB_STEP_SUMMARY"
