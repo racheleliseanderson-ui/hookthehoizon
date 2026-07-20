@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hook the Horizon Experience Core
  * Description: Publication-owned field-file, pathway, privacy, discovery, account and commerce contracts for the Hook the Horizon rebuild.
- * Version: 0.3.0
+ * Version: 0.3.1
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Author: Rachel Anderson
@@ -10,7 +10,7 @@
  */
 declare(strict_types=1);
 if (! defined('ABSPATH')) { exit; }
-const HTH_EXPERIENCE_CORE_VERSION = '0.3.0';
+const HTH_EXPERIENCE_CORE_VERSION = '0.3.1';
 function hth_experience_register_types(): void {
     register_post_type('hth_field_file',['labels'=>['name'=>__('Field Files','horizon-experience-core'),'singular_name'=>__('Field File','horizon-experience-core'),'add_new_item'=>__('Add Field File','horizon-experience-core'),'edit_item'=>__('Edit Field File','horizon-experience-core'),'not_found'=>__('No field files found.','horizon-experience-core')],'public'=>true,'show_in_rest'=>true,'has_archive'=>true,'rewrite'=>['slug'=>'field-files','with_front'=>false],'menu_icon'=>'dashicons-location-alt','supports'=>['title','editor','excerpt','thumbnail','revisions','custom-fields']]);
     register_taxonomy('hth_field_type',['hth_field_file'],['labels'=>['name'=>__('Field Types','horizon-experience-core'),'singular_name'=>__('Field Type','horizon-experience-core')],'public'=>true,'show_in_rest'=>true,'hierarchical'=>true,'rewrite'=>['slug'=>'field-type','with_front'=>false]]);
@@ -47,3 +47,15 @@ new NLH_Publication_Runtime([
         ['id'=>'downloads','title'=>'Field resources','state'=>'editorial-mapping-required']
     ]
 ]);
+
+add_filter('rest_request_before_callbacks', static function ($response, $handler, WP_REST_Request $request) {
+    if (! in_array($request->get_method(), ['POST', 'PUT', 'PATCH'], true) || $request->get_route() !== '/horizon-experience/v1/account') {
+        return $response;
+    }
+    $body = $request->get_body_params();
+    if (is_array($body) && $body !== []) {
+        $request->set_header('content-type', 'application/json');
+        $request->set_body((string) wp_json_encode($body));
+    }
+    return $response;
+}, 10, 3);
