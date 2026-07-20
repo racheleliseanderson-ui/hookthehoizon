@@ -1,0 +1,74 @@
+name: Hatch Match Maintenance
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 14 * * 1'
+  pull_request:
+    paths:
+      - 'applications/hatch-match/**'
+      - 'next-generation/plugins/hatch-match-preview/**'
+      - 'scripts/sync-hatch-match-preview.mjs'
+      - '.github/workflows/hatch-match-maintenance.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate and synchronize maintained artifacts
+        run: |
+          python -m json.tool applications/hatch-match/data/approved-preview-seed-records.json >/dev/null
+          python -m json.tool applications/hatch-match/maintenance-policy.json >/dev/null
+          python -m json.tool applications/hatch-match/maintenance-log.json >/dev/null
+          node scripts/sync-hatch-match-preview.mjs
+          cmp applications/hatch-match/data/approved-preview-seed-records.json next-generation/plugins/hatch-match-preview/data/seed-records.json
+          cmp applications/hatch-match/maintenance-policy.json next-generation/plugins/hatch-match-preview/data/maintenance-policy.json
+          cmp applications/hatch-match/maintenance-log.json next-generation/plugins/hatch-match-preview/data/maintenance-log.json
+      - name: Check source availability, review dates, and ownership boundaries
+        run: |
+          mkdir -p maintenance-evidence
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const seed=JSON.parse(fs.readFileSync('applications/hatch-match/data/approved-preview-seed-records.json','utf8'));
+          const policy=JSON.parse(fs.readFileSync('applications/hatch-match/maintenance-policy.json','utf8'));
+          const now=new Date();
+          const nextReview=new Date(`${seed.nextReviewDate}T23:59:59Z`);
+          const expiry=new Date(`${seed.expiresDate}T23:59:59Z`);
+          const report={checkedAt:now.toISOString(),applicationId:seed.applicationId,policyId:policy.policyId,seedSchemaVersion:seed.schemaVersion,recordCount:seed.records.length,sourceCount:seed.sources.length,nextReviewDate:seed.nextReviewDate,expiresDate:seed.expiresDate,sources:[],failures:[]};
+          if(policy.status!=='active-maintenance-authority')report.failures.push('maintenance policy is not active');
+          if(policy.secondaryOperationalOwner?.state!=='active')report.failures.push('secondary operational owner is not active');
+          if(now>expiry)report.failures.push('seed register passed hard expiry');
+          if(now>nextReview)report.failures.push('scheduled review is overdue');
+          const forbiddenKeys=/^(exactLocation|coordinates?|latitude|longitude|lat|lng|gps|accessCode|gateCode|currentConditions|regulations?)$/i;
+          const walk=(value)=>{if(Array.isArray(value)){value.forEach(walk);return;}if(value&&typeof value==='object'){for(const [key,child] of Object.entries(value)){if(forbiddenKeys.test(key))report.failures.push(`forbidden owned field: ${key}`);walk(child);}}};
+          walk(seed.records);
+          for(const source of seed.sources){
+            const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),15000);
+            try{
+              const response=await fetch(source.url,{redirect:'follow',signal:controller.signal,headers:{'user-agent':'Hook-the-Horizon-Hatch-Match-Maintenance/1.0'}});
+              report.sources.push({id:source.id,url:source.url,status:response.status,ok:response.ok,finalUrl:response.url});
+              if(!response.ok)report.failures.push(`${source.id}: HTTP ${response.status}`);
+            }catch(error){report.sources.push({id:source.id,url:source.url,ok:false,error:String(error)});report.failures.push(`${source.id}: ${error}`);}finally{clearTimeout(timer);}
+          }
+          fs.writeFileSync('maintenance-evidence/report.json',JSON.stringify(report,null,2));
+          fs.writeFileSync('maintenance-evidence/summary.md',`# Hatch Match maintenance\n\nChecked: ${report.checkedAt}\n\nRecords: ${report.recordCount}\n\nSources: ${report.sourceCount}\n\nNext review: ${report.nextReviewDate}\n\nHard expiry: ${report.expiresDate}\n\nFailures: ${report.failures.length}\n`);
+          if(report.failures.length){console.error(report.failures.join('\n'));process.exit(1);}
+          NODE
+      - name: Record artifact integrity
+        run: |
+          sha256sum applications/hatch-match/data/approved-preview-seed-records.json applications/hatch-match/maintenance-policy.json applications/hatch-match/maintenance-log.json next-generation/plugins/hatch-match-preview/data/runtime-manifest.json > maintenance-evidence/SHA256SUMS
+          git rev-parse HEAD > maintenance-evidence/commit.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hatch-match-maintenance-evidence
+          path: maintenance-evidence
+          if-no-files-found: error
