@@ -9,6 +9,7 @@ const files = [
   ['applications/presentation-planner/preview/app.mjs', 'preview/app.mjs'],
   ['applications/presentation-planner/preview/sw.js', 'preview/sw.js'],
   ['applications/presentation-planner/preview/manifest.webmanifest', 'preview/manifest.webmanifest'],
+  ['applications/presentation-planner/preview/water-column-decision-map.svg', 'preview/water-column-decision-map.svg'],
   ['applications/presentation-planner/data/seed-presentations.mjs', 'data/seed-presentations.mjs'],
   ['applications/_shared/personalization.mjs', '_shared/personalization.mjs'],
   ['applications/_shared/privacy.mjs', '_shared/privacy.mjs']
@@ -30,12 +31,18 @@ if (corrected === original) throw new Error('Presentation Planner shared-module 
 fs.writeFileSync(runtimeApp, corrected);
 
 const manifest = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   applicationId: 'HTH-PP-001',
   personalizationLayer: 'HTH-SM-001',
   source: 'applications/presentation-planner',
   generatedAt: new Date().toISOString(),
   runtimeImportAdjustment: 'preview/app.mjs uses ../_shared inside the packaged plugin',
+  representativeMedia: {
+    id: 'hth-water-column-decision-map-001',
+    runtime: 'preview/water-column-decision-map.svg',
+    ownership: 'project-owned-original',
+    alt: 'Field diagram connecting surface, middle, and bottom water zones to observation, presentation choice, and the next test.'
+  },
   files: files.map(([source, runtime]) => ({ source, runtime }))
 };
 fs.writeFileSync(path.join(destination, 'runtime-manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
