@@ -1,20 +1,51 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "publication": "Hook the Horizon",
   "canonicalDomain": "https://hookthehorizon.blog",
   "status": "active_clean_rebuild_foundation",
   "authority": {
     "driveDirective": "https://docs.google.com/document/d/1wxhRfP5Dxpz1MwqgzFSQS5VQ92ZQa5p0SRHLWEFu_Sk",
+    "creativeCorrection": "https://docs.google.com/document/d/1BbGEoaojspZmZEKw7X-Q5uXRWzJnedR-t8kW1kYPBko",
+    "primaryVisualReferenceFolder": "https://drive.google.com/drive/folders/1muJeUQXNZZEQ8udwOZy5NqpM8lYqZEV5",
     "operatingStandard": "GOV-LEAN-BEST-EFFORT-001",
     "architectureStandard": "GOV-EXPERIENCE-TEMPLATE-001"
+  },
+  "visualReferenceReview": {
+    "completed": true,
+    "reviewDate": "2026-07-20",
+    "rootFiles": 44,
+    "io2Files": 105,
+    "io3Files": 90,
+    "io4Files": 93,
+    "totalFiles": 332,
+    "exactUniqueFiles": 329,
+    "method": "enumerated_downloaded_visual_contact_sheet_review_and_hash_duplicate_check"
   },
   "sourceBoundary": {
     "theme": "next-generation/theme",
     "experiencePlugin": "next-generation/plugins/horizon-experience-core",
     "legacySourcePolicy": "forensic_reference_and_selective_recovery_only"
   },
-  "experienceThesis": "Brilliant, immersive field intelligence that makes conditions, equipment relationships, evidence, uncertainty, and the next decision legible.",
+  "experienceThesis": "Brilliant, creative field intelligence that makes water, weather, habitat, equipment relationships, evidence, uncertainty, and the next responsible decision visually compelling and legible.",
   "palettePrototype": "horizon-current-signal",
+  "creativeAcceptance": {
+    "creativityRequired": true,
+    "personalityRequired": true,
+    "identityMustSurviveLogoRemoval": true,
+    "fieldBoundariesConstrainClaimsNotCreativeAmbition": true,
+    "reject": [
+      "generic-outdoor-template",
+      "blue-wave-theme",
+      "tackle-catalog",
+      "trophy-only-grid",
+      "rustic-man-cave",
+      "neon-tournament-package",
+      "flat-desaturation",
+      "over-restrained-data-page",
+      "corporate-or-soulless-presentation"
+    ],
+    "peoplePolicy": "People may appear when they clarify field action, technique, scale, safety, stewardship, or lived conditions and rights, privacy, and sensitive-location controls are appropriate."
+  },
   "signatureFamilies": [
     "conditions-brief",
     "species-strategy",
@@ -31,10 +62,38 @@
   ],
   "imagePolicy": {
     "existingAssetsFirst": true,
-    "requiredModes": ["establishing-water", "condition-evidence", "equipment-detail", "route-map", "decision-diagram", "field-sequence"],
-    "prohibitedDefaults": ["trophy-only-grid", "generic-blue-wave", "rustic-man-cave", "neon-tournament", "catalog-product-wall", "flat-desaturation"]
+    "requiredModes": ["brilliant-establishing-water", "weather-and-light", "condition-evidence", "habitat-and-species-context", "equipment-detail", "route-map", "decision-diagram", "field-sequence", "human-action-when-useful"],
+    "prohibitedDefaults": ["trophy-only-grid", "generic-blue-wave", "rustic-man-cave", "neon-tournament", "catalog-product-wall", "flat-desaturation", "sensitive-location-exposure"]
   },
-  "requiredChecks": ["valid-block-theme", "php-syntax", "domain-metadata-check", "responsive-layout", "wcag-2.2-aa", "keyboard-navigation", "reduced-motion", "regulation-boundary", "location-privacy", "condition-labeling", "media-mapping", "visual-regression", "installed-preview", "rollback-package"],
+  "presentationPolicy": {
+    "internalContractsBackstageByDefault": true,
+    "readerVisibleWhenUseful": ["current-source-date", "uncertainty", "regulation", "safety", "stewardship", "sensitive-location-handling", "compatibility-limit", "result-interpretation", "controls", "next-action"],
+    "doNotExposeByDefault": ["post-type-keys", "taxonomy-keys", "schema-ids", "application-ids", "route-names", "endpoint-namespaces", "option-or-table-names", "migration-contracts", "test-and-deployment-internals"]
+  },
+  "aiDecisionRights": {
+    "routineOwnerApprovalRequired": false,
+    "owns": ["content-model-creation", "field-mapping", "legacy-migration-design", "validation", "semantic-consistency", "image-and-component-mapping", "reversible-source-edits", "proportionate-qa", "strongest-supported-option-selection"],
+    "escalateOnlyFor": ["irreconcilable-current-authority-conflict", "blocking-rights-consent-privacy-or-license-issue", "materially-unsupported-regulation-safety-location-compatibility-or-current-condition-claim", "destructive-or-live-action-without-rollback", "external-purchase-or-binding-commitment", "owner-only-credential-action", "equally-supported-material-brand-directions-after-rendered-comparison"]
+  },
+  "requiredChecks": [
+    "valid-block-theme",
+    "php-syntax",
+    "domain-metadata-check",
+    "creative-identity",
+    "backstage-contract-check",
+    "ai-decision-rights-check",
+    "responsive-layout",
+    "wcag-2.2-aa",
+    "keyboard-navigation",
+    "reduced-motion",
+    "regulation-boundary",
+    "location-privacy",
+    "condition-labeling",
+    "real-image-mapping",
+    "visual-regression",
+    "installed-preview",
+    "rollback-package"
+  ],
   "production": {
     "mergeAuthorized": false,
     "deploymentAuthorized": false,
