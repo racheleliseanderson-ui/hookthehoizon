@@ -22,8 +22,22 @@ add_action('after_setup_theme', static function (): void {
 
 add_action('wp_enqueue_scripts', static function (): void {
     $theme = wp_get_theme();
-    wp_enqueue_style('hook-the-horizon-tokens', get_theme_file_uri('assets/tokens.css'), [], (string) filemtime(get_theme_file_path('assets/tokens.css')));
-    wp_enqueue_style('hook-the-horizon', get_stylesheet_uri(), ['hook-the-horizon-tokens'], (string) $theme->get('Version'));
+    $tokens = get_theme_file_path('assets/tokens.css');
+    if (is_readable($tokens)) {
+        wp_enqueue_style('hook-the-horizon-tokens', get_theme_file_uri('assets/tokens.css'), [], (string) filemtime($tokens));
+    }
+    wp_enqueue_style('hook-the-horizon', get_stylesheet_uri(), wp_style_is('hook-the-horizon-tokens', 'registered') ? ['hook-the-horizon-tokens'] : [], (string) $theme->get('Version'));
+
+    if (is_page('honey-hole-intelligence')) {
+        $appStyle = get_theme_file_path('assets/honey-hole-intelligence/styles.css');
+        $appScript = get_theme_file_path('assets/honey-hole-intelligence/app.mjs');
+        if (is_readable($appStyle)) {
+            wp_enqueue_style('hook-honey-hole-intelligence', get_theme_file_uri('assets/honey-hole-intelligence/styles.css'), ['hook-the-horizon'], (string) filemtime($appStyle));
+        }
+        if (is_readable($appScript)) {
+            wp_enqueue_script_module('hook-honey-hole-intelligence', get_theme_file_uri('assets/honey-hole-intelligence/app.mjs'), [], (string) filemtime($appScript));
+        }
+    }
 });
 
 add_action('init', static function (): void {
