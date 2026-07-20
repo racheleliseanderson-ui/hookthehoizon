@@ -1,10 +1,10 @@
 name: Route-specific installed preview evidence
 on:
   pull_request:
-    paths: ['next-generation/**','.github/workflows/next-generation-route-evidence.yml']
+    paths: ['next-generation/**','wordpress-plugin/hook-content/**','scripts/build-wordpress-release.sh','.github/workflows/next-generation-route-evidence.yml']
   push:
     branches: ['rebuild/2026-07-clean-luxury-worlds']
-    paths: ['next-generation/**','.github/workflows/next-generation-route-evidence.yml']
+    paths: ['next-generation/**','wordpress-plugin/hook-content/**','scripts/build-wordpress-release.sh','.github/workflows/next-generation-route-evidence.yml']
 permissions: {contents: read}
 jobs:
   route-evidence:
@@ -14,6 +14,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '20'}
+      - name: Build exact Hook Content directory for wp-env
+        run: bash scripts/build-wordpress-release.sh
       - run: npm install --no-save @wordpress/env playwright @axe-core/playwright
       - run: npx playwright install --with-deps chromium
       - name: Start isolated WordPress
@@ -25,6 +27,7 @@ jobs:
           mkdir -p ../../route-evidence
           npx wp-env run cli wp theme activate theme
           npx wp-env run cli wp plugin activate horizon-experience-core
+          npx wp-env run cli wp plugin activate hook-the-horizon-content
           npx wp-env run cli wp option update blogname 'Hook the Horizon'
           article_id="$(npx wp-env run cli wp --quiet post create --post_type=post --post_title='Pack for the Decision, Not the Fantasy' --post_status=publish --post_content='<p>A generalized field fixture with no current-condition, catch, access, safe-condition, equipment-use, or exact-location claim.</p>' --porcelain | tail -n 1 | tr -d '\r')"
           pathway_id="$(npx wp-env run cli wp --quiet post create --post_type=page --post_title='Conditions and Stewardship Pathway' --post_status=publish --meta_input='{"_wp_page_template":"page-reader-pathway"}' --porcelain | tail -n 1 | tr -d '\r')"
