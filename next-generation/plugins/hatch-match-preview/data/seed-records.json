@@ -47,7 +47,7 @@
       "disconfirmingCues": ["three tail filaments point toward many mayfly nymphs rather than stonefly", "a two-tail observation without body and gill detail remains ambiguous"],
       "sourceIds": ["NPS-STONEFLY-ALPINE-AQUIFER", "MAINE-DEP-STONEFLY"],
       "evidenceState": "verified_reference",
-      "limitations": ["Habitat and emergence timing vary by species.", "This record cannot establish current presence, water quality, regulation, access, or fishing success."],
+      "limitations": ["Habitat and emergence timing vary by species.", "This record cannot establish a current observation, site-specific water status, or fishing success."],
       "publicationState": "approved_preview"
     }
   ],
