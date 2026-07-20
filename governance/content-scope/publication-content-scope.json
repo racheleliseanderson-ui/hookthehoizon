@@ -1,1 +1,28 @@
-{"version":"1.0.0","publication":"hook-the-horizon","public_name":"Hook the Horizon","canonical_site":"https://hookthehorizon.blog","intelligence_system":"honey-hole-intelligence","authority":"https://docs.google.com/document/d/1YyD7-XPUOi_DAUCNnfiQdydriOX8iOuIJvQRTMT5gPE/edit","central_registry":"racheleliseanderson-ui/Master-of-The-Universe-/governance/registries/inception-content-scope-recovery-v1.json","provenance_map":"racheleliseanderson-ui/Master-of-The-Universe-/governance/registries/content-scope-provenance-map-v1.json","queue_rule":"Current launch or production queues are subsets and may not be represented as total approved content scope.","queue_migration":{"source_families":["authority-foundation","diagnosis-problem-solving","decision-comparison","execution-operations","evidence-testing","case-study-story","visual-reference","personality-engagement","long-form-product","interactive-application","timely-seasonal-refresh","sister-site-bridge"],"required_fields":["reader_problem","reader_outcome","reader_stage","disposition","provenance","template_dependency","maintenance"]},"dedicated_templates":["long-form-product","reference-library","diagnostic-interface","comparison-interface","calculator-interface","configurator-interface","result-page","saved-state-workspace","download-layout","signature-editorial"],"required_states":["unknown","incomplete","conflicting","stale","stop","recovery","next-action"],"ownership_controls":["gear compatibility","techniques","field tests","conditions","access and regulation context","trip preparation","conservation","privacy-safe honey hole intelligence"],"privacy_controls":["no precise private locations","no private waypoints","no sensitive structure inference","no catch guarantees"],"runtime_status":"unverified-currently-wpvibe-rate-limited"}
+{
+  "version": "1.1.0",
+  "publication": "hook-the-horizon",
+  "public_name": "Hook the Horizon",
+  "canonical_site": "https://hookthehorizon.blog",
+  "intelligence_system": "honey-hole-intelligence",
+  "authority": "https://docs.google.com/document/d/1YyD7-XPUOi_DAUCNnfiQdydriOX8iOuIJvQRTMT5gPE/edit",
+  "central_registry": "racheleliseanderson-ui/Master-of-The-Universe-/governance/registries/inception-content-scope-recovery-v1.json",
+  "provenance_map": "racheleliseanderson-ui/Master-of-The-Universe-/governance/registries/content-scope-provenance-map-v1.json",
+  "runtime_registry": "racheleliseanderson-ui/Master-of-The-Universe-/governance/registries/wordpress-runtime-verification-2026-07-20.json",
+  "queue_rule": "Current launch or production queues are subsets and may not be represented as total approved content scope.",
+  "queue_migration": {
+    "required_fields": ["reader_problem", "reader_outcome", "reader_stage", "disposition", "provenance", "template_dependency", "maintenance"]
+  },
+  "dedicated_templates": ["long-form-product", "reference-library", "diagnostic-interface", "comparison-interface", "calculator-interface", "configurator-interface", "result-page", "saved-state-workspace", "download-layout", "signature-editorial"],
+  "required_states": ["unknown", "incomplete", "conflicting", "stale", "stop", "recovery", "next-action"],
+  "runtime_verification": {
+    "verified_at": "2026-07-20T17:35:00Z",
+    "wordpress": "7.0.2",
+    "php": "8.4.23",
+    "active_theme": "hook-the-horizon-canonical-parity 0.3.0-remediation",
+    "content_plugin": "0.2.2",
+    "homepage": "rendered",
+    "compatibility_builder": "shortcode-not-executed",
+    "governed_source_version": "0.3.1",
+    "status": "runtime-defect-open"
+  }
+}
