@@ -1,165 +1,77 @@
 # Hook the Horizon Workflow Operator Runbook
 
+## Current authority
+
+This runbook follows:
+
+- Google Drive: `MASTER — Current Operating Synchronization Contract — 2026-07-19`
+- GitHub: `racheleliseanderson-ui/Master-of-The-Universe-/docs/governance/current-operating-synchronization-2026-07-19.md`
+- Local pointer: `docs/governance/CURRENT_OPERATING_CONTRACT.md`
+
+Google Drive governs human-readable authority. GitHub governs implementation and execution history. WordPress is runtime. Notion is historical archive only and is not an active mirror, approval, parity, or status dependency.
+
 ## Purpose
 
-This runbook explains how the owner previews, approves, generates, monitors, and closes Hook the Horizon workflow tasks.
+This runbook explains how Hook the Horizon workflow tasks are generated, executed, validated, and closed. The workflow creates missing task records and protects against duplicate task IDs. It does not itself publish to WordPress.
 
-The workflow is intentionally manual at the approval boundary. Preview mode is non-writing. Generate mode requires an explicit phrase and creates only missing task IDs.
+## Repository setup
 
-## Prerequisite
+1. Confirm GitHub Actions and Issues are enabled.
+2. Permit the workflow to read repository content and write Issues.
+3. Confirm the workflow package is present on the default branch.
+4. Run the workflow from **Actions > Hook the Horizon Workflow Control**.
 
-The workflow file must be present on the repository default branch. Until pull request #62 is merged, the workflow will not appear as a runnable workflow under the normal Actions interface for `main`.
+## Preview and generation
 
-## One-time repository setup
+Preview mode remains available when the task package or priority is uncertain. It is not a universal gate.
 
-1. Open the Hook the Horizon repository.
-2. Open **Settings**.
-3. Select **Actions > General**.
-4. Under **Actions permissions**, allow actions and reusable workflows required by the repository.
-5. Under **Workflow permissions**, select **Read and write permissions** or otherwise ensure the workflow can write Issues.
-6. Save the settings.
-7. Confirm Issues are enabled under **Settings > General > Features**.
+Generate mode may proceed for clear, reversible task creation using the workflow's required input phrase. The phrase is an execution control for that workflow, not portfolio-wide owner approval.
 
-The workflow requests only:
-
-- `contents: read`
-- `issues: write`
-
-It does not request deployment, package, secret, WordPress, or repository-content write permission.
-
-## Merge the workflow package
-
-1. Open pull request #62: **Add complete Hook the Horizon ecosystem integration and workflow guard**.
-2. Review the four governed additions:
-   - ecosystem integration contract
-   - integration guard
-   - workflow control
-   - this operator runbook
-3. Confirm required checks pass.
-4. Merge the pull request into `main`.
-
-Merging makes the manual workflow available from the Actions tab. It does not generate tasks by itself and does not modify WordPress.
-
-## Preview the task package
-
-1. Open the repository.
-2. Select **Actions**.
-3. Select **Hook the Horizon Workflow Control** from the left navigation.
-4. Select **Run workflow**.
-5. Choose branch `main`.
-6. Set **mode** to `preview`.
-7. Choose a priority.
-8. Enter the target cycle or date.
-9. Leave the approval phrase blank.
-10. Select the green **Run workflow** button.
-11. Open the new run and review **Display proposed work items** and the run summary.
-
-Preview mode creates no issues and is the required first step when the task package or priority is uncertain.
-
-## Approve and generate tasks
-
-After reviewing preview output:
-
-1. Return to **Actions > Hook the Horizon Workflow Control**.
-2. Select **Run workflow**.
-3. Choose branch `main`.
-4. Set **mode** to `generate`.
-5. Choose the approved priority.
-6. Enter the approved target cycle or date.
-7. In **approval_phrase**, enter exactly:
-
-   `APPROVE HOOK WORK`
-
-8. Select **Run workflow**.
-9. Open the run and confirm `validate-request` passed.
-10. Confirm `generate-issues` passed.
-11. Open the repository **Issues** tab and verify the generated `HTH-WF-001` through `HTH-WF-006` records.
-
-The workflow is idempotent by task ID. Re-running it skips an issue when that task ID already exists.
+The workflow is idempotent by task ID and skips existing records.
 
 ## Generated task set
 
 - `HTH-WF-001` — Evidence, preservation, and product inventory
 - `HTH-WF-002` — Monthly source freshness and safety review
-- `HTH-WF-003` — Cross-system workflow parity
+- `HTH-WF-003` — Cross-system workflow reconciliation
 - `HTH-WF-004` — Mobile, offline, and field-use assessment
 - `HTH-WF-005` — Application and evidence ownership reconciliation
 - `HTH-WF-006` — Workflow acceptance and runtime evidence
 
-## Approval model
+## Authorization model
 
-### Owner approval required
+Routine reversible work proceeds directly when the task is clear and applicable checks pass. This includes research, documentation, branches, commits, tests, previews, evidence updates, issue creation, bounded corrections, Google draft updates, and WordPress draft updates.
 
-Owner approval is required before:
+Separate approval is required only for the actual elevated action involved, including consequential publication, sensitive or exact location exposure, unsupported legal/medical/safety claims, credentials, spending, contracts, sponsorship commitments, permanent deletion of the sole recoverable source, or another irreversible action.
 
-- generating the initial task package;
-- materially changing task scope or priority;
-- production activation or publication;
-- exact or sensitive location handling;
-- unsupported regulation, safety, legal, medical, or professional claims;
-- credentials, payments, contracts, sponsorships, or destructive actions.
+## Completion standard
 
-### Routine work may proceed
-
-Once tasks are generated, ordinary reversible work may proceed under the ecosystem autonomy standard when checks pass. This includes research, documentation, branches, commits, tests, previews, evidence updates, and bounded corrections.
-
-### Completion approval
-
-A task is not complete merely because code or documentation exists. Close it only after the issue contains:
+A task is complete only when the issue records:
 
 - governing source links;
 - work performed;
-- tests or validation evidence;
+- tests or observable validation evidence;
 - preservation impact;
-- open exceptions;
+- bounded unresolved exceptions;
 - runtime or publication status;
-- next review date;
-- rollback or recovery path where applicable.
+- recovery route where materially applicable.
 
-## Notion operating mirror
+Documentation without applied implementation is not completion.
 
-The Notion Ecosystem Research Work Queue is the operating status mirror. It should show ownership, priority, status, due date, evidence confidence, review trigger, and source URL.
+## Automation handoff
 
-GitHub remains the implementation and technical evidence system. Google Drive remains the governing substantial-document authority. Notion does not replace either source.
+GitHub issues are the durable automation trigger and status records. Any n8n workflow should use GitHub task IDs as external keys, avoid duplicates, and write results back to GitHub. It must not create or require a Notion record.
 
-## n8n handoff
+Automation may update reversible drafts and internal records directly. It must not expose sensitive fishing locations, invent field experience, or make unauthorized consequential live changes.
 
-The generated GitHub issues are the recommended trigger records for n8n.
+## Reader-facing firewall
 
-A bounded n8n workflow should:
-
-1. detect new issues whose titles contain `[HTH-WF-`;
-2. parse the task ID, priority, title, and target cycle;
-3. create or update the corresponding Notion work-queue record;
-4. write the GitHub issue URL into Notion;
-5. avoid creating duplicates by using the task ID as the external key;
-6. notify only when a task is blocked, overdue, requires owner approval, or reaches an exception threshold;
-7. never publish to WordPress or expose sensitive location information.
-
-Until that n8n workflow is connected and validated, GitHub issue generation and Notion updates remain separate controlled steps.
+Internal workflow, governance, queue, issue, PR, staging, QA, source-of-truth, prompt, model, task-ID, approval, blocker, and implementation language must remain out of reader-facing WordPress content, metadata, applications, captions, alt text, and downloads unless the reader genuinely needs the information.
 
 ## Troubleshooting
 
-### Workflow is not visible
-
-The workflow has not yet been merged into the default branch, Actions are disabled, or the current account cannot run workflows.
-
-### Generate job fails at approval
-
-Enter the approval phrase exactly: `APPROVE HOOK WORK`.
-
-### Issues are not created
-
-Confirm repository workflow permissions permit issue writes and that Issues are enabled.
-
-### Some task IDs are skipped
-
-The workflow found an existing issue containing that task ID. This is expected duplicate protection.
-
-### Workflow passes but no WordPress work occurs
-
-This workflow generates and governs tasks only. It intentionally does not publish, deploy, activate, or modify WordPress.
-
-## Current approval sequence
-
-`Review PR #62` → `Merge to main` → `Run preview` → `Review proposed tasks` → `Run generate with APPROVE HOOK WORK` → `Confirm issues` → `Assign owners and execute` → `Attach evidence` → `Close or schedule next review`
+- **Workflow is not visible:** confirm the workflow is on the default branch and Actions are enabled.
+- **Generate validation fails:** use the exact input required by the workflow definition.
+- **Issues are not created:** confirm Issues and workflow issue-write permissions are enabled.
+- **Some IDs are skipped:** an existing issue already contains the task ID; this is expected duplicate protection.
+- **No WordPress work occurs:** the workflow creates task records only. WordPress draft work is performed by the relevant execution task or connected automation.
