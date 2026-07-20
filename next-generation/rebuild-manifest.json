@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "publication": "Hook the Horizon",
   "canonicalDomain": "https://hookthehorizon.blog",
   "status": "active_clean_rebuild_foundation",
@@ -26,13 +26,20 @@
     "experiencePlugin": "next-generation/plugins/horizon-experience-core",
     "legacySourcePolicy": "forensic_reference_and_selective_recovery_only"
   },
-  "experienceThesis": "Brilliant, creative field intelligence that makes water, weather, habitat, equipment relationships, evidence, uncertainty, and the next responsible decision visually compelling and legible.",
+  "experienceThesis": "Brilliant, creative field intelligence that makes water, weather, habitat, equipment relationships, evidence, uncertainty, and the next responsible decision visually compelling, lively, memorable, and legible to normal readers.",
   "palettePrototype": "horizon-current-signal",
   "creativeAcceptance": {
     "creativityRequired": true,
     "personalityRequired": true,
+    "witRequired": true,
+    "funRequired": true,
+    "controlledMischiefRequired": true,
     "identityMustSurviveLogoRemoval": true,
     "fieldBoundariesConstrainClaimsNotCreativeAmbition": true,
+    "technicalRestraintControlsDosageNotPresence": true,
+    "normalReaderConsumabilityRequired": true,
+    "genericVisibleHeadingProhibited": true,
+    "literalCategoryLabelNotPrimaryHeading": true,
     "reject": [
       "generic-outdoor-template",
       "blue-wave-theme",
@@ -42,9 +49,22 @@
       "neon-tournament-package",
       "flat-desaturation",
       "over-restrained-data-page",
+      "bureaucratic-field-copy",
+      "technical-manual-tone",
+      "literal-category-heading",
       "corporate-or-soulless-presentation"
     ],
     "peoplePolicy": "People may appear when they clarify field action, technique, scale, safety, stewardship, or lived conditions and rights, privacy, and sensitive-location controls are appropriate."
+  },
+  "voiceAndNaming": {
+    "temperament": "adventurous-observant-clever-lively-field-credible-responsible",
+    "restraintLevel": "tempered-not-dry",
+    "normalReaderConsumabilityRequired": true,
+    "internalModelNamesBackstageByDefault": true,
+    "prohibitedVisibleLabels": ["overview", "insights", "solutions", "our-approach", "featured", "resources", "explore", "learn-more", "discover", "latest", "tools", "guides"],
+    "headingRule": "A primary heading must frame the conditions, expose the decision, create field anticipation, sharpen an observation, promise a useful adjustment, or deliver an intelligent outdoorsman's wink; it must not merely name the species, water type, gear class, map, or content family.",
+    "claritySupport": "Use a subtitle, kicker, breadcrumb, accessibility label, source-time line, regulation note, or metadata field for the literal species, location class, condition, equipment, or safety explanation.",
+    "humorBoundary": "Use observant, field-literate, adventurous, sly, or deadpan wit. Never trivialize safety, regulations, stewardship, uncertainty, equipment compatibility, changing conditions, or sensitive-location privacy."
   },
   "signatureFamilies": [
     "conditions-brief",
@@ -68,11 +88,11 @@
   "presentationPolicy": {
     "internalContractsBackstageByDefault": true,
     "readerVisibleWhenUseful": ["current-source-date", "uncertainty", "regulation", "safety", "stewardship", "sensitive-location-handling", "compatibility-limit", "result-interpretation", "controls", "next-action"],
-    "doNotExposeByDefault": ["post-type-keys", "taxonomy-keys", "schema-ids", "application-ids", "route-names", "endpoint-namespaces", "option-or-table-names", "migration-contracts", "test-and-deployment-internals"]
+    "doNotExposeByDefault": ["post-type-keys", "taxonomy-keys", "schema-ids", "application-ids", "route-names", "endpoint-namespaces", "option-or-table-names", "migration-contracts", "test-and-deployment-internals", "internal-family-names-as-public-headings"]
   },
   "aiDecisionRights": {
     "routineOwnerApprovalRequired": false,
-    "owns": ["content-model-creation", "field-mapping", "legacy-migration-design", "validation", "semantic-consistency", "image-and-component-mapping", "reversible-source-edits", "proportionate-qa", "strongest-supported-option-selection"],
+    "owns": ["content-model-creation", "field-mapping", "legacy-migration-design", "validation", "semantic-consistency", "image-and-component-mapping", "reader-facing-naming", "heading-and-microcopy-quality", "plain-language-translation", "reversible-source-edits", "proportionate-qa", "strongest-supported-option-selection"],
     "escalateOnlyFor": ["irreconcilable-current-authority-conflict", "blocking-rights-consent-privacy-or-license-issue", "materially-unsupported-regulation-safety-location-compatibility-or-current-condition-claim", "destructive-or-live-action-without-rollback", "external-purchase-or-binding-commitment", "owner-only-credential-action", "equally-supported-material-brand-directions-after-rendered-comparison"]
   },
   "requiredChecks": [
@@ -80,6 +100,10 @@
     "php-syntax",
     "domain-metadata-check",
     "creative-identity",
+    "voice-and-naming",
+    "generic-language-rejection",
+    "normal-reader-consumability",
+    "technical-without-dryness",
     "backstage-contract-check",
     "ai-decision-rights-check",
     "responsive-layout",
