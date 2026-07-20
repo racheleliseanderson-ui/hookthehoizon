@@ -48,7 +48,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if grep -RInE --exclude-dir=.git --exclude='*.lock' \
+          if grep -RInE --exclude-dir=.git --exclude='*.lock' --exclude='hth-ecosystem-integration-guard.yml' \
             '(all four publications|four-publication ecosystem|four-site ecosystem)' \
             README.md docs .github applications wordpress-theme wordpress-plugin 2>/dev/null; then
             echo 'Stale four-publication authority language found. Use the governed five-publication model.'
