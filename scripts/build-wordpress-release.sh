@@ -16,6 +16,7 @@ node "$ROOT/scripts/sync-presentation-planner-runtime.mjs"
 node "$ROOT/scripts/sync-system-compatibility-runtime.mjs"
 node "$ROOT/applications/system-compatibility/tests/run.mjs"
 php -l "$THEME_SRC/functions.php" >/dev/null
+php -l "$THEME_SRC/inc/system-compatibility.php" >/dev/null
 php -l "$PLUGIN_SRC/hook-content.php" >/dev/null
 php -l "$THEME_SRC/patterns/living-fly-bench-hub.php" >/dev/null
 php -l "$THEME_SRC/patterns/presentation-lab-hub.php" >/dev/null
@@ -34,6 +35,7 @@ node --check "$PLUGIN_SRC/assets/system-compatibility/preview/app.mjs"
 
 required=(
   style.css theme.json functions.php theme-tokens.json assets/tokens.css
+  inc/system-compatibility.php assets/system-compatibility/index.html
   templates/index.html templates/front-page.html templates/page.html templates/single.html
   templates/archive.html templates/search.html templates/404.html
   templates/page-compatibility-builder.html templates/page-compatibility-result.html
@@ -49,6 +51,27 @@ for relative in "${required[@]}"; do
     exit 1
   fi
 done
+
+if ! grep -Fq "add_shortcode('hth_system_compatibility_resilient'" "$THEME_SRC/inc/system-compatibility.php"; then
+  printf 'Compatibility Builder resilient shortcode registration is missing.\n' >&2
+  exit 1
+fi
+if ! grep -Fq "add_shortcode('hth_system_compatibility'" "$THEME_SRC/inc/system-compatibility.php"; then
+  printf 'Compatibility Builder canonical fallback registration is missing.\n' >&2
+  exit 1
+fi
+if ! grep -Fq '[hth_system_compatibility_resilient]' "$THEME_SRC/patterns/system-compatibility-application.php"; then
+  printf 'Compatibility Builder pattern does not use the resilient shortcode.\n' >&2
+  exit 1
+fi
+if grep -Fq '[hth_system_compatibility]' "$THEME_SRC/patterns/system-compatibility-application.php"; then
+  printf 'Compatibility Builder pattern still depends directly on the plugin-only shortcode.\n' >&2
+  exit 1
+fi
+if ! grep -Fq "add_shortcode('hth_system_compatibility'" "$PLUGIN_SRC/hook-content.php"; then
+  printf 'Hook Content canonical Compatibility Builder shortcode is missing.\n' >&2
+  exit 1
+fi
 
 plugin_required=(
   hook-content.php
