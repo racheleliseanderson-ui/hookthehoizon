@@ -179,7 +179,7 @@ jobs:
           npx wp-env run cli wp eval-file wp-content/plugins/hatch-match-preview/tools/runtime-readback.php > ../../preview-evidence/hatch-match-runtime-readback.json
           python - <<'PY'
           import json
-          data=json.load(open('preview-evidence/hatch-match-runtime-readback.json'))
+          data=json.load(open('../../preview-evidence/hatch-match-runtime-readback.json'))
           assert data['applicationId']=='HTH-HM-001'
           assert data['pluginVersion']=='0.1.1-preview'
           assert data['seedSchemaVersion']==2
