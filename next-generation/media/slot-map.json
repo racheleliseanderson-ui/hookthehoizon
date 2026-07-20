@@ -1,0 +1,71 @@
+{
+  "schemaVersion":"2.0.0",
+  "publication":"Hook the Horizon",
+  "updated":"2026-07-20",
+  "publicationGate":"Field imagery must have a durable rights record and pass location-privacy review. Current-condition utilities require dated sources and explicit uncertainty.",
+  "slots":[
+    {
+      "slot":"moving-water-diagram-one",
+      "readerJob":"label seams, current breaks, obstructions and depth transitions without claiming fish presence",
+      "asset":{"source":"publication-designed diagram","id":"HTH-PATHWAY-WATER-01"},
+      "state":"design-required",
+      "provenance":{"status":"project-owned-on-creation","rightsBasis":"original publication diagram"},
+      "altText":"Moving-water diagram labeling current seams, breaks, obstructions, depth transitions, and safe observation positions without marking fish locations.",
+      "caption":"Water-reading reference only; conditions, access, hazards, and regulations must be checked at the time of use.",
+      "crops":{"desktop":{"ratio":"16:10"},"tablet":{"ratio":"4:3"},"mobile":{"ratio":"1:1","behavior":"stack labels below diagram"}},
+      "requirements":["non-color line styles","mobile labels","no exact location"]
+    },
+    {
+      "slot":"moving-water-diagram-two",
+      "readerJob":"show observation-to-adjustment sequence",
+      "asset":{"source":"publication-designed diagram","id":"HTH-PATHWAY-WATER-02"},
+      "state":"design-required",
+      "provenance":{"status":"project-owned-on-creation","rightsBasis":"original publication diagram"},
+      "altText":"Sequence diagram moving from field observation to one controlled adjustment, a recheck, and a stop condition.",
+      "caption":"The sequence supports disciplined adjustment; it does not predict a catch or safe access.",
+      "crops":{"desktop":{"ratio":"21:9"},"tablet":{"ratio":"4:3"},"mobile":{"ratio":"4:5","behavior":"stack steps vertically"}},
+      "requirements":["observation not outcome","no catch implication"]
+    },
+    {
+      "slot":"changing-conditions-packing-card",
+      "readerJob":"separate known conditions, uncertainty, manufacturer limits, leave-behind and plan changes",
+      "asset":{"source":"HTML/print utility","id":"HTH-PATHWAY-PACK-01"},
+      "state":"design-required",
+      "provenance":{"status":"project-owned-on-creation","rightsBasis":"original publication utility"},
+      "altText":null,
+      "caption":"Packing and plan-change record with explicit unknown, equipment-limit, and leave-behind fields.",
+      "crops":{"screen":{"ratio":"auto"},"print":{"paper":"US Letter and A4","orientation":"portrait"}}
+    },
+    {
+      "slot":"weather-stop-gate",
+      "readerJob":"show dated source, threshold, stop action and return condition",
+      "asset":{"source":"interface/print utility","id":"HTH-PATHWAY-STOP-01"},
+      "state":"blocked-until-current-sources",
+      "provenance":{"status":"project-owned-on-creation","rightsBasis":"original publication utility"},
+      "altText":null,
+      "caption":"Stop-gate record requiring a dated source, threshold, action, and return condition.",
+      "crops":{"screen":{"ratio":"auto"},"print":{"paper":"US Letter and A4","orientation":"portrait"}},
+      "reason":"Weather-stop content remains on a material-risk hold until current sources and operational review are available."
+    },
+    {
+      "slot":"privacy-safe-story-checklist",
+      "readerJob":"apply delay, geographic generalization, metadata removal, landmark review and consent",
+      "asset":{"source":"HTML/print utility","id":"HTH-PATHWAY-PRIVACY-01"},
+      "state":"design-required",
+      "provenance":{"status":"project-owned-on-creation","rightsBasis":"original publication utility"},
+      "altText":null,
+      "caption":"Privacy checklist for delayed publication, location generalization, metadata removal, landmark review, and consent.",
+      "crops":{"screen":{"ratio":"auto"},"print":{"paper":"US Letter and A4","orientation":"portrait"}}
+    },
+    {
+      "slot":"homepage-field-photography",
+      "readerJob":"show brilliant water, weather and equipment relationships without identifying a sensitive place",
+      "state":"privacy-safe-source-required",
+      "provenance":{"status":"not-verified","rightsBasis":null,"locationReview":null},
+      "altText":null,
+      "caption":null,
+      "crops":{"desktop":{"ratio":"21:9"},"tablet":{"ratio":"4:3"},"mobile":{"ratio":"4:5"}},
+      "reason":"No rights-cleared durable asset was verified that also passes location-safety review."
+    }
+  ]
+}
