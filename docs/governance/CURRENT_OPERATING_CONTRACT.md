@@ -9,7 +9,6 @@ GitHub implementation authority: `racheleliseanderson-ui/Master-of-The-Universe-
 Operational interpretation:
 
 - Google Drive governs human-readable authority; GitHub governs implementation and durable execution history; WordPress is runtime.
-- Notion is historical archive only and is not an active mirror, approval, parity, or status dependency.
 - Comprehensive requests require complete inventory and disposition; priority controls order, not scope.
 - Daily backups are the standing rollback baseline. Separate staging and checksum parity are not mandatory release gates.
 - Reader-facing surfaces must not expose internal workflow, governance, queue, staging, QA, schema, prompt, or source-of-truth language.
