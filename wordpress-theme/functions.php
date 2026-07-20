@@ -74,3 +74,8 @@ add_filter('attachment_fields_to_save', static function (array $post, array $att
     update_post_meta((int) $post['ID'], '_re_homepage_safe', isset($attachment['re_homepage_safe']) ? '1' : '0');
     return $post;
 }, 10, 2);
+
+$systemCompatibilityBridge = get_theme_file_path('inc/system-compatibility.php');
+if (is_readable($systemCompatibilityBridge)) {
+    require_once $systemCompatibilityBridge;
+}
