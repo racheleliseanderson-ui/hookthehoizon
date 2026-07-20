@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Hook the Horizon Experience Core
- * Description: Publication-owned field-file, pathway, privacy and evidence contracts for the Hook the Horizon rebuild.
- * Version: 0.2.0
+ * Description: Publication-owned field-file, pathway, privacy, discovery, account and commerce contracts for the Hook the Horizon rebuild.
+ * Version: 0.3.0
  * Requires at least: 6.6
  * Requires PHP: 8.1
  * Author: Rachel Anderson
@@ -10,7 +10,7 @@
  */
 declare(strict_types=1);
 if (! defined('ABSPATH')) { exit; }
-const HTH_EXPERIENCE_CORE_VERSION = '0.2.0';
+const HTH_EXPERIENCE_CORE_VERSION = '0.3.0';
 function hth_experience_register_types(): void {
     register_post_type('hth_field_file',['labels'=>['name'=>__('Field Files','horizon-experience-core'),'singular_name'=>__('Field File','horizon-experience-core'),'add_new_item'=>__('Add Field File','horizon-experience-core'),'edit_item'=>__('Edit Field File','horizon-experience-core'),'not_found'=>__('No field files found.','horizon-experience-core')],'public'=>true,'show_in_rest'=>true,'has_archive'=>true,'rewrite'=>['slug'=>'field-files','with_front'=>false],'menu_icon'=>'dashicons-location-alt','supports'=>['title','editor','excerpt','thumbnail','revisions','custom-fields']]);
     register_taxonomy('hth_field_type',['hth_field_file'],['labels'=>['name'=>__('Field Types','horizon-experience-core'),'singular_name'=>__('Field Type','horizon-experience-core')],'public'=>true,'show_in_rest'=>true,'hierarchical'=>true,'rewrite'=>['slug'=>'field-type','with_front'=>false]]);
@@ -31,3 +31,19 @@ register_activation_hook(__FILE__,'hth_experience_activate');
 register_deactivation_hook(__FILE__,'flush_rewrite_rules');
 function hth_experience_notice(): void { if (! current_user_can('manage_options') || get_option('hth_experience_core_cutover_authorized')==='yes') { return; } echo '<div class="notice notice-warning"><p>'.esc_html__('Hook the Horizon Experience Core is a reversible rebuild candidate. Activation does not authorize publication, migration, location disclosure, or production replacement.','horizon-experience-core').'</p></div>'; }
 add_action('admin_notices','hth_experience_notice');
+require_once __DIR__ . '/includes/class-publication-runtime.php';
+new NLH_Publication_Runtime([
+    'key'=>'hook-the-horizon','publication'=>'Hook the Horizon','version'=>HTH_EXPERIENCE_CORE_VERSION,'plugin_file'=>__FILE__,'rest_namespace'=>'horizon-experience/v1',
+    'discover_post_types'=>['post','page','hth_field_file'],
+    'page_worlds'=>['start-here','field-files','resources','tools','store','research-and-standards'],
+    'applications'=>[
+        ['id'=>'conditions-brief','title'=>'Conditions Brief','state'=>'contract-ready'],
+        ['id'=>'trip-blueprint','title'=>'Trip Blueprint','state'=>'contract-ready'],
+        ['id'=>'tackle-compatibility','title'=>'Tackle Compatibility','state'=>'contract-ready']
+    ],
+    'commerce_collections'=>[
+        ['id'=>'gear','title'=>'Gear edits','state'=>'editorial-mapping-required'],
+        ['id'=>'packing','title'=>'Packing systems','state'=>'editorial-mapping-required'],
+        ['id'=>'downloads','title'=>'Field resources','state'=>'editorial-mapping-required']
+    ]
+]);
