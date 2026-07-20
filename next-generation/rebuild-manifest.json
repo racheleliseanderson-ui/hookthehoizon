@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "publication": "Hook the Horizon",
+  "canonicalDomain": "https://hookthehorizon.blog",
   "status": "active_clean_rebuild_foundation",
   "authority": {
     "driveDirective": "https://docs.google.com/document/d/1wxhRfP5Dxpz1MwqgzFSQS5VQ92ZQa5p0SRHLWEFu_Sk",
@@ -33,7 +34,7 @@
     "requiredModes": ["establishing-water", "condition-evidence", "equipment-detail", "route-map", "decision-diagram", "field-sequence"],
     "prohibitedDefaults": ["trophy-only-grid", "generic-blue-wave", "rustic-man-cave", "neon-tournament", "catalog-product-wall", "flat-desaturation"]
   },
-  "requiredChecks": ["valid-block-theme", "php-syntax", "responsive-layout", "wcag-2.2-aa", "keyboard-navigation", "reduced-motion", "regulation-boundary", "location-privacy", "condition-labeling", "media-mapping", "visual-regression", "installed-preview", "rollback-package"],
+  "requiredChecks": ["valid-block-theme", "php-syntax", "domain-metadata-check", "responsive-layout", "wcag-2.2-aa", "keyboard-navigation", "reduced-motion", "regulation-boundary", "location-privacy", "condition-labeling", "media-mapping", "visual-regression", "installed-preview", "rollback-package"],
   "production": {
     "mergeAuthorized": false,
     "deploymentAuthorized": false,
