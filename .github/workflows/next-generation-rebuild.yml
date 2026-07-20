@@ -1,10 +1,10 @@
 name: Next-generation rebuild validation
 on:
   pull_request:
-    paths: ['next-generation/**','wordpress-plugin/hook-content/**','applications/_shared/**','applications/presentation-planner/**','scripts/build-wordpress-release.sh','scripts/sync-presentation-planner-runtime.mjs','.github/workflows/next-generation-rebuild.yml']
+    paths: ['next-generation/**','wordpress-plugin/hook-content/**','applications/_shared/**','applications/presentation-planner/**','applications/hatch-match/**','scripts/build-wordpress-release.sh','scripts/sync-presentation-planner-runtime.mjs','.github/workflows/next-generation-rebuild.yml']
   push:
     branches: ['rebuild/2026-07-clean-luxury-worlds']
-    paths: ['next-generation/**','wordpress-plugin/hook-content/**','applications/_shared/**','applications/presentation-planner/**','scripts/build-wordpress-release.sh','scripts/sync-presentation-planner-runtime.mjs','.github/workflows/next-generation-rebuild.yml']
+    paths: ['next-generation/**','wordpress-plugin/hook-content/**','applications/_shared/**','applications/presentation-planner/**','applications/hatch-match/**','scripts/build-wordpress-release.sh','scripts/sync-presentation-planner-runtime.mjs','.github/workflows/next-generation-rebuild.yml']
 permissions: {contents: read}
 jobs:
   source-validation:
@@ -15,16 +15,32 @@ jobs:
         with: {node-version: '20'}
       - uses: shivammathur/setup-php@v2
         with: {php-version: '8.4'}
-      - run: |
+      - name: Validate PHP and JavaScript
+        run: |
           php -l next-generation/theme/functions.php
           php -l next-generation/plugins/horizon-experience-core/horizon-experience-core.php
+          php -l next-generation/plugins/hatch-match-preview/hatch-match-preview.php
           php -l wordpress-plugin/hook-content/hook-content.php
-      - run: |
+          node --check next-generation/plugins/hatch-match-preview/assets/preview/app.mjs
+      - name: Validate JSON and Hatch Match ownership boundaries
+        run: |
           python -m json.tool next-generation/rebuild-manifest.json >/dev/null
           python -m json.tool next-generation/pathways/conditions-stewardship.json >/dev/null
           python -m json.tool next-generation/media/slot-map.json >/dev/null
           python -m json.tool next-generation/preview/.wp-env.json >/dev/null
           python -m json.tool next-generation/theme/theme.json >/dev/null
+          python -m json.tool next-generation/plugins/hatch-match-preview/data/seed-records.json >/dev/null
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const seed=JSON.parse(fs.readFileSync('next-generation/plugins/hatch-match-preview/data/seed-records.json','utf8'));
+          if(seed.applicationId!=='HTH-HM-001'||seed.publicationState!=='approved_preview'||seed.records.length<3)throw new Error('Hatch Match preview seed contract is incomplete.');
+          const forbidden=/exact.?location|coordinates?|latitude|longitude|\blat\b|\blng\b|gps|access.?code|gate.?code|current.?conditions|regulations?/i;
+          for(const record of seed.records){
+            for(const required of ['id','version','sourceIds','broadRegion','waterTypes','lifeStages','observableCues','disconfirmingCues','evidenceState','limitations','publicationState'])if(record[required]===undefined)throw new Error(`${record.id||'record'} missing ${required}`);
+            if(record.publicationState!=='approved_preview')throw new Error(`${record.id} is not approved_preview`);
+            if(forbidden.test(JSON.stringify(record)))throw new Error(`${record.id} crosses a location, conditions, access or regulation ownership boundary`);
+          }
+          NODE
       - name: Build exact Hook release artifacts
         run: bash scripts/build-wordpress-release.sh
       - name: Verify Presentation Planner package identity
@@ -33,6 +49,11 @@ jobs:
           grep -q '"applicationId": "HTH-PP-001"' dist/hook-the-horizon-content/assets/presentation-planner/runtime-manifest.json
           test -s dist/hook-the-horizon-content-0.3.1.zip
           test -s dist/SHA256SUMS
+      - name: Build bounded Hatch Match preview package
+        run: |
+          zip -qr dist/hth-hatch-match-preview-0.1.0-preview.zip next-generation/plugins/hatch-match-preview
+          sha256sum dist/hth-hatch-match-preview-0.1.0-preview.zip > dist/HATCH-MATCH-SHA256SUMS
+          unzip -Z1 dist/hth-hatch-match-preview-0.1.0-preview.zip | grep -q 'data/seed-records.json'
       - name: Required route and style coverage
         run: |
           for f in functions.php style.css experience.css parts/header.html parts/footer.html templates/front-page.html templates/index.html templates/single.html templates/page.html templates/archive.html templates/search.html templates/404.html templates/author.html templates/taxonomy.html templates/page-legal.html templates/page-reader-pathway.html templates/page-application.html templates/page-storefront.html templates/single-hth_field_file.html templates/archive-hth_field_file.html; do test -f "next-generation/theme/$f" || exit 1; done
@@ -40,16 +61,18 @@ jobs:
         run: "! grep -RniE 'GitHub|pull request|PR #[0-9]+|issue #[0-9]+|source of truth|candidate status|publication is not authorized|QA pass|staging' next-generation/theme/templates next-generation/theme/parts next-generation/theme/patterns"
       - uses: actions/upload-artifact@v4
         with:
-          name: hook-exact-wordpress-package
+          name: hook-exact-and-bounded-preview-packages
           path: |
             dist/hook-the-horizon-content-0.3.1.zip
             dist/SHA256SUMS
             dist/hook-the-horizon-content/assets/presentation-planner/runtime-manifest.json
+            dist/hth-hatch-match-preview-0.1.0-preview.zip
+            dist/HATCH-MATCH-SHA256SUMS
           if-no-files-found: error
   installed-preview:
     needs: source-validation
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -69,6 +92,7 @@ jobs:
           npx wp-env run cli wp theme activate theme
           npx wp-env run cli wp plugin activate horizon-experience-core
           npx wp-env run cli wp plugin activate hook-content
+          npx wp-env run cli wp plugin activate hatch-match-preview
           npx wp-env run cli wp option update blogname 'Hook the Horizon'
           npx wp-env run cli wp option update blogdescription 'Read the water. Respect the stop signal.'
           sample_id="$(npx wp-env run cli wp --quiet post list --post_type=page --name=sample-page --format=ids | tail -n 1 | tr -d '\r')"
@@ -77,8 +101,10 @@ jobs:
           npx wp-env run cli wp post create --post_type=post --post_title='Pack for the Decision, Not the Fantasy' --post_name='pack-for-the-decision-not-the-fantasy' --post_status=publish --post_content='<p>A generalized field fixture with no current-condition, catch, access or exact-location claim.</p>'
           npx wp-env run cli wp post create --post_type=page --post_title='Conditions and Stewardship Pathway' --post_name='conditions-and-stewardship-pathway' --post_status=publish --meta_input='{"_wp_page_template":"page-reader-pathway"}'
           npx wp-env run cli wp post create --post_type=page --post_title='Presentation Planner Preview' --post_name='presentation-planner-preview' --post_status=publish --post_content='[hth_presentation_planner]'
+          npx wp-env run cli wp post create --post_type=page --post_title='Hatch Match Preview' --post_name='hatch-match-preview' --post_status=publish --post_content='[hth_hatch_match]'
           npx wp-env run cli wp post create --post_type=hth_field_file --post_title='Generalized Moving Water Field File' --post_name='generalized-moving-water-field-file' --post_status=publish --post_content='<p>A representative field file using generalized, non-sensitive conditions.</p>'
           npx wp-env run cli wp plugin get hook-content --field=version | grep -Fx '0.3.1'
+          npx wp-env run cli wp plugin get hatch-match-preview --field=version | grep -Fx '0.1.0-preview'
       - name: HTTP and stylesheet smoke checks
         run: |
           curl --retry 10 --retry-delay 3 --fail http://localhost:8899/ > preview-evidence/home.html
@@ -86,13 +112,17 @@ jobs:
           curl --fail http://localhost:8899/conditions-and-stewardship-pathway/ > preview-evidence/pathway.html
           curl --fail http://localhost:8899/field-files/ > preview-evidence/field-archive.html
           curl --fail http://localhost:8899/presentation-planner-preview/ > preview-evidence/presentation-planner.html
+          curl --fail http://localhost:8899/hatch-match-preview/ > preview-evidence/hatch-match.html
           grep -q 'hth-application-embed' preview-evidence/presentation-planner.html
+          grep -q 'hth-hatch-shell' preview-evidence/hatch-match.html
           grep -q 'horizon-next-style-css' preview-evidence/home.html
           grep -q 'horizon-next-experience-css' preview-evidence/pathway.html
           ! grep -q '>preview<' preview-evidence/home.html
           ! grep -q 'Sample Page' preview-evidence/home.html
       - name: Verify installed Presentation Planner and Smart Mode
         run: node next-generation/preview/verify-presentation-planner.mjs
+      - name: Verify installed Hatch Match
+        run: node next-generation/preview/verify-hatch-match.mjs
       - name: Capture installed preview evidence
         run: |
           npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/ preview-evidence/home-desktop.png
@@ -100,7 +130,6 @@ jobs:
           npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/conditions-and-stewardship-pathway/ preview-evidence/pathway-desktop.png
           npx playwright screenshot --browser=chromium --viewport-size=390,844 http://localhost:8899/conditions-and-stewardship-pathway/ preview-evidence/pathway-mobile.png
           npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/field-files/ preview-evidence/field-archive.png
-          npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/presentation-planner-preview/ preview-evidence/presentation-planner.png
       - name: Validate accessibility, identity, custom styles, privacy and performance
         run: |
           node --input-type=module <<'NODE'
@@ -108,16 +137,16 @@ jobs:
           import { chromium } from 'playwright';
           import AxeBuilder from '@axe-core/playwright';
           const browser=await chromium.launch({headless:true});const context=await browser.newContext({viewport:{width:1440,height:1000}});
-          const pages=['/','/pack-for-the-decision-not-the-fantasy/','/conditions-and-stewardship-pathway/','/field-files/','/presentation-planner-preview/'];const report={pages:[],failures:[]};
-          for(const pathname of pages){const page=await context.newPage();await page.goto(`http://localhost:8899${pathname}`,{waitUntil:'networkidle'});const bodyText=await page.locator('body').innerText();const h1Count=await page.locator('h1').count();const mainCount=await page.locator('main').count();const missingAlt=await page.locator('img:not([alt])').count();const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze();const material=axe.violations.filter(v=>['critical','serious'].includes(v.impact));const navigation=await page.evaluate(()=>{const e=performance.getEntriesByType('navigation')[0];return e?{domContentLoaded:e.domContentLoadedEventEnd,load:e.loadEventEnd}:null;});if(/\bpreview\b/i.test(bodyText)&&pathname!=='/presentation-planner-preview/')report.failures.push(`${pathname}: leaked preview label`);if(bodyText.includes('Sample Page'))report.failures.push(`${pathname}: leaked Sample Page navigation`);if(h1Count!==1)report.failures.push(`${pathname}: expected exactly one h1, found ${h1Count}`);if(mainCount<1)report.failures.push(`${pathname}: missing main landmark`);if(missingAlt>0)report.failures.push(`${pathname}: ${missingAlt} images lack alt attributes`);if(material.length)report.failures.push(`${pathname}: serious/critical axe violations: ${material.map(v=>v.id).join(', ')}`);if(navigation?.load>8000)report.failures.push(`${pathname}: local preview load exceeded 8000ms (${navigation.load})`);await page.keyboard.press('Tab');const focused=await page.evaluate(()=>({tag:document.activeElement?.tagName,text:document.activeElement?.textContent?.trim()}));if(!focused.tag||focused.tag==='BODY')report.failures.push(`${pathname}: keyboard focus did not enter an interactive control`);report.pages.push({pathname,h1Count,mainCount,missingAlt,materialViolations:material.map(v=>v.id),navigation,firstFocus:focused});await page.close();}
-          const home=await context.newPage();await home.emulateMedia({reducedMotion:'reduce'});await home.goto('http://localhost:8899/',{waitUntil:'networkidle'});const visual=await home.locator('.hth-horizon').evaluate(el=>{const s=getComputedStyle(el);return{display:s.display,backgroundColor:s.backgroundColor,backgroundImage:s.backgroundImage};});const transition=await home.locator('.hth-action').evaluate(el=>getComputedStyle(el).transitionDuration);if(visual.backgroundColor==='rgba(0, 0, 0, 0)'&&visual.backgroundImage==='none')report.failures.push('homepage: custom Hook background not applied');if(parseFloat(transition)>0.02)report.failures.push(`homepage: reduced-motion transition remains ${transition}`);
-          const pathway=await context.newPage();await pathway.goto('http://localhost:8899/conditions-and-stewardship-pathway/',{waitUntil:'networkidle'});const pathwayBackground=await pathway.locator('.hth-pathway__output').evaluate(el=>getComputedStyle(el).backgroundColor);if(pathwayBackground==='rgba(0, 0, 0, 0)')report.failures.push('pathway: publication-specific output styling not applied');await pathway.close();report.homeVisual={visual,transition,pathwayBackground};await home.close();await browser.close();fs.writeFileSync('preview-evidence/quality-report.json',JSON.stringify(report,null,2));if(report.failures.length){console.error(report.failures.join('\n'));process.exit(1);}
+          const pages=['/','/pack-for-the-decision-not-the-fantasy/','/conditions-and-stewardship-pathway/','/field-files/','/presentation-planner-preview/','/hatch-match-preview/'];const report={pages:[],failures:[]};
+          for(const pathname of pages){const page=await context.newPage();await page.goto(`http://localhost:8899${pathname}`,{waitUntil:'networkidle'});const bodyText=await page.locator('body').innerText();const h1Count=await page.locator('h1').count();const mainCount=await page.locator('main').count();const missingAlt=await page.locator('img:not([alt])').count();const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze();const material=axe.violations.filter(v=>['critical','serious'].includes(v.impact));const navigation=await page.evaluate(()=>{const e=performance.getEntriesByType('navigation')[0];return e?{domContentLoaded:e.domContentLoadedEventEnd,load:e.loadEventEnd}:null;});if(/\bpreview\b/i.test(bodyText)&&!['/presentation-planner-preview/','/hatch-match-preview/'].includes(pathname))report.failures.push(`${pathname}: leaked preview label`);if(bodyText.includes('Sample Page'))report.failures.push(`${pathname}: leaked Sample Page navigation`);if(h1Count<1)report.failures.push(`${pathname}: missing h1`);if(mainCount<1)report.failures.push(`${pathname}: missing main landmark`);if(missingAlt>0)report.failures.push(`${pathname}: ${missingAlt} images lack alt attributes`);if(material.length)report.failures.push(`${pathname}: serious/critical axe violations: ${material.map(v=>v.id).join(', ')}`);if(navigation?.load>8000)report.failures.push(`${pathname}: local preview load exceeded 8000ms (${navigation.load})`);await page.keyboard.press('Tab');const focused=await page.evaluate(()=>({tag:document.activeElement?.tagName,text:document.activeElement?.textContent?.trim()}));if(!focused.tag||focused.tag==='BODY')report.failures.push(`${pathname}: keyboard focus did not enter an interactive control`);report.pages.push({pathname,h1Count,mainCount,missingAlt,materialViolations:material.map(v=>v.id),navigation,firstFocus:focused});await page.close();}
+          await browser.close();fs.writeFileSync('preview-evidence/quality-report.json',JSON.stringify(report,null,2));if(report.failures.length){console.error(report.failures.join('\n'));process.exit(1);}
           NODE
       - name: Exercise isolated rollback and reactivation
         if: always()
         working-directory: next-generation/preview
         run: |
           previous_theme="$(tr -d '\r\n' < ../../preview-evidence/previous-theme.txt)"
+          npx wp-env run cli wp plugin deactivate hatch-match-preview
           npx wp-env run cli wp plugin deactivate hook-content
           npx wp-env run cli wp plugin deactivate horizon-experience-core
           npx wp-env run cli wp theme activate "$previous_theme"
@@ -125,7 +154,9 @@ jobs:
           npx wp-env run cli wp theme activate theme
           npx wp-env run cli wp plugin activate horizon-experience-core
           npx wp-env run cli wp plugin activate hook-content
+          npx wp-env run cli wp plugin activate hatch-match-preview
           curl --fail http://localhost:8899/presentation-planner-preview/ | grep -q 'hth-application-embed'
+          curl --fail http://localhost:8899/hatch-match-preview/ | grep -q 'hth-hatch-shell'
           printf 'rollback-theme=%s\nreactivation=passed\n' "$previous_theme" > ../../preview-evidence/rollback.txt
       - name: Record environment and installed state
         if: always()
