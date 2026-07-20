@@ -12,7 +12,8 @@ Hook the Horizon is the fifth independent publication in the Five-Brand Editoria
 - `wordpress-theme/` — authoritative deployable block theme, brand tokens, templates, parts, responsive and accessible presentation
 - `wordpress-plugin/hook-content/` — authoritative deployable content plugin and durable fishing content models
 - `applications/` — bounded Hook intelligence applications
-- `theme/` and `content-plugin/` — retained legacy/source-history paths until fully reconciled; they are not the release authority
+- `theme/` — retained legacy/source-history theme path; it is not the release authority
+- `content-plugin/` — retired historical locator only; it must not contain an executable WordPress plugin bootstrap or enter release artifacts
 - `docs/` — design, editorial, governance, evidence, and technical authorities
 
 Public brand text must always spell **Hook the Horizon** correctly. The repository locator is `hookthehorizon`; retired spellings such as `Hook the Forizon` and `hookthehoizon` are invalid in active source, governance, packaging, and deployment records.
