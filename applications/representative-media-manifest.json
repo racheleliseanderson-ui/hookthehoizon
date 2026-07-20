@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "publication": "Hook the Horizon",
+  "assets": [
+    {
+      "id": "hth-water-column-decision-map-001",
+      "applicationIds": ["HTH-PP-001", "HTH-SM-001"],
+      "sourcePath": "applications/presentation-planner/preview/water-column-decision-map.svg",
+      "runtimePath": "wordpress-plugin/hook-content/assets/presentation-planner/preview/water-column-decision-map.svg",
+      "ownership": "project-owned-original",
+      "provenance": "Original SVG geometry, labels, and composition created for Presentation Planner; no third-party image or protected interface copied.",
+      "rightsState": "approved-project-owned",
+      "placement": "Presentation Planner orientation state",
+      "alt": "Field diagram connecting surface, middle, and bottom water zones to observation, presentation choice, and the next test.",
+      "responsiveTreatment": "Scale the complete 2:1 diagram within the application width; do not crop away a water zone.",
+      "performance": "SVG, lazy loaded, async decoded, no remote dependency",
+      "claimBoundary": "Generalized field-decision education; no current-condition, location, access, safety, regulation, or catch claim."
+    },
+    {
+      "id": "hth-observable-cues-map-001",
+      "applicationIds": ["HTH-HM-001"],
+      "sourcePath": "next-generation/plugins/hatch-match-preview/assets/preview/observable-cues-map.svg",
+      "runtimePath": "next-generation/plugins/hatch-match-preview/assets/preview/observable-cues-map.svg",
+      "ownership": "project-owned-original",
+      "provenance": "Original simplified cue diagram created for Hatch Match; shapes are explanatory and are not documentary specimens.",
+      "rightsState": "approved-project-owned",
+      "placement": "Hatch Match orientation state",
+      "alt": "Simplified field diagram comparing tail filaments, portable cases, winged surface insects, and rock-crawling behavior.",
+      "responsiveTreatment": "Scale the complete 2:1 diagram; preserve all four cue panels and text labels.",
+      "performance": "SVG, lazy loaded, async decoded, no remote dependency",
+      "claimBoundary": "Broad observable-cue education only; no species certainty, current hatch, exact location, regulation, access, or catch claim."
+    }
+  ]
+}
