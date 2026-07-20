@@ -1,0 +1,38 @@
+name: Hook Content Registration Guard
+
+on:
+  pull_request:
+    paths:
+      - "content-plugin/**"
+      - "wordpress-plugin/hook-content/**"
+      - "tests/test_hook_content_registration.py"
+      - ".github/workflows/hook-content-registration-guard.yml"
+      - "README.md"
+  push:
+    branches:
+      - main
+    paths:
+      - "content-plugin/**"
+      - "wordpress-plugin/hook-content/**"
+      - "tests/test_hook_content_registration.py"
+      - ".github/workflows/hook-content-registration-guard.yml"
+      - "README.md"
+
+permissions:
+  contents: read
+
+jobs:
+  duplicate-registration-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate canonical Hook Content provider
+        run: python -m unittest tests/test_hook_content_registration.py -v
