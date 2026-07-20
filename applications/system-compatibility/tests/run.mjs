@@ -20,7 +20,7 @@ const base = {
   handlingGoal: 'mixed'
 };
 
-test('returns a compatible system for known in-range properties', () => {
+test('returns compatible for known in-range properties', () => {
   const result = evaluateSystemCompatibility(base);
   assert.equal(result.tier, 'compatible');
   assert.equal(result.privacy.locationData, 'not_collected');
@@ -34,18 +34,30 @@ test('rating boundaries are inclusive', () => {
   assert.equal(upper.tier, 'compatible');
 });
 
-test('hard rating mismatch is not averaged away', () => {
+test('terminal hard mismatch is not averaged away', () => {
   const result = evaluateSystemCompatibility({ ...base, terminal: { weightOz: 1.25 } });
   assert.equal(result.tier, 'mismatch');
   assert.ok(result.failures.includes('terminal_weight_outside_rod_rating'));
   assert.equal(result.checks.find((check) => check.key === 'rod_lure_rating').consequence, 'stop');
 });
 
-test('recollection does not authorize exact model specifications', () => {
+test('main-line hard mismatch is not averaged away', () => {
+  const result = evaluateSystemCompatibility({ ...base, mainLine: { material: 'braid', strengthLb: 20 } });
+  assert.equal(result.tier, 'mismatch');
+  assert.ok(result.failures.includes('main_line_outside_rod_rating'));
+});
+
+test('reel-capacity hard mismatch is not averaged away', () => {
+  const result = evaluateSystemCompatibility({ ...base, reel: { capacityYards: 50 } });
+  assert.equal(result.tier, 'mismatch');
+  assert.ok(result.failures.includes('reel_capacity_insufficient'));
+});
+
+test('recollection produces test-before-use and forbids exact model assumptions', () => {
   const result = evaluateSystemCompatibility({ ...base, identityEvidence: 'contributor_recollection' });
+  assert.equal(result.tier, 'test_before_use');
   assert.equal(result.identity.useExactModelSpecifications, false);
   assert.ok(result.unknowns.includes('exact_product_identity_not_primary_verified'));
-  assert.notEqual(result.tier, 'compatible');
 });
 
 test('missing properties produce insufficient information', () => {
@@ -56,14 +68,29 @@ test('missing properties produce insufficient information', () => {
   assert.equal(result.tier, 'insufficient_information');
 });
 
-test('strong current creates a qualified condition rather than an invented guarantee', () => {
+test('one material condition produces compatible-with-conditions', () => {
   const result = evaluateSystemCompatibility({
     ...base,
     terminal: { weightOz: 0.125 },
     fieldConditions: { ...base.fieldConditions, current: 'strong' }
   });
+  assert.equal(result.tier, 'compatible_with_conditions');
   assert.ok(result.conditions.includes('terminal_weight_may_not_control_depth_or_presentation_in_strong_current'));
-  assert.notEqual(result.tier, 'compatible');
+});
+
+test('multiple material conditions produce test-before-use', () => {
+  const result = evaluateSystemCompatibility({
+    ...base,
+    mainLine: { material: 'monofilament', strengthLb: 10 },
+    terminal: { weightOz: 0.125 },
+    fieldConditions: { cover: 'heavy', current: 'strong', wind: 'light' }
+  });
+  assert.equal(result.tier, 'test_before_use');
+  assert.equal(result.conditions.length, 2);
+});
+
+test('non-object input is invalid', () => {
+  assert.equal(evaluateSystemCompatibility(null).status, 'invalid');
 });
 
 test('invalid rating ranges stop evaluation', () => {
@@ -75,6 +102,12 @@ test('invalid rating ranges stop evaluation', () => {
   assert.ok(result.errors.includes('rod lure rating minimum cannot exceed maximum'));
 });
 
+test('negative values stop evaluation', () => {
+  const result = evaluateSystemCompatibility({ ...base, requiredLineYards: -1 });
+  assert.equal(result.status, 'invalid');
+  assert.ok(result.errors.includes('required line must be a non-negative number'));
+});
+
 test('nested exact location data is rejected', () => {
   const result = evaluateSystemCompatibility({
     ...base,
@@ -84,8 +117,25 @@ test('nested exact location data is rejected', () => {
   assert.ok(result.errors.some((error) => error.includes('exact location data is prohibited')));
 });
 
+test('deeply nested access codes are rejected', () => {
+  const result = evaluateSystemCompatibility({
+    ...base,
+    metadata: { trip: { gateCode: '1234' } }
+  });
+  assert.equal(result.status, 'invalid');
+  assert.ok(result.errors.some((error) => error.includes('metadata.trip.gateCode')));
+});
+
 test('deterministic inputs return deterministic results', () => {
   assert.deepEqual(evaluateSystemCompatibility(base), evaluateSystemCompatibility(base));
 });
 
-console.log('All System Compatibility tests passed.');
+test('public-output privacy contract is stable', () => {
+  assert.deepEqual(evaluateSystemCompatibility(base).privacy, {
+    locationData: 'not_collected',
+    protectedFieldsRejected: true,
+    publicOutput: 'broad conditions and equipment facts only'
+  });
+});
+
+console.log('All expanded System Compatibility state tests passed.');
