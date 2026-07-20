@@ -19,8 +19,61 @@ jobs:
           python -m json.tool next-generation/pathways/conditions-stewardship.json >/dev/null
           python -m json.tool next-generation/media/slot-map.json >/dev/null
           python -m json.tool next-generation/preview/.wp-env.json >/dev/null
+          python -m json.tool next-generation/theme/theme.json >/dev/null
       - name: Required route coverage
         run: |
           for f in parts/header.html parts/footer.html templates/front-page.html templates/index.html templates/single.html templates/page.html templates/archive.html templates/search.html templates/404.html templates/author.html templates/taxonomy.html templates/page-legal.html templates/page-reader-pathway.html templates/page-application.html templates/page-storefront.html templates/single-hth_field_file.html templates/archive-hth_field_file.html; do test -f "next-generation/theme/$f" || exit 1; done
       - name: Reader-facing content firewall
         run: "! grep -RniE 'GitHub|pull request|PR #[0-9]+|issue #[0-9]+|source of truth|candidate status|publication is not authorized|QA pass|staging' next-generation/theme/templates next-generation/theme/parts next-generation/theme/patterns"
+  installed-preview:
+    needs: source-validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - name: Install preview tooling
+        run: npm install --no-save @wordpress/env playwright
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Start isolated WordPress
+        working-directory: next-generation/preview
+        run: npx wp-env start
+      - name: Activate candidate package and create fixtures
+        working-directory: next-generation/preview
+        run: |
+          npx wp-env run cli wp theme activate theme
+          npx wp-env run cli wp plugin activate horizon-experience-core
+          npx wp-env run cli wp rewrite structure '/%postname%/' --hard
+          npx wp-env run cli wp post create --post_type=post --post_title='Pack for the Decision, Not the Fantasy' --post_name='pack-for-the-decision-not-the-fantasy' --post_status=publish --post_content='<p>A generalized field fixture with no current-condition, catch, access or exact-location claim.</p>'
+          npx wp-env run cli wp post create --post_type=page --post_title='Conditions and Stewardship Pathway' --post_name='conditions-and-stewardship-pathway' --post_status=publish --meta_input='{"_wp_page_template":"page-reader-pathway"}'
+          npx wp-env run cli wp post create --post_type=hth_field_file --post_title='Generalized Moving Water Field File' --post_name='generalized-moving-water-field-file' --post_status=publish --post_content='<p>A representative field file using generalized, non-sensitive conditions.</p>'
+      - name: HTTP smoke checks
+        run: |
+          curl --retry 10 --retry-delay 3 --fail http://localhost:8899/ >/dev/null
+          curl --fail http://localhost:8899/pack-for-the-decision-not-the-fantasy/ >/dev/null
+          curl --fail http://localhost:8899/conditions-and-stewardship-pathway/ >/dev/null
+          curl --fail http://localhost:8899/field-files/ >/dev/null
+      - name: Capture installed preview evidence
+        run: |
+          mkdir -p preview-evidence
+          npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/ preview-evidence/home-desktop.png
+          npx playwright screenshot --browser=chromium --device='iPhone 13' http://localhost:8899/ preview-evidence/home-mobile.png
+          npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/conditions-and-stewardship-pathway/ preview-evidence/pathway-desktop.png
+          npx playwright screenshot --browser=chromium --device='iPhone 13' http://localhost:8899/conditions-and-stewardship-pathway/ preview-evidence/pathway-mobile.png
+          npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/field-files/ preview-evidence/field-archive.png
+      - name: Record environment
+        working-directory: next-generation/preview
+        run: |
+          npx wp-env run cli wp core version > ../../preview-evidence/wordpress-version.txt
+          npx wp-env run cli php -v > ../../preview-evidence/php-version.txt
+          git rev-parse HEAD > ../../preview-evidence/commit.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hook-installed-preview
+          path: preview-evidence
+      - name: Stop isolated WordPress
+        if: always()
+        working-directory: next-generation/preview
+        run: npx wp-env stop
