@@ -59,9 +59,9 @@ jobs:
         run: |
           mkdir -p preview-evidence
           npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/ preview-evidence/home-desktop.png
-          npx playwright screenshot --browser=chromium --device='iPhone 13' http://localhost:8899/ preview-evidence/home-mobile.png
+          npx playwright screenshot --browser=chromium --viewport-size=390,844 http://localhost:8899/ preview-evidence/home-mobile.png
           npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/conditions-and-stewardship-pathway/ preview-evidence/pathway-desktop.png
-          npx playwright screenshot --browser=chromium --device='iPhone 13' http://localhost:8899/conditions-and-stewardship-pathway/ preview-evidence/pathway-mobile.png
+          npx playwright screenshot --browser=chromium --viewport-size=390,844 http://localhost:8899/conditions-and-stewardship-pathway/ preview-evidence/pathway-mobile.png
           npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/field-files/ preview-evidence/field-archive.png
       - name: Record environment
         working-directory: next-generation/preview
