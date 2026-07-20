@@ -1,0 +1,100 @@
+name: Next-generation release readiness
+on:
+  pull_request:
+    paths: ['next-generation/**', '.github/workflows/next-generation-release-readiness.yml']
+  push:
+    branches: ['rebuild/2026-07-clean-luxury-worlds']
+    paths: ['next-generation/**', '.github/workflows/next-generation-release-readiness.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  release-readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with: {php-version: '8.1'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - name: Validate source contracts
+        run: |
+          find next-generation/plugins next-generation/migration next-generation/qa -name '*.php' -print0 | xargs -0 -n1 php -l
+          find next-generation -name '*.json' -print0 | xargs -0 -n1 sh -c 'python -m json.tool "$0" >/dev/null'
+          test -f next-generation/migration/page-worlds.json
+          test -f next-generation/media/slot-map.json
+      - name: Install preview and audit tooling
+        run: npm install --no-save @wordpress/env playwright @axe-core/playwright lighthouse
+      - name: Install browser engines
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Start isolated WordPress
+        working-directory: next-generation/preview
+        run: npx wp-env start
+      - name: Activate package and migrate primary page worlds
+        working-directory: next-generation/preview
+        run: |
+          mkdir -p ../../preview-evidence ../../release-packages
+          npx wp-env run cli wp --quiet option get stylesheet > ../../preview-evidence/previous-theme.txt
+          npx wp-env run cli wp theme activate theme
+          npx wp-env run cli wp plugin activate horizon-experience-core
+          npx wp-env run cli wp plugin activate hook-content || true
+          npx wp-env run cli wp option update blogname 'Hook the Horizon'
+          npx wp-env run cli wp option update blogdescription 'Field judgment before the next move.'
+          npx wp-env run cli wp rewrite structure '/%postname%/' --hard
+          npx wp-env run cli wp eval-file wp-content/nlh-migration/page-worlds.php -- --apply --status=publish --set-front-page | tee ../../preview-evidence/page-world-migration.json
+          npx wp-env run cli wp post create --post_type=hth_field_file --post_title='Release Readiness Field File' --post_name='release-readiness-field-file' --post_status=publish --post_content='<p>Controlled fixture with no current weather, regulation, access, or location claim.</p>'
+          npx wp-env run cli wp eval-file wp-content/nlh-qa/validate-block-templates.php | tee ../../preview-evidence/gutenberg-parse.json
+      - name: Validate public data adapters
+        run: |
+          curl --retry 10 --retry-delay 3 --fail http://localhost:8899/ >/dev/null
+          for route in start-here field-files resources tools store research-and-standards; do curl --fail "http://localhost:8899/$route/" >/dev/null; done
+          curl --fail 'http://localhost:8899/wp-json/horizon-experience/v1/discover?post_type=hth_field_file' > preview-evidence/discover.json
+          curl --fail 'http://localhost:8899/wp-json/horizon-experience/v1/applications' > preview-evidence/applications.json
+          curl --fail 'http://localhost:8899/wp-json/horizon-experience/v1/commerce' > preview-evidence/commerce.json
+      - name: Validate authenticated saved and account behavior
+        working-directory: next-generation/preview
+        run: |
+          npx wp-env run cli wp eval '
+          do_action("rest_api_init");$user=username_exists("qa_runtime") ?: wp_create_user("qa_runtime",wp_generate_password(24),"qa-runtime@example.invalid");wp_set_current_user((int)$user);$post=get_page_by_path("release-readiness-field-file",OBJECT,"hth_field_file");$save=new WP_REST_Request("POST","/horizon-experience/v1/saved");$save->set_param("item_id",$post->ID);$save->set_param("item_type","hth_field_file");$saved=rest_do_request($save);if($saved->is_error()){throw new Exception("save failed");}$account=new WP_REST_Request("POST","/horizon-experience/v1/account");$account->set_body_params(["emailUpdates"=>false,"recommendationMode"=>"practical","reducedMotionPreference"=>true]);$updated=rest_do_request($account);if($updated->is_error()){throw new Exception("account failed");}echo wp_json_encode(["saved"=>$saved->get_data(),"account"=>$updated->get_data()]);' > ../../preview-evidence/authenticated-runtime.json
+      - name: Run responsive, accessibility, browser and print tests
+        env:
+          BASE_URL: http://localhost:8899
+          PAGE_PATHS: '["/","/start-here/","/field-files/","/resources/","/tools/","/store/","/research-and-standards/"]'
+          EVIDENCE_DIR: preview-evidence
+        run: node next-generation/qa/run-installed-preview.mjs
+      - name: Run performance and metadata audit
+        run: |
+          npx lighthouse http://localhost:8899/ --chrome-flags='--headless --no-sandbox' --only-categories=performance,accessibility,best-practices,seo --output=json --output-path=preview-evidence/lighthouse-home.json
+          node -e "const r=require('./preview-evidence/lighthouse-home.json');const c=r.categories;console.log(JSON.stringify({performance:c.performance.score,accessibility:c.accessibility.score,bestPractices:c['best-practices'].score,seo:c.seo.score},null,2))" > preview-evidence/lighthouse-scores.json
+      - name: Build installable packages and rollback manifest
+        run: |
+          rm -rf release-packages && mkdir -p release-packages/hook-the-horizon-next release-packages/horizon-experience-core
+          cp -R next-generation/theme/. release-packages/hook-the-horizon-next/
+          cp -R next-generation/plugins/horizon-experience-core/. release-packages/horizon-experience-core/
+          (cd release-packages && zip -qr hook-the-horizon-next.zip hook-the-horizon-next && zip -qr horizon-experience-core.zip horizon-experience-core)
+          sha256sum release-packages/*.zip > release-packages/SHA256SUMS
+          printf '{"commit":"%s","branch":"%s","cutoverAuthorized":false}\n' "$(git rev-parse HEAD)" "${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}" > release-packages/rollback-manifest.json
+      - name: Rehearse rollback and reactivation
+        if: always()
+        working-directory: next-generation/preview
+        run: |
+          previous_theme="$(tr -d '\r\n' < ../../preview-evidence/previous-theme.txt)"
+          npx wp-env run cli wp plugin deactivate horizon-experience-core || true
+          npx wp-env run cli wp theme activate "$previous_theme"
+          curl --fail http://localhost:8899/ >/dev/null
+          npx wp-env run cli wp theme activate theme
+          npx wp-env run cli wp plugin activate horizon-experience-core
+          curl --fail http://localhost:8899/ >/dev/null
+          printf 'rollback-theme=%s\nreactivation=passed\n' "$previous_theme" > ../../preview-evidence/rollback.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: horizon-release-readiness
+          path: |
+            preview-evidence
+            release-packages
+          retention-days: 30
+      - name: Stop isolated WordPress
+        if: always()
+        working-directory: next-generation/preview
+        run: npx wp-env stop
