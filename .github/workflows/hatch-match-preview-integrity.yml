@@ -1,0 +1,40 @@
+name: Hatch Match Preview Integrity
+on:
+  pull_request:
+    paths:
+      - 'applications/hatch-match/**'
+      - 'next-generation/plugins/hatch-match-preview/**'
+      - 'scripts/sync-hatch-match-preview.mjs'
+      - '.github/workflows/hatch-match-preview-integrity.yml'
+  push:
+    branches: ['rebuild/2026-07-clean-luxury-worlds']
+    paths:
+      - 'applications/hatch-match/**'
+      - 'next-generation/plugins/hatch-match-preview/**'
+      - 'scripts/sync-hatch-match-preview.mjs'
+      - '.github/workflows/hatch-match-preview-integrity.yml'
+permissions: {contents: read}
+jobs:
+  source-runtime-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - name: Regenerate runtime copy from canonical Hatch Match data
+        run: node scripts/sync-hatch-match-preview.mjs
+      - name: Reject source/runtime drift
+        run: |
+          cmp applications/hatch-match/data/approved-preview-seed-records.json next-generation/plugins/hatch-match-preview/data/seed-records.json
+          git diff --exit-code -- next-generation/plugins/hatch-match-preview/data
+      - name: Validate preview application ownership
+        run: |
+          python -m json.tool applications/hatch-match/data/approved-preview-seed-records.json >/dev/null
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const seed=JSON.parse(fs.readFileSync('applications/hatch-match/data/approved-preview-seed-records.json','utf8'));
+          if(seed.applicationId!=='HTH-HM-001'||seed.publicationState!=='approved_preview'||seed.records.length<3)throw new Error('Canonical Hatch Match seed contract is incomplete.');
+          const forbiddenKeys=/^(exactLocation|coordinates?|latitude|longitude|lat|lng|gps|accessCode|gateCode|currentConditions|regulations?)$/i;
+          const walk=(value)=>{if(Array.isArray(value)){value.forEach(walk);return;}if(value&&typeof value==='object'){for(const [key,child] of Object.entries(value)){if(forbiddenKeys.test(key))throw new Error(`Forbidden owned field: ${key}`);walk(child);}}};
+          walk(seed.records);
+          NODE
