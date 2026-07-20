@@ -1,0 +1,84 @@
+name: Route-specific installed preview evidence
+on:
+  pull_request:
+    paths: ['next-generation/**','wordpress-plugin/hook-content/**','scripts/build-wordpress-release.sh','.github/workflows/next-generation-route-evidence.yml']
+  push:
+    branches: ['rebuild/2026-07-clean-luxury-worlds']
+    paths: ['next-generation/**','wordpress-plugin/hook-content/**','scripts/build-wordpress-release.sh','.github/workflows/next-generation-route-evidence.yml']
+permissions: {contents: read}
+jobs:
+  route-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - name: Build exact Hook Content directory for wp-env
+        run: bash scripts/build-wordpress-release.sh
+      - run: npm install --no-save @wordpress/env playwright @axe-core/playwright
+      - run: npx playwright install --with-deps chromium
+      - name: Start isolated WordPress
+        working-directory: next-generation/preview
+        run: npx wp-env start
+      - name: Activate and create route-specific fixtures
+        working-directory: next-generation/preview
+        run: |
+          mkdir -p ../../route-evidence
+          npx wp-env run cli wp theme activate theme
+          npx wp-env run cli wp plugin activate horizon-experience-core
+          npx wp-env run cli wp plugin activate hook-the-horizon-content
+          npx wp-env run cli wp option update blogname 'Hook the Horizon'
+          article_id="$(npx wp-env run cli wp --quiet post create --post_type=post --post_title='Pack for the Decision, Not the Fantasy' --post_status=publish --post_content='<p>A generalized field fixture with no current-condition, catch, access, safe-condition, equipment-use, or exact-location claim.</p>' --porcelain | tail -n 1 | tr -d '\r')"
+          pathway_id="$(npx wp-env run cli wp --quiet post create --post_type=page --post_title='Conditions and Stewardship Pathway' --post_status=publish --meta_input='{"_wp_page_template":"page-reader-pathway"}' --porcelain | tail -n 1 | tr -d '\r')"
+          field_id="$(npx wp-env run cli wp --quiet post create --post_type=hth_field_file --post_title='Generalized Moving Water Field File' --post_status=publish --post_content='<p>A representative field file using generalized, non-sensitive conditions.</p>' --porcelain | tail -n 1 | tr -d '\r')"
+          [[ "$article_id" =~ ^[0-9]+$ ]] && [[ "$pathway_id" =~ ^[0-9]+$ ]] && [[ "$field_id" =~ ^[0-9]+$ ]]
+          article_url="$(npx wp-env run cli wp --quiet post url "$article_id" | tail -n 1 | tr -d '\r')"
+          pathway_url="$(npx wp-env run cli wp --quiet post url "$pathway_id" | tail -n 1 | tr -d '\r')"
+          article_url="${article_url/localhost:8888/localhost:8899}"
+          pathway_url="${pathway_url/localhost:8888/localhost:8899}"
+          echo "ARTICLE_ID=$article_id" >> "$GITHUB_ENV"
+          echo "PATHWAY_ID=$pathway_id" >> "$GITHUB_ENV"
+          echo "FIELD_ID=$field_id" >> "$GITHUB_ENV"
+          echo "ARTICLE_URL=$article_url" >> "$GITHUB_ENV"
+          echo "PATHWAY_URL=$pathway_url" >> "$GITHUB_ENV"
+      - name: Assert distinct routes and publication styles
+        run: |
+          curl --location --retry 10 --retry-delay 3 --fail 'http://localhost:8899/' > route-evidence/home.html
+          curl --location --fail "$ARTICLE_URL" > route-evidence/article.html
+          curl --location --fail "$PATHWAY_URL" > route-evidence/pathway.html
+          curl --location --fail 'http://localhost:8899/?post_type=hth_field_file' > route-evidence/archive.html
+          grep -q 'Read the water before you make the move.' route-evidence/home.html
+          grep -q 'Pack for the Decision, Not the Fantasy' route-evidence/article.html
+          grep -q 'hth-pathway' route-evidence/pathway.html
+          grep -q 'hth-field-archive' route-evidence/archive.html
+          grep -q 'horizon-next-style-css' route-evidence/home.html
+          grep -q 'horizon-next-experience-css' route-evidence/pathway.html
+          test "$(sha256sum route-evidence/home.html | cut -d' ' -f1)" != "$(sha256sum route-evidence/article.html | cut -d' ' -f1)"
+          test "$(sha256sum route-evidence/home.html | cut -d' ' -f1)" != "$(sha256sum route-evidence/pathway.html | cut -d' ' -f1)"
+      - name: Capture route screenshots
+        run: |
+          npx playwright screenshot --browser=chromium --viewport-size=1440,1000 'http://localhost:8899/' route-evidence/home-desktop.png
+          npx playwright screenshot --browser=chromium --viewport-size=390,844 'http://localhost:8899/' route-evidence/home-mobile.png
+          npx playwright screenshot --browser=chromium --viewport-size=1440,1000 "$ARTICLE_URL" route-evidence/article-desktop.png
+          npx playwright screenshot --browser=chromium --viewport-size=1440,1000 "$PATHWAY_URL" route-evidence/pathway-desktop.png
+          npx playwright screenshot --browser=chromium --viewport-size=390,844 "$PATHWAY_URL" route-evidence/pathway-mobile.png
+          npx playwright screenshot --browser=chromium --viewport-size=1440,1000 'http://localhost:8899/?post_type=hth_field_file' route-evidence/archive-desktop.png
+      - name: Route-level accessibility and identity validation
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';import { chromium } from 'playwright';import AxeBuilder from '@axe-core/playwright';
+          const targets=[['home','http://localhost:8899/'],['article',process.env.ARTICLE_URL],['pathway',process.env.PATHWAY_URL],['archive','http://localhost:8899/?post_type=hth_field_file']];const browser=await chromium.launch({headless:true});const context=await browser.newContext({viewport:{width:1440,height:1000}});const report={pages:[],failures:[]};
+          for(const [label,url] of targets){const page=await context.newPage();await page.goto(url,{waitUntil:'networkidle'});const h1=await page.locator('h1').count();const main=await page.locator('main').count();const text=await page.locator('body').innerText();const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();const material=axe.violations.filter(v=>['critical','serious'].includes(v.impact));if(h1!==1)report.failures.push(`${label}: expected one h1, found ${h1}`);if(main<1)report.failures.push(`${label}: missing main`);if(/\bpreview\b/i.test(text)||text.includes('Sample Page'))report.failures.push(`${label}: preview identity leaked`);if(material.length)report.failures.push(`${label}: ${material.map(v=>v.id).join(', ')}`);report.pages.push({label,url,h1,main,title:await page.title(),violations:material.map(v=>v.id)});await page.close();}
+          await browser.close();fs.writeFileSync('route-evidence/route-quality.json',JSON.stringify(report,null,2));if(report.failures.length){console.error(report.failures.join('\n'));process.exit(1);}
+          NODE
+      - run: |
+          git rev-parse HEAD > route-evidence/commit.txt
+          printf 'home=/\narticle=%s\npathway=%s\narchive=/?post_type=hth_field_file\n' "$ARTICLE_URL" "$PATHWAY_URL" > route-evidence/routes.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: hook-route-evidence, path: route-evidence, if-no-files-found: error}
+      - name: Stop isolated WordPress
+        if: always()
+        working-directory: next-generation/preview
+        run: npx wp-env stop
