@@ -1,10 +1,10 @@
 name: Next-generation release readiness
 on:
   pull_request:
-    paths: ['next-generation/**', '.github/workflows/next-generation-release-readiness.yml']
+    paths: ['next-generation/**', 'wordpress-plugin/hook-content/**', 'applications/_shared/**', 'applications/presentation-planner/**', 'scripts/build-wordpress-release.sh', 'scripts/sync-presentation-planner-runtime.mjs', '.github/workflows/next-generation-release-readiness.yml']
   push:
     branches: ['rebuild/2026-07-clean-luxury-worlds']
-    paths: ['next-generation/**', '.github/workflows/next-generation-release-readiness.yml']
+    paths: ['next-generation/**', 'wordpress-plugin/hook-content/**', 'applications/_shared/**', 'applications/presentation-planner/**', 'scripts/build-wordpress-release.sh', 'scripts/sync-presentation-planner-runtime.mjs', '.github/workflows/next-generation-release-readiness.yml']
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
@@ -20,9 +20,15 @@ jobs:
       - name: Validate source contracts
         run: |
           find next-generation/plugins next-generation/migration next-generation/qa -name '*.php' -print0 | xargs -0 -n1 php -l
+          php -l wordpress-plugin/hook-content/hook-content.php
           find next-generation -name '*.json' -print0 | xargs -0 -n1 sh -c 'python -m json.tool "$0" >/dev/null'
           test -f next-generation/migration/page-worlds.json
           test -f next-generation/media/slot-map.json
+      - name: Build exact Hook Content directory for wp-env
+        run: |
+          bash scripts/build-wordpress-release.sh
+          test -d dist/hook-the-horizon-content
+          test -s dist/hook-the-horizon-content-0.3.1.zip
       - name: Install preview and audit tooling
         run: npm install --no-save @wordpress/env playwright @axe-core/playwright lighthouse
       - name: Install browser engines
@@ -38,7 +44,8 @@ jobs:
           npx wp-env run cli wp --quiet option get stylesheet > ../../preview-evidence/previous-theme.txt
           npx wp-env run cli wp theme activate theme
           npx wp-env run cli wp plugin activate horizon-experience-core
-          npx wp-env run cli wp plugin activate hook-content || true
+          npx wp-env run cli wp plugin activate hook-the-horizon-content
+          npx wp-env run cli wp plugin get hook-the-horizon-content --field=version | grep -Fx '0.3.1'
           npx wp-env run cli wp option update blogname 'Hook the Horizon'
           npx wp-env run cli wp option update blogdescription 'Field judgment before the next move.'
           npx wp-env run cli wp rewrite structure '/%postname%/' --hard
@@ -80,6 +87,7 @@ jobs:
           cp -R next-generation/theme/. release-packages/hook-the-horizon-next/
           cp -R next-generation/plugins/horizon-experience-core/. release-packages/horizon-experience-core/
           (cd release-packages && zip -qr hook-the-horizon-next.zip hook-the-horizon-next && zip -qr horizon-experience-core.zip horizon-experience-core)
+          cp dist/hook-the-horizon-content-0.3.1.zip release-packages/
           sha256sum release-packages/*.zip > release-packages/SHA256SUMS
           printf '{"commit":"%s","branch":"%s","cutoverAuthorized":false}\n' "$(git rev-parse HEAD)" "${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}" > release-packages/rollback-manifest.json
       - name: Rehearse rollback and reactivation
@@ -87,11 +95,13 @@ jobs:
         working-directory: next-generation/preview
         run: |
           previous_theme="$(tr -d '\r\n' < ../../preview-evidence/previous-theme.txt)"
+          npx wp-env run cli wp plugin deactivate hook-the-horizon-content || true
           npx wp-env run cli wp plugin deactivate horizon-experience-core || true
           npx wp-env run cli wp theme activate "$previous_theme"
           curl --fail http://localhost:8899/ >/dev/null
           npx wp-env run cli wp theme activate theme
           npx wp-env run cli wp plugin activate horizon-experience-core
+          npx wp-env run cli wp plugin activate hook-the-horizon-content
           curl --fail http://localhost:8899/ >/dev/null
           printf 'rollback-theme=%s\nreactivation=passed\n' "$previous_theme" > ../../preview-evidence/rollback.txt
       - uses: actions/upload-artifact@v4
