@@ -1,0 +1,155 @@
+name: Hook Application Builds
+
+on:
+  pull_request:
+    paths:
+      - 'applications/hatch-match/**'
+      - 'applications/rig-signal/**'
+      - 'next-generation/plugins/hatch-match-preview/**'
+      - 'scripts/sync-hatch-match-preview.mjs'
+      - '.github/workflows/application-builds.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'applications/hatch-match/**'
+      - 'applications/rig-signal/**'
+      - 'next-generation/plugins/hatch-match-preview/**'
+      - 'scripts/sync-hatch-match-preview.mjs'
+      - '.github/workflows/application-builds.yml'
+  workflow_dispatch:
+    inputs:
+      application:
+        description: Application build to run
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - hatch-match
+          - rig-signal
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hook-application-builds-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  hatch-match:
+    if: github.event_name != 'workflow_dispatch' || inputs.application == 'all' || inputs.application == 'hatch-match'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Validate Hatch Match authority and privacy boundary
+        run: |
+          test -s applications/hatch-match/application.yaml
+          test -s applications/hatch-match/BIOLOGICAL_SEED_AND_REVIEW_STANDARD.md
+          grep -q 'id: HTH-HM-001' applications/hatch-match/application.yaml
+          grep -q 'Required negative evidence' applications/hatch-match/BIOLOGICAL_SEED_AND_REVIEW_STANDARD.md
+          grep -q 'no exact location or vulnerable-water disclosure' applications/hatch-match/BIOLOGICAL_SEED_AND_REVIEW_STANDARD.md
+          grep -q 'maintenance_branch: operations/hatch-match-maintenance-activation-2026-07-20' applications/hatch-match/application.yaml
+
+      - name: Validate maintenance and preview package when present
+        run: |
+          if [ -f applications/hatch-match/data/approved-preview-seed-records.json ]; then
+            node -e "JSON.parse(require('fs').readFileSync('applications/hatch-match/data/approved-preview-seed-records.json','utf8'))"
+          fi
+          if [ -f scripts/sync-hatch-match-preview.mjs ]; then
+            node --check scripts/sync-hatch-match-preview.mjs
+            node scripts/sync-hatch-match-preview.mjs
+          fi
+          if [ -d next-generation/plugins/hatch-match-preview ]; then
+            find next-generation/plugins/hatch-match-preview -name '*.php' -print0 | xargs -0 -r -n1 php -l
+          fi
+
+      - name: Build Hatch Match evidence artifact
+        run: |
+          rm -rf dist/hatch-match
+          mkdir -p dist/hatch-match/application
+          cp applications/hatch-match/application.yaml dist/hatch-match/application/
+          cp applications/hatch-match/BIOLOGICAL_SEED_AND_REVIEW_STANDARD.md dist/hatch-match/application/
+          if [ -d applications/hatch-match/data ]; then cp -R applications/hatch-match/data dist/hatch-match/application/data; fi
+          if [ -f applications/hatch-match/maintenance-policy.json ]; then cp applications/hatch-match/maintenance-policy.json dist/hatch-match/application/; fi
+          if [ -f applications/hatch-match/maintenance-log.json ]; then cp applications/hatch-match/maintenance-log.json dist/hatch-match/application/; fi
+          if [ -d next-generation/plugins/hatch-match-preview ]; then cp -R next-generation/plugins/hatch-match-preview dist/hatch-match/wordpress-preview; fi
+          (
+            cd dist/hatch-match
+            find . -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
+          )
+          cat > dist/hatch-match/build-record.json <<JSON
+          {
+            "applicationId": "HTH-HM-001",
+            "application": "Hatch Match",
+            "repository": "${{ github.repository }}",
+            "commit": "${{ github.sha }}",
+            "maintenanceActivationDependency": "PR 85",
+            "productionAuthorized": false
+          }
+          JSON
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hook-hatch-match-${{ github.sha }}
+          path: dist/hatch-match
+          if-no-files-found: error
+          retention-days: 30
+
+  rig-signal:
+    if: github.event_name != 'workflow_dispatch' || inputs.application == 'all' || inputs.application == 'rig-signal'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate Rig Signal contract and representative events
+        run: |
+          test -s applications/rig-signal/application.yaml
+          test -s applications/rig-signal/device-event.v1.json
+          test -s applications/rig-signal/fixtures/device-events.v1.json
+          grep -q 'id: HTH-RS-001' applications/rig-signal/application.yaml
+          node --check applications/rig-signal/validate.mjs
+          node applications/rig-signal/tests/run.mjs
+          node -e "JSON.parse(require('fs').readFileSync('applications/rig-signal/device-event.v1.json','utf8')); JSON.parse(require('fs').readFileSync('applications/rig-signal/fixtures/device-events.v1.json','utf8'));"
+          grep -R --line-number 'catch_prediction' applications/rig-signal
+          grep -R --line-number 'locationIncluded must be false' applications/rig-signal
+
+      - name: Build Rig Signal evidence artifact
+        run: |
+          rm -rf dist/rig-signal
+          mkdir -p dist/rig-signal
+          cp -R applications/rig-signal/. dist/rig-signal/
+          (
+            cd dist/rig-signal
+            find . -type f -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
+          )
+          cat > dist/rig-signal/build-record.json <<JSON
+          {
+            "applicationId": "HTH-RS-001",
+            "application": "Rig Signal",
+            "repository": "${{ github.repository }}",
+            "commit": "${{ github.sha }}",
+            "buildType": "contract-fixture-validator-foundation",
+            "manufacturerAdapters": false,
+            "productionAuthorized": false
+          }
+          JSON
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hook-rig-signal-${{ github.sha }}
+          path: dist/rig-signal
+          if-no-files-found: error
+          retention-days: 30
