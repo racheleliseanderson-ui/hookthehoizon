@@ -14,9 +14,10 @@ try {
   await frame.locator('h1').waitFor();
   assert.match(await frame.locator('h1').innerText(), /smarter field test/i);
   const inventory = frame.locator('#inventory input[type="checkbox"]');
-  assert.ok(await inventory.count(), 'Owned-inventory fixtures were not rendered.');
+  assert.ok((await inventory.count()) >= 2, 'Owned-inventory fixtures were not rendered.');
 
-  await inventory.first().check();
+  // The second governed fixture supports the default reservoir + rock + bottom + clear context.
+  await inventory.nth(1).check();
   await frame.locator('#conditions input[value="clear"]').check();
   await frame.locator('#planner-form button[type="submit"]').click();
   await frame.locator('#results .plan').first().waitFor();
