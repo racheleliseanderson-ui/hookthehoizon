@@ -2,7 +2,13 @@
   "schemaVersion": 1,
   "applicationId": "HTH-HM-001",
   "publicationState": "approved_preview",
+  "maintenancePolicyId": "HTH-HM-MAINT-001",
+  "maintenanceOwner": "Rachel Anderson",
+  "operationalMaintainer": "Hook the Horizon field intelligence operations",
+  "reviewCadenceDays": 90,
+  "hardExpiryDays": 184,
   "reviewedDate": "2026-07-20",
+  "nextReviewDate": "2026-10-20",
   "expiresDate": "2027-01-20",
   "records": [
     {
