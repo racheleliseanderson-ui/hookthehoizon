@@ -1,0 +1,61 @@
+name: Publish Hook Runtime Artifacts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'applications/presentation-planner/**'
+      - 'applications/system-compatibility/**'
+      - 'wordpress-theme/**'
+      - 'wordpress-plugin/**'
+      - 'scripts/build-wordpress-release.sh'
+      - 'scripts/sync-presentation-planner-runtime.mjs'
+      - 'scripts/sync-system-compatibility-runtime.mjs'
+      - '.github/workflows/runtime-artifact-publisher.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hook-runtime-artifacts
+  cancel-in-progress: true
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out canonical source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build validated WordPress artifacts
+        run: bash scripts/build-wordpress-release.sh
+
+      - name: Stage auditable runtime artifacts
+        run: |
+          rm -rf /tmp/hth-runtime-artifacts
+          mkdir -p /tmp/hth-runtime-artifacts
+          cp dist/*.zip /tmp/hth-runtime-artifacts/
+          cp dist/SHA256SUMS /tmp/hth-runtime-artifacts/
+          cp dist/hook-the-horizon/release-manifest.json /tmp/hth-runtime-artifacts/hook-the-horizon-release-manifest.json
+          cp dist/hook-the-horizon-content/assets/presentation-planner/runtime-manifest.json /tmp/hth-runtime-artifacts/presentation-planner-runtime-manifest.json
+          cp dist/hook-the-horizon-content/assets/system-compatibility/runtime-manifest.json /tmp/hth-runtime-artifacts/system-compatibility-runtime-manifest.json
+          printf '%s\n' "${GITHUB_SHA}" > /tmp/hth-runtime-artifacts/SOURCE_COMMIT
+
+      - name: Publish artifact branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout --orphan runtime-artifacts-build
+          git rm -rf .
+          cp -R /tmp/hth-runtime-artifacts/. .
+          git add .
+          git commit -m "Publish Hook runtime artifacts for ${GITHUB_SHA}"
+          git branch -M runtime-artifacts
+          git push --force origin runtime-artifacts
