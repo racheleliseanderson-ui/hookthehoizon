@@ -23,7 +23,10 @@ jobs:
       - name: Validate design authority and evidence coverage
         run: |
           python - <<'PY'
+          import json
+          from datetime import date
           from pathlib import Path
+
           design = Path('next-generation/DESIGN.md')
           if not design.is_file():
               raise SystemExit('Missing next-generation/DESIGN.md')
@@ -32,12 +35,39 @@ jobs:
           missing = [heading for heading in required if heading.casefold() not in text.casefold()]
           if missing:
               raise SystemExit('DESIGN.md missing sections: ' + ', '.join(missing))
+
           workflows = '\n'.join(path.read_text(encoding='utf-8', errors='ignore') for path in Path('.github/workflows').glob('*.y*ml')).casefold()
           evidence_terms = ['playwright','axe','mobile','reduced','forced','print','upload-artifact']
           absent = [term for term in evidence_terms if term not in workflows]
           if absent:
               raise SystemExit('Rendered-evidence workflow coverage missing: ' + ', '.join(absent))
+
+          data_root = Path('next-generation/plugins/hatch-match-preview/data')
+          seed = json.loads((data_root / 'seed-records.json').read_text(encoding='utf-8'))
+          policy = json.loads((data_root / 'maintenance-policy.json').read_text(encoding='utf-8'))
+          if seed.get('maintenancePolicyId') != policy.get('policyId'):
+              raise SystemExit('Hatch Match seed is not bound to the active maintenance policy')
+          if not seed.get('maintenanceOwner') or not policy.get('primaryOwner', {}).get('name'):
+              raise SystemExit('Hatch Match maintenance owner is missing')
+          if seed.get('reviewCadenceDays') != policy.get('cadence', {}).get('scheduledReviewDays'):
+              raise SystemExit('Hatch Match review cadence differs between seed and policy')
+          reviewed = date.fromisoformat(seed['reviewedDate'])
+          next_review = date.fromisoformat(seed['nextReviewDate'])
+          expires = date.fromisoformat(seed['expiresDate'])
+          if (next_review - reviewed).days > policy['cadence']['scheduledReviewDays']:
+              raise SystemExit('Hatch Match next review exceeds scheduled cadence')
+          if (expires - reviewed).days > policy['cadence']['hardExpiryDays']:
+              raise SystemExit('Hatch Match hard expiry exceeds policy')
+          source_ids = {source['id'] for source in seed.get('sources', [])}
+          forbidden = ('latitude','longitude','coordinates','gps','exact location','current conditions','regulation','access code','catch probability','catch guarantee')
+          for record in seed.get('records', []):
+              missing_sources = set(record.get('sourceIds', [])) - source_ids
+              if missing_sources:
+                  raise SystemExit(f"{record.get('id')} references missing sources: {sorted(missing_sources)}")
+              serialized = json.dumps(record).casefold()
+              if any(term in serialized for term in forbidden):
+                  raise SystemExit(f"{record.get('id')} crosses a Hatch Match ownership boundary")
           if 'Hook the Horizon' not in text:
               raise SystemExit('Publication identity missing from DESIGN.md')
-          print('Application design authority and evidence contract validated.')
+          print('Application design authority, Hatch Match ownership, and refresh controls validated.')
           PY
