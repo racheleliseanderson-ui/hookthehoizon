@@ -4,7 +4,6 @@
  * Dry run: wp eval-file page-worlds.php
  * Apply to preview: wp eval-file page-worlds.php apply publish set-front-page
  */
-declare(strict_types=1);
 if (! defined('ABSPATH')) { fwrite(STDERR, "WordPress must be loaded.\n"); exit(1); }
 $cli_args = isset($args) && is_array($args) ? array_map('strval', $args) : [];
 $apply = in_array('--apply', $cli_args, true) || in_array('apply', $cli_args, true);
