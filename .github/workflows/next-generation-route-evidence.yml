@@ -35,10 +35,10 @@ jobs:
           echo "FIELD_ID=$field_id" >> "$GITHUB_ENV"
       - name: Assert distinct routes and publication styles
         run: |
-          curl --retry 10 --retry-delay 3 --fail 'http://localhost:8899/' > route-evidence/home.html
-          curl --fail "http://localhost:8899/?p=${ARTICLE_ID}" > route-evidence/article.html
-          curl --fail "http://localhost:8899/?page_id=${PATHWAY_ID}" > route-evidence/pathway.html
-          curl --fail 'http://localhost:8899/?post_type=hth_field_file' > route-evidence/archive.html
+          curl --location --retry 10 --retry-delay 3 --fail 'http://localhost:8899/' > route-evidence/home.html
+          curl --location --fail "http://localhost:8899/?p=${ARTICLE_ID}" > route-evidence/article.html
+          curl --location --fail "http://localhost:8899/?page_id=${PATHWAY_ID}" > route-evidence/pathway.html
+          curl --location --fail 'http://localhost:8899/?post_type=hth_field_file' > route-evidence/archive.html
           grep -q 'Read the water before you make the move.' route-evidence/home.html
           grep -q 'Pack for the Decision, Not the Fantasy' route-evidence/article.html
           grep -q 'hth-pathway' route-evidence/pathway.html
