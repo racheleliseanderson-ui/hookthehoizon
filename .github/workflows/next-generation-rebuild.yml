@@ -47,6 +47,8 @@ jobs:
         run: |
           grep -q 'Version: 0.3.1' wordpress-plugin/hook-content/hook-content.php
           grep -q '"applicationId": "HTH-PP-001"' dist/hook-the-horizon-content/assets/presentation-planner/runtime-manifest.json
+          grep -q 'No exact location shared' dist/hook-the-horizon-content/assets/presentation-planner/preview/app.mjs
+          grep -q 'link.download' dist/hook-the-horizon-content/assets/presentation-planner/preview/app.mjs
           test -s dist/hook-the-horizon-content-0.3.1.zip
           test -s dist/SHA256SUMS
       - name: Build bounded Hatch Match preview package
@@ -77,6 +79,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '20'}
+      - name: Build exact Hook Content directory for wp-env
+        run: bash scripts/build-wordpress-release.sh
       - name: Install preview tooling
         run: npm install --no-save @wordpress/env playwright @axe-core/playwright
       - name: Install Chromium
@@ -84,14 +88,14 @@ jobs:
       - name: Start isolated WordPress
         working-directory: next-generation/preview
         run: npx wp-env start
-      - name: Activate candidate packages and create controlled fixtures
+      - name: Activate exact packages and create controlled fixtures
         working-directory: next-generation/preview
         run: |
           mkdir -p ../../preview-evidence
           npx wp-env run cli wp --quiet option get stylesheet > ../../preview-evidence/previous-theme.txt
           npx wp-env run cli wp theme activate theme
           npx wp-env run cli wp plugin activate horizon-experience-core
-          npx wp-env run cli wp plugin activate hook-content
+          npx wp-env run cli wp plugin activate hook-the-horizon-content
           npx wp-env run cli wp plugin activate hatch-match-preview
           npx wp-env run cli wp option update blogname 'Hook the Horizon'
           npx wp-env run cli wp option update blogdescription 'Read the water. Respect the stop signal.'
@@ -103,7 +107,7 @@ jobs:
           npx wp-env run cli wp post create --post_type=page --post_title='Presentation Planner Preview' --post_name='presentation-planner-preview' --post_status=publish --post_content='[hth_presentation_planner]'
           npx wp-env run cli wp post create --post_type=page --post_title='Hatch Match Preview' --post_name='hatch-match-preview' --post_status=publish --post_content='[hth_hatch_match]'
           npx wp-env run cli wp post create --post_type=hth_field_file --post_title='Generalized Moving Water Field File' --post_name='generalized-moving-water-field-file' --post_status=publish --post_content='<p>A representative field file using generalized, non-sensitive conditions.</p>'
-          npx wp-env run cli wp plugin get hook-content --field=version | grep -Fx '0.3.1'
+          npx wp-env run cli wp plugin get hook-the-horizon-content --field=version | grep -Fx '0.3.1'
           npx wp-env run cli wp plugin get hatch-match-preview --field=version | grep -Fx '0.1.0-preview'
       - name: HTTP and stylesheet smoke checks
         run: |
@@ -113,6 +117,7 @@ jobs:
           curl --fail http://localhost:8899/field-files/ > preview-evidence/field-archive.html
           curl --fail http://localhost:8899/presentation-planner-preview/ > preview-evidence/presentation-planner.html
           curl --fail http://localhost:8899/hatch-match-preview/ > preview-evidence/hatch-match.html
+          curl --fail http://localhost:8899/wp-content/plugins/hook-the-horizon-content/assets/presentation-planner/preview/index.html | grep -q 'Build a smarter field test'
           grep -q 'hth-application-embed' preview-evidence/presentation-planner.html
           grep -q 'hth-hatch-shell' preview-evidence/hatch-match.html
           grep -q 'horizon-next-style-css' preview-evidence/home.html
@@ -147,13 +152,13 @@ jobs:
         run: |
           previous_theme="$(tr -d '\r\n' < ../../preview-evidence/previous-theme.txt)"
           npx wp-env run cli wp plugin deactivate hatch-match-preview
-          npx wp-env run cli wp plugin deactivate hook-content
+          npx wp-env run cli wp plugin deactivate hook-the-horizon-content
           npx wp-env run cli wp plugin deactivate horizon-experience-core
           npx wp-env run cli wp theme activate "$previous_theme"
           curl --fail http://localhost:8899/ >/dev/null
           npx wp-env run cli wp theme activate theme
           npx wp-env run cli wp plugin activate horizon-experience-core
-          npx wp-env run cli wp plugin activate hook-content
+          npx wp-env run cli wp plugin activate hook-the-horizon-content
           npx wp-env run cli wp plugin activate hatch-match-preview
           curl --fail http://localhost:8899/presentation-planner-preview/ | grep -q 'hth-application-embed'
           curl --fail http://localhost:8899/hatch-match-preview/ | grep -q 'hth-hatch-shell'
