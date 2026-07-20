@@ -1,0 +1,26 @@
+name: Next-generation rebuild validation
+on:
+  pull_request:
+    paths: ['next-generation/**','.github/workflows/next-generation-rebuild.yml']
+  push:
+    branches: ['rebuild/2026-07-clean-luxury-worlds']
+    paths: ['next-generation/**','.github/workflows/next-generation-rebuild.yml']
+permissions: {contents: read}
+jobs:
+  source-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with: {php-version: '8.1'}
+      - run: php -l next-generation/plugins/horizon-experience-core/horizon-experience-core.php
+      - run: |
+          python -m json.tool next-generation/rebuild-manifest.json >/dev/null
+          python -m json.tool next-generation/pathways/conditions-stewardship.json >/dev/null
+          python -m json.tool next-generation/media/slot-map.json >/dev/null
+          python -m json.tool next-generation/preview/.wp-env.json >/dev/null
+      - name: Required route coverage
+        run: |
+          for f in parts/header.html parts/footer.html templates/front-page.html templates/index.html templates/single.html templates/page.html templates/archive.html templates/search.html templates/404.html templates/author.html templates/taxonomy.html templates/page-legal.html templates/page-reader-pathway.html templates/page-application.html templates/page-storefront.html templates/single-hth_field_file.html templates/archive-hth_field_file.html; do test -f "next-generation/theme/$f" || exit 1; done
+      - name: Reader-facing content firewall
+        run: "! grep -RniE 'GitHub|pull request|PR #[0-9]+|issue #[0-9]+|source of truth|candidate status|publication is not authorized|QA pass|staging' next-generation/theme/templates next-generation/theme/parts next-generation/theme/patterns"
