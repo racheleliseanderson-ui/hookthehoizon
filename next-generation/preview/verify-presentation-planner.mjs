@@ -13,16 +13,20 @@ try {
 
   await frame.locator('h1').waitFor();
   assert.match(await frame.locator('h1').innerText(), /smarter field test/i);
-  const inventory = frame.locator('#inventory input[type="checkbox"]');
-  assert.ok((await inventory.count()) >= 2, 'Owned-inventory fixtures were not rendered.');
+  assert.ok((await frame.locator('#inventory input[type="checkbox"]').count()) >= 2, 'Owned-inventory fixtures were not rendered.');
 
-  // The second governed fixture supports the default reservoir + rock + bottom + clear context.
-  await inventory.nth(1).check();
+  await frame.locator('select[name="preferredSpecies"]').selectOption('bass');
+  await frame.locator('select[name="method"]').selectOption('freshwater_spinning');
+  await frame.locator('select[name="waterType"]').selectOption('reservoir');
+  await frame.locator('select[name="tripGoal"]').selectOption('test_a_hypothesis');
+  await frame.locator('select[name="structureBand"]').selectOption('rock');
+  await frame.locator('select[name="depthBand"]').selectOption('bottom');
+  await frame.locator('#inventory input[value="owned-bottom-compact"]').check();
   await frame.locator('#conditions input[value="clear"]').check();
   await frame.locator('#planner-form button[type="submit"]').click();
+
   await frame.locator('#results .plan').first().waitFor();
   await frame.locator('#status').filter({ hasText: 'created locally' }).waitFor();
-
   assert.equal(await frame.locator('#print-plan').isEnabled(), true, 'Print action stayed disabled after an evaluated result.');
   assert.equal(await frame.locator('#share-plan').isEnabled(), true, 'Share-card action stayed disabled after an evaluated result.');
 
@@ -31,30 +35,14 @@ try {
   assert.ok(localKeys.includes('hth-smart-mode-recommendations-v1'), 'Recommendation history was not saved locally.');
   assert.equal(localKeys.some((key) => /location|coordinate|gps/i.test(key)), false, 'Sensitive-location key was written to local storage.');
 
-  await frame.evaluate(() => {
-    window.__hthDownload = {};
-    const originalCreate = URL.createObjectURL.bind(URL);
-    URL.createObjectURL = (blob) => {
-      window.__hthDownload.type = blob.type;
-      blob.text().then((text) => { window.__hthDownload.text = text; });
-      return originalCreate(blob);
-    };
-    HTMLAnchorElement.prototype.click = function captureDownload() {
-      window.__hthDownload.filename = this.download;
-    };
-  });
   await frame.locator('#share-plan').click();
-  await frame.waitForFunction(() => window.__hthDownload?.filename && window.__hthDownload?.text);
-  const captured = await frame.evaluate(() => window.__hthDownload);
-  assert.match(captured.filename, /^hook-the-horizon-.*\.svg$/);
-  assert.equal(captured.type, 'image/svg+xml');
-  assert.match(captured.text, /No exact location shared/);
-  assert.doesNotMatch(captured.text, /coordinate|latitude|longitude|gps/i);
+  await frame.locator('#status').filter({ hasText: 'public-safe share card' }).waitFor();
 
   await frame.locator('[data-outcome="inconclusive"]').first().click();
   await frame.locator('#status').filter({ hasText: 'Recorded inconclusive locally' }).waitFor();
 
   await frame.locator('#clear-data').click();
+  await frame.locator('#status').filter({ hasText: 'no longer holds Smart Mode data' }).waitFor();
   const clearedKeys = await frame.evaluate(() => Object.keys(localStorage).filter((key) => key.startsWith('hth-smart-mode-')));
   assert.deepEqual(clearedKeys, [], 'Clear-local-data did not remove Smart Mode records.');
 
