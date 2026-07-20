@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "applicationId": "HTH-PP-001",
+  "personalizationLayer": "HTH-SM-001",
+  "source": "applications/presentation-planner",
+  "generatedAt": "2026-07-20T12:00:00Z",
+  "sourceCommit": "add4b20f3cf8e89224876498574f5abe89e1f983",
+  "files": [
+    {"source":"applications/presentation-planner/preview/index.html","runtime":"preview/index.html"},
+    {"source":"applications/presentation-planner/preview/app.mjs","runtime":"preview/app.mjs"},
+    {"source":"applications/presentation-planner/preview/sw.js","runtime":"preview/sw.js"},
+    {"source":"applications/presentation-planner/preview/manifest.webmanifest","runtime":"preview/manifest.webmanifest"},
+    {"source":"applications/presentation-planner/data/seed-presentations.mjs","runtime":"data/seed-presentations.mjs"},
+    {"source":"applications/_shared/personalization.mjs","runtime":"_shared/personalization.mjs"},
+    {"source":"applications/_shared/privacy.mjs","runtime":"_shared/privacy.mjs"}
+  ]
+}

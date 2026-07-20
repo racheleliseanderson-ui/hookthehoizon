@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "applicationId": "HTH-SC-001",
+  "applicationSchemaVersion": "0.2.0",
+  "ruleVersion": "0.2.0",
+  "source": "applications/system-compatibility",
+  "generatedAt": "2026-07-20T12:00:00Z",
+  "sourceCommit": "add4b20f3cf8e89224876498574f5abe89e1f983",
+  "privacy": "no_exact_location_collection",
+  "files": [
+    {"source":"applications/system-compatibility/evaluate.mjs","runtime":"evaluate.mjs"},
+    {"source":"applications/system-compatibility/preview/index.html","runtime":"preview/index.html"},
+    {"source":"applications/system-compatibility/preview/app.mjs","runtime":"preview/app.mjs"}
+  ]
+}
