@@ -1,0 +1,48 @@
+schema_version: 1.0.0
+application:
+  id: HTH-HM-001
+  key: hatch-match
+  public_name: Hatch Match
+  parent_publication: Hook the Horizon
+  class: biological-evidence-application
+  lifecycle: maintenance-preview-candidate
+  repository: racheleliseanderson-ui/hookthehorizon
+  path: applications/hatch-match
+  owner: Rachel Anderson
+reader_contract:
+  primary_job: Compare broad-region biological plausibility with observable cues, disconfirming evidence, pattern and material records, and current condition references without claiming a verified current hatch from a calendar alone.
+  result_contract: A bounded candidate set with life stage, observable cues, lookalikes, negative evidence, source date, freshness, limitations, and explicit no-match or insufficient-evidence states.
+  out_of_scope:
+    - exact or sensitive fishing locations
+    - catch prediction
+    - universal occurrence claims
+    - regional calendar treated as current observation
+    - regulation or access determination
+architecture:
+  biological_standard: applications/hatch-match/BIOLOGICAL_SEED_AND_REVIEW_STANDARD.md
+  maintenance_branch: operations/hatch-match-maintenance-activation-2026-07-20
+  parent_conditions: HHI-001
+  presentation_consumer: HTH-PP-001
+state:
+  persistence_class: local-or-none
+  prohibited_fields:
+    - coordinates
+    - private access instructions
+    - vulnerable-water identifiers
+    - contributor identity without consent
+quality:
+  accessibility_target: WCAG-2.2-AA
+  required_states:
+    - no-observation
+    - candidate-match
+    - ambiguous-match
+    - disconfirmed
+    - stale-source
+    - conservation-stop
+    - source-failure
+release:
+  current_version: 0.1.0-preview
+  production_authorized: false
+  known_limitations:
+    - maintenance and seed activation remain in PR 85 until reconciled to main
+    - installed WordPress reader verification remains pending
