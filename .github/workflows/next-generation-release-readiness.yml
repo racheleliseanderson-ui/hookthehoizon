@@ -33,6 +33,7 @@ jobs:
       - name: Activate package and migrate primary page worlds
         working-directory: next-generation/preview
         run: |
+          set -o pipefail
           mkdir -p ../../preview-evidence ../../release-packages
           npx wp-env run cli wp --quiet option get stylesheet > ../../preview-evidence/previous-theme.txt
           npx wp-env run cli wp theme activate theme
@@ -41,21 +42,28 @@ jobs:
           npx wp-env run cli wp option update blogname 'Hook the Horizon'
           npx wp-env run cli wp option update blogdescription 'Field judgment before the next move.'
           npx wp-env run cli wp rewrite structure '/%postname%/' --hard
-          npx wp-env run cli wp eval-file wp-content/nlh-migration/page-worlds.php -- --apply --status=publish --set-front-page | tee ../../preview-evidence/page-world-migration.json
+          npx wp-env run cli wp eval-file wp-content/nlh-migration/page-worlds.php apply publish set-front-page 2>&1 | tee ../../preview-evidence/page-world-migration.json
+          test -s ../../preview-evidence/page-world-migration.json
+          grep -q '"mode": "apply"' ../../preview-evidence/page-world-migration.json
+          npx wp-env run cli wp post list --post_type=page --fields=ID,post_name,post_status --format=json 2>&1 | tee ../../preview-evidence/page-world-inventory.json
           npx wp-env run cli wp post create --post_type=hth_field_file --post_title='Release Readiness Field File' --post_name='release-readiness-field-file' --post_status=publish --post_content='<p>Controlled fixture with no current weather, regulation, access, or location claim.</p>'
-          npx wp-env run cli wp eval-file wp-content/nlh-qa/validate-block-templates.php | tee ../../preview-evidence/gutenberg-parse.json
+          npx wp-env run cli wp eval-file wp-content/nlh-qa/validate-block-templates.php 2>&1 | tee ../../preview-evidence/gutenberg-parse.json
+          test -s ../../preview-evidence/gutenberg-parse.json
       - name: Validate public data adapters
         run: |
-          curl --retry 10 --retry-delay 3 --fail http://localhost:8899/ >/dev/null
-          for route in start-here field-files resources tools store research-and-standards; do curl --fail "http://localhost:8899/$route/" >/dev/null; done
-          curl --fail 'http://localhost:8899/wp-json/horizon-experience/v1/discover?post_type=hth_field_file' > preview-evidence/discover.json
-          curl --fail 'http://localhost:8899/wp-json/horizon-experience/v1/applications' > preview-evidence/applications.json
-          curl --fail 'http://localhost:8899/wp-json/horizon-experience/v1/commerce' > preview-evidence/commerce.json
+          set -euo pipefail
+          mkdir -p preview-evidence/http
+          check_url() { name="$1"; url="$2"; status="$(curl --retry 10 --retry-delay 3 -sS -o "preview-evidence/http/${name}.html" -w '%{http_code}' "$url")"; printf '%s %s\n' "$status" "$url" | tee -a preview-evidence/http-status.txt; test "$status" -ge 200 && test "$status" -lt 400; }
+          check_url home http://localhost:8899/
+          for route in start-here field-files resources tools store research-and-standards; do check_url "$route" "http://localhost:8899/$route/"; done
+          curl --fail-with-body -sS 'http://localhost:8899/wp-json/horizon-experience/v1/discover?post_type=hth_field_file' | tee preview-evidence/discover.json
+          curl --fail-with-body -sS 'http://localhost:8899/wp-json/horizon-experience/v1/applications' | tee preview-evidence/applications.json
+          curl --fail-with-body -sS 'http://localhost:8899/wp-json/horizon-experience/v1/commerce' | tee preview-evidence/commerce.json
       - name: Validate authenticated saved and account behavior
         working-directory: next-generation/preview
         run: |
           npx wp-env run cli wp eval '
-          do_action("rest_api_init");$user=username_exists("qa_runtime") ?: wp_create_user("qa_runtime",wp_generate_password(24),"qa-runtime@example.invalid");wp_set_current_user((int)$user);$post=get_page_by_path("release-readiness-field-file",OBJECT,"hth_field_file");$save=new WP_REST_Request("POST","/horizon-experience/v1/saved");$save->set_param("item_id",$post->ID);$save->set_param("item_type","hth_field_file");$saved=rest_do_request($save);if($saved->is_error()){throw new Exception("save failed");}$account=new WP_REST_Request("POST","/horizon-experience/v1/account");$account->set_body_params(["emailUpdates"=>false,"recommendationMode"=>"practical","reducedMotionPreference"=>true]);$updated=rest_do_request($account);if($updated->is_error()){throw new Exception("account failed");}echo wp_json_encode(["saved"=>$saved->get_data(),"account"=>$updated->get_data()]);' > ../../preview-evidence/authenticated-runtime.json
+          do_action("rest_api_init");$user=username_exists("qa_runtime") ?: wp_create_user("qa_runtime",wp_generate_password(24),"qa-runtime@example.invalid");wp_set_current_user((int)$user);$post=get_page_by_path("release-readiness-field-file",OBJECT,"hth_field_file");$save=new WP_REST_Request("POST","/horizon-experience/v1/saved");$save->set_param("item_id",$post->ID);$save->set_param("item_type","hth_field_file");$saved=rest_do_request($save);if($saved->is_error()){throw new Exception("save failed");}$get=new WP_REST_Request("GET","/horizon-experience/v1/saved");$list=rest_do_request($get);if($list->is_error()||!array_is_list($list->get_data()["items"])){throw new Exception("saved list failed");}$account=new WP_REST_Request("POST","/horizon-experience/v1/account");$account->set_body_params(["emailUpdates"=>false,"recommendationMode"=>"practical","reducedMotionPreference"=>true]);$updated=rest_do_request($account);if($updated->is_error()){throw new Exception("account failed");}echo wp_json_encode(["saved"=>$saved->get_data(),"list"=>$list->get_data(),"account"=>$updated->get_data()]);' > ../../preview-evidence/authenticated-runtime.json
       - name: Run responsive, accessibility, browser and print tests
         env:
           BASE_URL: http://localhost:8899
