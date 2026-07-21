@@ -35,7 +35,7 @@ require_once __DIR__ . '/includes/class-publication-runtime.php';
 new NLH_Publication_Runtime([
     'key'=>'hook-the-horizon','publication'=>'Hook the Horizon','version'=>HTH_EXPERIENCE_CORE_VERSION,'plugin_file'=>__FILE__,'rest_namespace'=>'horizon-experience/v1',
     'discover_post_types'=>['post','page','hth_field_file'],
-    'page_worlds'=>['start-here','field-files','resources','tools','store','research-and-standards'],
+    'primary_sections'=>['start-here','field-files','resources','tools','store','research-and-standards'],
     'applications'=>[
         ['id'=>'conditions-brief','title'=>'Conditions Brief','state'=>'contract-ready'],
         ['id'=>'trip-blueprint','title'=>'Trip Blueprint','state'=>'contract-ready'],
