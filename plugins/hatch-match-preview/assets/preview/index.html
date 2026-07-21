@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hatch Match Preview</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">Biology before bravado</p>
+      <h1>What did you actually see?</h1>
+      <p class="lede">Compare visible cues against a small reviewed reference set. Broad context helps; exact coordinates do not belong here.</p>
+      <p class="boundary">Reference plausibility is not a current observation. Check current conditions, regulations, access, safety, and conservation guidance separately.</p>
+      <figure class="cue-map">
+        <img src="./observable-cues-map.svg" width="1200" height="600" loading="lazy" decoding="async" alt="Simplified field diagram comparing tail filaments, portable cases, winged surface insects, and rock-crawling behavior.">
+        <figcaption>Count what you can see, record what remains unclear, and resist upgrading a broad reference into a species claim or current hatch report.</figcaption>
+      </figure>
+    </header>
+    <form id="hatch-form" novalidate>
+      <label>Water type
+        <select name="waterType" required>
+          <option value="river">River</option>
+          <option value="stream">Stream</option>
+          <option value="lake-margin">Lake margin</option>
+          <option value="spring">Spring</option>
+        </select>
+      </label>
+      <label>Observed life stage
+        <select name="lifeStage" required>
+          <option value="nymph">Aquatic nymph</option>
+          <option value="larva">Aquatic larva</option>
+          <option value="pupa">Pupa</option>
+          <option value="subimago">Winged subadult or dun</option>
+          <option value="adult">Winged adult</option>
+        </select>
+      </label>
+      <fieldset>
+        <legend>Visible cues</legend>
+        <label><input type="checkbox" name="cue" value="three-tails"> Two or three tail filaments</label>
+        <label><input type="checkbox" name="cue" value="two-tails"> Clearly two tail filaments</label>
+        <label><input type="checkbox" name="cue" value="portable-case"> Portable case or case-like structure</label>
+        <label><input type="checkbox" name="cue" value="surface-winged"> Winged insect at or near the surface</label>
+        <label><input type="checkbox" name="cue" value="rock-crawler"> Aquatic insect crawling on rock or debris</label>
+      </fieldset>
+      <button type="submit">Compare the clues</button>
+      <p id="status" role="status" aria-live="polite"></p>
+    </form>
+    <section id="results" aria-live="polite">
+      <p>Choose the broad context and the cues you could actually observe.</p>
+    </section>
+  </main>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>
