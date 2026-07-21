@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,follow">
+  <title>Rig Signal · Hook the Horizon</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="hero">
+    <p class="eyebrow">Hook the Horizon · Rig Signal</p>
+    <h1>Keep the device event smaller than the claim.</h1>
+    <p>Enter a location-free manual or device event. Rig Signal separates identity, maturity, evidence, calibration, quality, uncertainty, privacy, and retention before the event can be used as a bounded observation.</p>
+    <div class="pills"><span>Manual logging is complete</span><span>No coordinates</span><span>No catch prediction</span><span>Local validation</span></div>
+  </header>
+
+  <main class="layout">
+    <section class="panel controls" aria-labelledby="event-title">
+      <h2 id="event-title">Describe one event</h2>
+      <form id="rig-signal-form" novalidate>
+        <div class="grid">
+          <label>Example profile<select id="fixture"><option value="manual">Manual water temperature</option><option value="prototype">Prototype vibration estimate</option><option value="privacy">Prohibited privacy record</option><option value="prediction">Unsupported catch prediction</option><option value="blank">Blank record</option></select></label>
+          <label>Device profile ID<input name="deviceProfileId" required maxlength="100"></label>
+          <label>Event type<select name="eventType" required><option value="water_temperature">Water temperature</option><option value="depth_observation">Depth observation</option><option value="rod_tip_vibration">Rod-tip vibration</option><option value="bite_detection">Bite detection claim</option><option value="species_identification">Species identification claim</option><option value="fight_classification">Fight classification claim</option><option value="catch_prediction">Catch prediction claim</option><option value="manual_note">Manual note</option></select></label>
+          <label>Recorded at<input name="recordedAt" type="datetime-local" required></label>
+          <label>Device maturity<select name="deviceMaturity"><option>commercial</option><option>prototype</option><option>research</option><option>patent</option><option>concept</option><option>unknown</option></select></label>
+          <label>Capability evidence<select name="capabilityEvidence"><option>manufacturer_documented</option><option>independently_validated</option><option>field_tested</option><option>recollected</option><option>inferred</option><option>unknown</option></select></label>
+          <label>Value<input name="value" inputmode="decimal"></label>
+          <label>Unit<input name="unit" maxlength="40" placeholder="degF, feet, relative_signal"></label>
+          <label>Quality<select name="quality" required><option>documented</option><option>validated</option><option>estimated</option><option>unknown</option><option>invalid</option></select></label>
+          <label>Calibration state<select name="calibrationState" required><option>current</option><option>aging</option><option>stale</option><option>unknown</option><option>not_applicable</option></select></label>
+          <label>Measurement uncertainty<input name="measurementUncertainty" type="number" min="0" step="any"></label>
+          <label>Source<select name="source" required><option>manual_entry</option><option>device_import</option><option>derived</option></select></label>
+          <label>Privacy class<select name="privacyClass" required><option>local_only</option><option>public_safe</option><option>private</option><option>prohibited</option></select></label>
+          <label>Retention<select name="retention"><option>none</option><option>session</option><option>local_device</option><option>approved_server</option></select></label>
+        </div>
+        <label>Event-specific limitation<textarea name="limitation" rows="3" maxlength="400" placeholder="What this event does not establish"></textarea></label>
+        <label class="check"><input type="checkbox" name="locationIncluded"> This record includes an exact or inference-enabling location</label>
+        <div class="actions"><button type="submit">Validate event</button><button type="reset" class="secondary">Reset</button></div>
+        <p id="status" role="status" aria-live="polite">The manual water-temperature example is loaded.</p>
+      </form>
+    </section>
+
+    <section class="panel result-panel" aria-labelledby="result-title">
+      <div id="empty" class="empty"><div><p class="eyebrow">Evidence before interpretation</p><h2 id="result-title">The disposition appears here.</h2><p>Accepted, review-required, and rejected states remain visibly different. A rejected event never becomes an inferred field recommendation.</p></div></div>
+      <div id="result" hidden tabindex="-1"></div>
+    </section>
+  </main>
+  <footer><p>Rig Signal does not own current environmental truth, access, regulations, biological identification, or catch outcomes.</p></footer>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>
