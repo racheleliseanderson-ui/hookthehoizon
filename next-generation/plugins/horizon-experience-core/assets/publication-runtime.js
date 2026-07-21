@@ -85,5 +85,14 @@
     });
   });
   getSaved().then(syncSaveButtons).catch(() => syncSaveButtons(localItems()));
-  if (config.statisticsConsent) document.dispatchEvent(new CustomEvent('nlh:analytics-ready', {detail: {publication: config.key, pageWorlds: config.pageWorlds || []}}));
+  if (config.statisticsConsent) {
+    const primarySections = config.primarySections || config.pageWorlds || [];
+    document.dispatchEvent(new CustomEvent('nlh:analytics-ready', {
+      detail: {
+        publication: config.key,
+        primarySections,
+        pageWorlds: primarySections // Deprecated compatibility alias; remove after dependent consumers migrate.
+      }
+    }));
+  }
 })();
