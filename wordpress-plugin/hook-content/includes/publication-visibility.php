@@ -115,8 +115,7 @@ final class RE_Publication_Visibility {
         if (self::seo_plugin() || is_admin() || is_feed() || is_404() || is_search()) return;
         $url = self::canonical(); if ($url === '') return;
         $title = wp_get_document_title(); $description = self::description(); $image = self::image();
-        echo "\n<!-- Editorial Ecosystem publication visibility fallback -->\n";
-        printf("<link rel=\"canonical\" href=\"%s\">\n", esc_url($url));
+        printf("\n<link rel=\"canonical\" href=\"%s\">\n", esc_url($url));
         if ($description !== '') printf("<meta name=\"description\" content=\"%s\">\n", esc_attr($description));
         foreach (['og:site_name' => (string) self::$c['name'], 'og:title' => $title, 'og:url' => $url, 'og:type' => is_singular() ? 'article' : 'website'] as $property => $value) {
             printf("<meta property=\"%s\" content=\"%s\">\n", esc_attr($property), esc_attr($value));
