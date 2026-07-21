@@ -3,7 +3,7 @@ on:
   pull_request:
     paths: ['next-generation/**', 'wordpress-plugin/hook-content/**', 'applications/_shared/**', 'applications/presentation-planner/**', 'scripts/build-wordpress-release.sh', 'scripts/sync-presentation-planner-runtime.mjs', '.github/workflows/next-generation-release-readiness.yml']
   push:
-    branches: ['rebuild/2026-07-clean-luxury-worlds']
+    branches: ['main']
     paths: ['next-generation/**', 'wordpress-plugin/hook-content/**', 'applications/_shared/**', 'applications/presentation-planner/**', 'scripts/build-wordpress-release.sh', 'scripts/sync-presentation-planner-runtime.mjs', '.github/workflows/next-generation-release-readiness.yml']
   workflow_dispatch:
 permissions: {contents: read}
@@ -17,13 +17,20 @@ jobs:
         with: {php-version: '8.1'}
       - uses: actions/setup-node@v4
         with: {node-version: '24'}
-      - name: Validate source contracts
+      - name: Validate source contracts and terminology
         run: |
           find next-generation/plugins next-generation/migration next-generation/qa -name '*.php' -print0 | xargs -0 -n1 php -l
           php -l wordpress-plugin/hook-content/hook-content.php
           find next-generation -name '*.json' -print0 | xargs -0 -n1 sh -c 'python -m json.tool "$0" >/dev/null'
-          test -f next-generation/migration/page-worlds.json
+          test -f next-generation/migration/primary-sections.json
+          test -f next-generation/migration/primary-sections.php
+          test -f next-generation/PRIMARY_EDITORIAL_SYSTEMS.md
           test -f next-generation/media/slot-map.json
+          test ! -e next-generation/PRIMARY_PAGE_WORLDS.md
+          test ! -e next-generation/migration/page-worlds.json
+          test ! -e next-generation/migration/page-worlds.php
+          grep -q "'primary_sections'" next-generation/plugins/horizon-experience-core/horizon-experience-core.php
+          ! grep -RniE 'Event Worlds?|Topic Worlds?|Storefront World|Tools and Applications World' next-generation/theme next-generation/migration next-generation/PRIMARY_EDITORIAL_SYSTEMS.md
       - name: Build exact Hook Content directory for wp-env
         run: |
           bash scripts/build-wordpress-release.sh
@@ -36,7 +43,7 @@ jobs:
       - name: Start isolated WordPress
         working-directory: next-generation/preview
         run: npx wp-env start
-      - name: Activate package and migrate primary page worlds
+      - name: Activate package and migrate primary editorial sections
         working-directory: next-generation/preview
         run: |
           set -o pipefail
@@ -49,10 +56,11 @@ jobs:
           npx wp-env run cli wp option update blogname 'Hook the Horizon'
           npx wp-env run cli wp option update blogdescription 'Field judgment before the next move.'
           npx wp-env run cli wp rewrite structure '/%postname%/' --hard
-          npx wp-env run cli wp eval-file wp-content/nlh-migration/page-worlds.php apply publish set-front-page 2>&1 | tee ../../preview-evidence/page-world-migration.json
-          test -s ../../preview-evidence/page-world-migration.json
-          grep -q '"mode": "apply"' ../../preview-evidence/page-world-migration.json
-          npx wp-env run cli wp post list --post_type=page --fields=ID,post_name,post_status --format=json 2>&1 | tee ../../preview-evidence/page-world-inventory.json
+          npx wp-env run cli wp eval-file wp-content/nlh-migration/primary-sections.php apply publish set-front-page 2>&1 | tee ../../preview-evidence/primary-section-migration.json
+          test -s ../../preview-evidence/primary-section-migration.json
+          grep -q '"mode": "apply"' ../../preview-evidence/primary-section-migration.json
+          grep -q '"primarySections"' ../../preview-evidence/primary-section-migration.json
+          npx wp-env run cli wp post list --post_type=page --fields=ID,post_name,post_status --format=json 2>&1 | tee ../../preview-evidence/primary-section-inventory.json
           npx wp-env run cli wp post create --post_type=hth_field_file --post_title='Release Readiness Field File' --post_name='release-readiness-field-file' --post_status=publish --post_content='<p>Controlled fixture with no current weather, regulation, access, or location claim.</p>'
           npx wp-env run cli wp eval-file wp-content/nlh-qa/validate-block-templates.php 2>&1 | tee ../../preview-evidence/gutenberg-parse.json
           test -s ../../preview-evidence/gutenberg-parse.json
