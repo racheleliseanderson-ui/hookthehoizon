@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "1.1.0",
+  "publication": "Hook the Horizon",
+  "frontPageSlug": "home",
+  "compatibility": {
+    "retiredTerms": ["world", "worlds"],
+    "reuseProhibited": true,
+    "readerVisible": false
+  },
+  "pages": [
+    {"slug": "home", "title": "Hook the Horizon", "template": "front-page", "role": "living-homepage"},
+    {"slug": "start-here", "title": "Start Here", "template": "page-start-here", "role": "guided-discovery"},
+    {"slug": "field-files", "title": "Field Files", "template": "page-field-files", "role": "major-topic-portal"},
+    {"slug": "resources", "title": "Resource Library", "template": "page-resources", "role": "resource-library"},
+    {"slug": "tools", "title": "Tools", "template": "page-tools", "role": "tool-studio"},
+    {"slug": "store", "title": "The Field Edit", "template": "page-store", "role": "editorial-storefront"},
+    {"slug": "research-and-standards", "title": "Research and Standards", "template": "page-research-and-standards", "role": "research-standards"}
+  ]
+}
