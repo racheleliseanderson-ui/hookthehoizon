@@ -1,0 +1,56 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "appearanceTools": true,
+    "color": {
+      "custom": false,
+      "palette": [
+        {"slug":"depth-black","name":"Depth Black","color":"#0C1112"},
+        {"slug":"graphite-water","name":"Graphite Water","color":"#1F2828"},
+        {"slug":"deep-silt","name":"Deep Silt","color":"#3C4038"},
+        {"slug":"mineral-fog","name":"Mineral Fog","color":"#D8D6CC"},
+        {"slug":"foam-white","name":"Foam White","color":"#F5F3EC"},
+        {"slug":"cork-tan","name":"Cork Tan","color":"#A98962"},
+        {"slug":"oxidized-metal","name":"Oxidized Metal","color":"#55766D"},
+        {"slug":"signal-vermilion","name":"Signal Vermilion","color":"#D85B3F"},
+        {"slug":"brass-marker","name":"Brass Marker","color":"#B89A58"},
+        {"slug":"cold-sky","name":"Cold Sky","color":"#AEBCC0"}
+      ]
+    },
+    "layout": {"contentSize":"704px","wideSize":"1440px"},
+    "spacing": {
+      "units":["px","rem","vw","vh","%"],
+      "spacingSizes":[
+        {"slug":"30","name":"Small","size":"0.75rem"},
+        {"slug":"40","name":"Medium","size":"1.25rem"},
+        {"slug":"50","name":"Large","size":"2rem"},
+        {"slug":"60","name":"Section","size":"clamp(3rem, 7vw, 6rem)"},
+        {"slug":"70","name":"Route","size":"clamp(4rem, 9vw, 8rem)"}
+      ]
+    },
+    "typography": {
+      "fluid": true,
+      "fontFamilies": [
+        {"slug":"display","name":"Display","fontFamily":"Georgia, 'Times New Roman', serif"},
+        {"slug":"editorial","name":"Editorial","fontFamily":"ui-serif, Georgia, serif"},
+        {"slug":"ui","name":"Interface","fontFamily":"system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"}
+      ],
+      "fontSizes": [
+        {"slug":"small","name":"Small","size":"0.875rem"},
+        {"slug":"body","name":"Body","size":"1.0625rem"},
+        {"slug":"lead","name":"Lead","size":"clamp(1.2rem, 2vw, 1.45rem)"},
+        {"slug":"display","name":"Display","size":"clamp(3.5rem, 9vw, 8rem)"}
+      ]
+    }
+  },
+  "styles": {
+    "color": {"background":"var(--re-background-canvas)","text":"var(--re-text-primary)"},
+    "typography": {"fontFamily":"var(--wp--preset--font-family--editorial)","lineHeight":"1.65"},
+    "elements": {"heading":{"color":{"text":"var(--re-heading)"},"typography":{"fontFamily":"var(--wp--preset--font-family--display)"}},"link":{"color":{"text":"var(--re-link)"}}}
+  },
+  "templateParts": [
+    {"name":"header","title":"Hook Header","area":"header"},
+    {"name":"footer","title":"Hook Footer","area":"footer"}
+  ]
+}
