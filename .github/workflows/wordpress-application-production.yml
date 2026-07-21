@@ -1,0 +1,117 @@
+name: Hook Application Production Promotion
+
+on:
+  pull_request:
+    paths:
+      - 'wordpress-theme/**'
+      - 'wordpress-plugin/hook-content/**'
+      - 'wordpress-plugin/honey-hole-condition-route/**'
+      - 'next-generation/plugins/hatch-match-preview/**'
+      - 'next-generation/plugins/rig-signal-preview/**'
+      - '.github/workflows/wordpress-application-production.yml'
+  workflow_dispatch:
+    inputs:
+      promote:
+        description: Promote the validated custom wp-content payload to production
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hook-application-production
+  cancel-in-progress: false
+
+jobs:
+  validate-payload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+      - name: Build complete Hook custom payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf production-payload release-evidence
+          mkdir -p \
+            production-payload/themes/hook-the-horizon \
+            production-payload/plugins/hook-the-horizon-content \
+            production-payload/plugins/honey-hole-condition-route \
+            production-payload/plugins/hatch-match-preview \
+            production-payload/plugins/rig-signal-preview \
+            release-evidence
+
+          cp -R wordpress-theme/. production-payload/themes/hook-the-horizon/
+          cp -R wordpress-plugin/hook-content/. production-payload/plugins/hook-the-horizon-content/
+          cp -R wordpress-plugin/honey-hole-condition-route/. production-payload/plugins/honey-hole-condition-route/
+          cp -R next-generation/plugins/hatch-match-preview/. production-payload/plugins/hatch-match-preview/
+          cp -R next-generation/plugins/rig-signal-preview/. production-payload/plugins/rig-signal-preview/
+          rm -rf production-payload/plugins/hatch-match-preview/tools
+
+          node applications/rig-signal/tests/run.mjs
+          node --check production-payload/plugins/rig-signal-preview/assets/preview/app.mjs
+          node --check production-payload/plugins/rig-signal-preview/assets/preview/validate.mjs
+          find production-payload -type f -name '*.php' -print0 | xargs -0 -r -n1 php -l >/dev/null
+          test -f production-payload/themes/hook-the-horizon/style.css
+          test -f production-payload/plugins/hook-the-horizon-content/hook-content.php
+          test -f production-payload/plugins/honey-hole-condition-route/honey-hole-condition-route.php
+          test -f production-payload/plugins/hatch-match-preview/hatch-match-preview.php
+          test -f production-payload/plugins/rig-signal-preview/rig-signal-preview.php
+          grep -q 'HTH-HM-001' production-payload/plugins/hatch-match-preview/hatch-match-preview.php
+          grep -q 'HTH-RS-001' production-payload/plugins/rig-signal-preview/rig-signal-preview.php
+          grep -q 'locationIncluded must be false' production-payload/plugins/rig-signal-preview/assets/preview/validate.mjs
+          test "$(find production-payload -mindepth 1 -maxdepth 1 -printf '%f\n' | sort | paste -sd, -)" = 'plugins,themes'
+          (cd production-payload && find . -type f -print0 | sort -z | xargs -0 sha256sum) > release-evidence/SHA256SUMS
+          printf '{"schemaVersion":1,"repository":"%s","sourceCommit":"%s","destination":"/wp-content","applications":["HTH-HM-001","HTH-RS-001","HTH-SC-001","HTH-PP-001","HHI-001"],"generatedAt":"%s"}\n' "$GITHUB_REPOSITORY" "$GITHUB_SHA" "$(date -u +%FT%TZ)" > release-evidence/release-manifest.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hook-application-production-${{ github.sha }}
+          path: |
+            production-payload/**
+            release-evidence/**
+          if-no-files-found: error
+          retention-days: 90
+
+  promote-production:
+    needs: validate-payload
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.promote
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: hook-application-production-${{ github.sha }}
+          path: validated
+      - name: Publish deployment-only production branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code origin refs/heads/production >/dev/null 2>&1; then
+            old_sha="$(git ls-remote origin refs/heads/production | awk '{print $1}')"
+            git tag "production-rollback-$(date -u +%Y%m%dT%H%M%SZ)" "$old_sha"
+            git push origin --tags
+          fi
+          tmp="$(mktemp -d)"
+          cp -R validated/production-payload/. "$tmp/"
+          git checkout --orphan production-build
+          git rm -rf . >/dev/null 2>&1 || true
+          cp -R "$tmp"/. .
+          git add themes plugins
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "Promote ${GITHUB_SHA} to production wp-content mirror"
+          git push --force origin HEAD:production
