@@ -1,0 +1,96 @@
+name: Industrial Content Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Pipeline action
+        required: true
+        default: validate
+        type: choice
+        options:
+          - validate
+          - drive-mirror
+          - wordpress-dry-run
+          - wordpress-create-drafts
+      batch_size:
+        description: WordPress batch size, 5-10
+        required: true
+        default: '8'
+  pull_request:
+    paths:
+      - 'content/articles/**/*.md'
+      - 'content/batches/**'
+      - 'scripts/content_pipeline/**'
+      - '.github/workflows/industrial-content-pipeline.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: industrial-content-pipeline
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate article corpus
+        run: python3 scripts/content_pipeline/validate_articles.py
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: article-validation
+          path: artifacts/article-validation.json
+
+  drive:
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'drive-mirror'
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: editorial-mirror
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Drive dependencies
+        run: pip install -r scripts/content_pipeline/requirements.txt
+      - name: Create missing Google Docs mirrors
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+        run: python3 scripts/content_pipeline/mirror_to_drive.py
+      - name: Upload Drive mirror report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: drive-mirror-report
+          path: artifacts/drive-mirror.json
+
+  wordpress:
+    if: github.event_name == 'workflow_dispatch' && startsWith(inputs.action, 'wordpress-')
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: wordpress-draft-staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enforce allowed batch size
+        shell: bash
+        run: |
+          size='${{ inputs.batch_size }}'
+          test "$size" -ge 5 -a "$size" -le 10
+      - name: Build WordPress draft batch plan
+        if: inputs.action == 'wordpress-dry-run'
+        run: python3 scripts/content_pipeline/push_wordpress_drafts.py --limit '${{ inputs.batch_size }}'
+      - name: Create and verify WordPress drafts
+        if: inputs.action == 'wordpress-create-drafts'
+        env:
+          WORDPRESS_BASE_URL: ${{ secrets.WORDPRESS_BASE_URL }}
+          WORDPRESS_USERNAME: ${{ secrets.WORDPRESS_USERNAME }}
+          WORDPRESS_APPLICATION_PASSWORD: ${{ secrets.WORDPRESS_APPLICATION_PASSWORD }}
+        run: python3 scripts/content_pipeline/push_wordpress_drafts.py --limit '${{ inputs.batch_size }}' --execute
+      - name: Upload WordPress batch report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wordpress-import-report
+          path: artifacts/wordpress-import.json
