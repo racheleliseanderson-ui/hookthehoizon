@@ -32,6 +32,7 @@ register_deactivation_hook(__FILE__,'flush_rewrite_rules');
 function hth_experience_notice(): void { if (! current_user_can('manage_options') || get_option('hth_experience_core_cutover_authorized')==='yes') { return; } echo '<div class="notice notice-warning"><p>'.esc_html__('Hook the Horizon Experience Core is a reversible rebuild candidate. Activation does not authorize publication, migration, location disclosure, or production replacement.','horizon-experience-core').'</p></div>'; }
 add_action('admin_notices','hth_experience_notice');
 require_once __DIR__ . '/includes/class-publication-runtime.php';
+require_once __DIR__ . '/includes/publication-adapter-runtime.php';
 new NLH_Publication_Runtime([
     'key'=>'hook-the-horizon','publication'=>'Hook the Horizon','version'=>HTH_EXPERIENCE_CORE_VERSION,'plugin_file'=>__FILE__,'rest_namespace'=>'horizon-experience/v1',
     'discover_post_types'=>['post','page','hth_field_file'],
@@ -47,6 +48,12 @@ new NLH_Publication_Runtime([
         ['id'=>'downloads','title'=>'Field resources','state'=>'editorial-mapping-required']
     ]
 ]);
+nlh_register_publication_adapter_runtime(
+    'horizon-experience/v1',
+    dirname(__DIR__, 2) . '/contracts/publication-adapter.json',
+    'nlh-hook-the-horizon-runtime',
+    'hook-the-horizon'
+);
 
 add_filter('rest_request_before_callbacks', static function ($response, $handler, WP_REST_Request $request) {
     if (! in_array($request->get_method(), ['POST', 'PUT', 'PATCH'], true) || $request->get_route() !== '/horizon-experience/v1/account') {
