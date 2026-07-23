@@ -11,6 +11,7 @@ on:
       - 'next-generation/migration/primary-sections.json'
       - 'next-generation/plugins/hatch-match-preview/**'
       - 'next-generation/plugins/rig-signal-preview/**'
+      - 'tests/installed-acceptance/**'
       - 'scripts/validate-five-application-acceptance.mjs'
       - 'scripts/validate-reader-journeys.mjs'
       - '.github/workflows/five-application-acceptance.yml'
@@ -25,6 +26,7 @@ on:
       - 'next-generation/migration/primary-sections.json'
       - 'next-generation/plugins/hatch-match-preview/**'
       - 'next-generation/plugins/rig-signal-preview/**'
+      - 'tests/installed-acceptance/**'
       - 'scripts/validate-five-application-acceptance.mjs'
       - 'scripts/validate-reader-journeys.mjs'
       - '.github/workflows/five-application-acceptance.yml'
@@ -145,8 +147,75 @@ jobs:
               ;;
           esac
 
-  acceptance-evidence-contract:
+  installed-playwright-axe:
     needs: application-source-matrix
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HTH_BASE_URL: http://localhost:8888
+      HTH_EVIDENCE_DIR: evidence/installed-five-application
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Start isolated WordPress runtime
+        run: |
+          npx --yes @wordpress/env@10.25.0 start
+          npx --yes @wordpress/env@10.25.0 run cli wp plugin activate hook-the-horizon-content honey-hole-condition-route hatch-match-preview rig-signal-preview || true
+          npx --yes @wordpress/env@10.25.0 run cli wp rewrite flush
+      - name: Create installed application pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          create_page() {
+            local title="$1"
+            local slug="$2"
+            local content="$3"
+            if ! npx --yes @wordpress/env@10.25.0 run cli wp post list --post_type=page --name="$slug" --field=ID | grep -q .; then
+              npx --yes @wordpress/env@10.25.0 run cli wp post create --post_type=page --post_status=publish --post_title="$title" --post_name="$slug" --post_content="$content"
+            fi
+          }
+          create_page 'Compatibility Builder' 'compatibility-builder' '[hth_system_compatibility]'
+          create_page 'Hatch Match' 'hatch-match' '[hth_hatch_match]'
+          create_page 'Presentation Planner' 'presentation-planner' '[hth_presentation_planner]'
+          create_page 'Rig Signal' 'rig-signal' '[hth_rig_signal]'
+          create_page 'Honey Hole Intelligence' 'honey-hole-intelligence' '<!-- wp:shortcode -->[hth_honey_hole_intelligence]<!-- /wp:shortcode -->'
+          create_page 'Start Here' 'start-here' '<p>Choose the field decision you need to make.</p>'
+      - name: Install Playwright and Axe harness
+        working-directory: tests/installed-acceptance
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Run installed five-application evidence matrix
+        working-directory: tests/installed-acceptance
+        run: npm test
+      - name: Collect WordPress runtime diagnostics
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p evidence/installed-five-application/runtime
+          npx --yes @wordpress/env@10.25.0 run cli wp core version > evidence/installed-five-application/runtime/wordpress-version.txt 2>&1 || true
+          npx --yes @wordpress/env@10.25.0 run cli wp plugin list --format=json > evidence/installed-five-application/runtime/plugins.json 2>&1 || true
+          npx --yes @wordpress/env@10.25.0 run cli wp theme list --format=json > evidence/installed-five-application/runtime/themes.json 2>&1 || true
+          npx --yes @wordpress/env@10.25.0 run cli wp option get siteurl > evidence/installed-five-application/runtime/siteurl.txt 2>&1 || true
+          npx --yes @wordpress/env@10.25.0 logs > evidence/installed-five-application/runtime/wp-env.log 2>&1 || true
+          find . -path '*/wp-content/debug.log' -type f -exec cp {} evidence/installed-five-application/runtime/debug.log \; || true
+          find evidence/installed-five-application -type f -print0 | sort -z | xargs -0 sha256sum > evidence/installed-five-application/SHA256SUMS.txt || true
+      - name: Upload installed acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hook-five-application-installed-evidence-${{ github.run_id }}
+          path: evidence/installed-five-application
+          if-no-files-found: error
+          retention-days: 30
+      - name: Stop isolated WordPress runtime
+        if: always()
+        run: npx --yes @wordpress/env@10.25.0 stop
+
+  acceptance-evidence-contract:
+    needs: [application-source-matrix, installed-playwright-axe]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -158,7 +227,7 @@ jobs:
         run: |
           node - <<'NODE'
           const matrix = require('./applications/acceptance-matrix.json');
-          const evidence = ['screenshots','axe-reports','console-logs','network-logs','runtime-readback','print-evidence'];
+          const evidence = ['screenshots','axe-reports','console-logs','network-logs','runtime-readback','print-evidence','rest-readback','downloaded-artifacts','sha256-manifests'];
           for (const item of evidence) if (!matrix.evidenceRetention.includes(item)) throw new Error(`missing evidence contract: ${item}`);
           const facts = ['regulation','closure','access','hazard','weather','waterCondition'];
           for (const item of facts) if (!matrix.freshnessContract.requiredOfficialFacts.includes(item)) throw new Error(`missing freshness fact: ${item}`);
