@@ -1,0 +1,29 @@
+name: P1 source and runtime reconciliation
+
+on:
+  pull_request:
+    paths:
+      - 'applications/hatch-match/**'
+      - 'next-generation/plugins/hatch-match-preview/**'
+      - 'governance/runtime/**'
+      - 'scripts/sync-hatch-match-preview.mjs'
+      - 'scripts/validate-p1-hatch-match-runtime-record.mjs'
+      - '.github/workflows/p1-source-runtime-reconciliation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/validate-p1-hatch-match-runtime-record.mjs
+      - run: node scripts/sync-hatch-match-preview.mjs
+      - run: cmp applications/hatch-match/data/approved-preview-seed-records.json next-generation/plugins/hatch-match-preview/data/seed-records.json
+      - run: cmp applications/hatch-match/maintenance-policy.json next-generation/plugins/hatch-match-preview/data/maintenance-policy.json
+      - run: cmp applications/hatch-match/maintenance-log.json next-generation/plugins/hatch-match-preview/data/maintenance-log.json

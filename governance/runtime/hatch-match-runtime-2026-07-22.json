@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0.0",
+  "captured_at": "2026-07-22",
+  "capture_method": "WPVibe site_info and read-only WP-CLI plugin inventory",
+  "site": "https://hookthehorizon.blog",
+  "wordpress_version": "7.0.2",
+  "php_version": "8.4.23",
+  "active_theme": {
+    "stylesheet": "hook-the-horizon-canonical-parity",
+    "version": "0.3.0-remediation"
+  },
+  "active_components": {
+    "hook_the_horizon_content": "0.3.1",
+    "hatch_match_preview": "0.1.1-preview",
+    "honey_hole_condition_route": "0.1.0",
+    "rig_signal": "0.1.0",
+    "rachel_editorial_core": "0.3.2"
+  },
+  "application": {
+    "id": "HTH-HM-001",
+    "source_path": "applications/hatch-match",
+    "wordpress_package_source": "next-generation/plugins/hatch-match-preview",
+    "installed_active": true,
+    "installed_browser_acceptance": false,
+    "freshness_fixture_acceptance": false,
+    "sensitive_location_leakage_acceptance": false
+  },
+  "production_change_authorized": false
+}

@@ -1,11 +1,11 @@
-schema_version: 1.0.0
+schema_version: 1.1.0
 application:
   id: HTH-HM-001
   key: hatch-match
   public_name: Hatch Match
   parent_publication: Hook the Horizon
   class: biological-evidence-application
-  lifecycle: maintenance-preview-candidate
+  lifecycle: installed-preview-under-p1-acceptance
   repository: racheleliseanderson-ui/hookthehorizon
   path: applications/hatch-match
   owner: Rachel Anderson
@@ -20,7 +20,9 @@ reader_contract:
     - regulation or access determination
 architecture:
   biological_standard: applications/hatch-match/BIOLOGICAL_SEED_AND_REVIEW_STANDARD.md
-  maintenance_branch: operations/hatch-match-maintenance-activation-2026-07-20
+  maintenance_authority: applications/hatch-match/maintenance-policy.json
+  historical_maintenance_branch: operations/hatch-match-maintenance-activation-2026-07-20
+  wordpress_package_source: next-generation/plugins/hatch-match-preview
   parent_conditions: HHI-001
   presentation_consumer: HTH-PP-001
 state:
@@ -41,8 +43,26 @@ quality:
     - conservation-stop
     - source-failure
 release:
-  current_version: 0.1.0-preview
+  application_version: 0.1.1-preview
   production_authorized: false
+  runtime_readback:
+    captured_at: 2026-07-22
+    site: https://hookthehorizon.blog
+    wordpress_version: 7.0.2
+    php_version: 8.4.23
+    active_theme:
+      stylesheet: hook-the-horizon-canonical-parity
+      version: 0.3.0-remediation
+    installed_plugin:
+      name: Hook the Horizon Hatch Match Preview
+      version: 0.1.1-preview
+      active: true
+    hosting_content_plugin:
+      name: Hook the Horizon Content
+      version: 0.3.1
+      active: true
   known_limitations:
-    - maintenance and seed activation remain in PR 85 until reconciled to main
-    - installed WordPress reader verification remains pending
+    - exact source-to-built-package-to-installed-file digest parity remains pending
+    - installed-browser responsive and assistive-technology acceptance remains pending
+    - stale-source and source-failure behavior must be exercised against current official-source fixtures
+    - production activation remains separately governed
