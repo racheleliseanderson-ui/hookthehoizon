@@ -77,10 +77,39 @@ function hth_render_local_application_frame(string $application, string $title, 
     return (string) ob_get_clean();
 }
 
+/** @param array<int,array{label:string,href:string}> $links */
+function hth_render_application_continuations(string $heading, string $prompt, array $links): string
+{
+    ob_start();
+    ?>
+    <nav class="hth-application-continuations" aria-label="<?php echo esc_attr($heading); ?>">
+        <h2><?php echo esc_html($heading); ?></h2>
+        <p><?php echo esc_html($prompt); ?></p>
+        <ul>
+            <?php foreach ($links as $link) : ?>
+                <li><a href="<?php echo esc_url($link['href']); ?>"><?php echo esc_html($link['label']); ?></a></li>
+            <?php endforeach; ?>
+        </ul>
+    </nav>
+    <?php
+    return (string) ob_get_clean();
+}
+
 function hth_render_presentation_planner_shortcode(array $attributes = []): string
 {
     $attributes = shortcode_atts(['title' => __('Horizon Smart Mode Presentation Planner', 'hook-the-horizon-content'), 'height' => '980'], $attributes, 'hth_presentation_planner');
-    return hth_render_local_application_frame('presentation-planner', sanitize_text_field((string) $attributes['title']), absint($attributes['height']), __('The planner runs locally in your browser. It does not request exact location, create an account, or send inventory and outcome history to WordPress.', 'hook-the-horizon-content'), __('Presentation Planner requires JavaScript for its local deterministic calculations. No external analytics or recommendation service is required.', 'hook-the-horizon-content'));
+    $application = hth_render_local_application_frame('presentation-planner', sanitize_text_field((string) $attributes['title']), absint($attributes['height']), __('The planner runs locally in your browser. It does not request exact location, create an account, or send inventory and outcome history to WordPress.', 'hook-the-horizon-content'), __('Presentation Planner requires JavaScript for its local deterministic calculations. No external analytics or recommendation service is required.', 'hook-the-horizon-content'));
+    $continuations = hth_render_application_continuations(
+        __('After the result', 'hook-the-horizon-content'),
+        __('Confirm the setup, verify current conditions, and change one major variable during the field test.', 'hook-the-horizon-content'),
+        [
+            ['label' => __('Check whether the complete setup works together', 'hook-the-horizon-content'), 'href' => '/compatibility-builder/'],
+            ['label' => __('Verify current trip conditions and access', 'hook-the-horizon-content'), 'href' => '/honey-hole-intelligence/'],
+            ['label' => __('Open supporting field files', 'hook-the-horizon-content'), 'href' => '/field-files/'],
+            ['label' => __('Return to Start Here', 'hook-the-horizon-content'), 'href' => '/start-here/'],
+        ]
+    );
+    return $application . $continuations;
 }
 add_shortcode('hth_presentation_planner', 'hth_render_presentation_planner_shortcode');
 

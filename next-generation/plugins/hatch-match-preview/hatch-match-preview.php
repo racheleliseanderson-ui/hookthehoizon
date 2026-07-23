@@ -34,6 +34,16 @@ function hth_hatch_match_preview_shortcode(array $attributes = []): string
         </header>
         <iframe class="hth-hatch-shell__frame" src="<?php echo esc_url($source); ?>" title="<?php esc_attr_e('Hatch Match biological plausibility preview', 'hth-hatch-match-preview'); ?>" height="<?php echo esc_attr((string) $height); ?>" loading="lazy" referrerpolicy="no-referrer" credentialless sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
         <noscript><p><?php esc_html_e('Hatch Match requires JavaScript for local comparison. The reviewed source records remain available in the preview package.', 'hth-hatch-match-preview'); ?></p></noscript>
+        <nav class="hth-hatch-shell__continuations" aria-label="<?php esc_attr_e('After the Hatch Match result', 'hth-hatch-match-preview'); ?>">
+            <h3><?php esc_html_e('After the result', 'hth-hatch-match-preview'); ?></h3>
+            <p><?php esc_html_e('Treat the candidate as a hypothesis and decide what visible cue or presentation variable to test next.', 'hth-hatch-match-preview'); ?></p>
+            <ul>
+                <li><a href="/presentation-planner/"><?php esc_html_e('Turn the hypothesis into a bounded presentation test', 'hth-hatch-match-preview'); ?></a></li>
+                <li><a href="/field-files/"><?php esc_html_e('Read species, water, and conditions field files', 'hth-hatch-match-preview'); ?></a></li>
+                <li><a href="/research-and-standards/"><?php esc_html_e('Inspect source and uncertainty standards', 'hth-hatch-match-preview'); ?></a></li>
+                <li><a href="/start-here/"><?php esc_html_e('Return to Start Here', 'hth-hatch-match-preview'); ?></a></li>
+            </ul>
+        </nav>
     </section>
     <?php
     return (string) ob_get_clean();

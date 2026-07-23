@@ -26,6 +26,16 @@ add_shortcode('hth_rig_signal', static function (array $attributes = []): string
       </header>
       <iframe class="hth-rig-signal__frame" src="<?php echo esc_url($source); ?>" title="<?php esc_attr_e('Rig Signal event validator', 'hth-rig-signal'); ?>" height="<?php echo esc_attr((string) $height); ?>" loading="eager" referrerpolicy="no-referrer" credentialless sandbox="allow-scripts allow-same-origin allow-downloads allow-forms"></iframe>
       <noscript><p><?php esc_html_e('Rig Signal requires JavaScript for its local contract validation. No device event is sent to WordPress.', 'hth-rig-signal'); ?></p></noscript>
+      <nav class="hth-rig-signal__continuations" aria-label="<?php esc_attr_e('After the Rig Signal result', 'hth-rig-signal'); ?>">
+        <h3><?php esc_html_e('After the result', 'hth-rig-signal'); ?></h3>
+        <p><?php esc_html_e('Keep the event within its evidence limits before using it in a field decision.', 'hth-rig-signal'); ?></p>
+        <ul>
+          <li><a href="/tools/"><?php esc_html_e('Open the field systems studio', 'hth-rig-signal'); ?></a></li>
+          <li><a href="/field-files/"><?php esc_html_e('Read the field-testing and evidence system', 'hth-rig-signal'); ?></a></li>
+          <li><a href="/research-and-standards/"><?php esc_html_e('Inspect source, privacy, and evidence standards', 'hth-rig-signal'); ?></a></li>
+          <li><a href="/start-here/"><?php esc_html_e('Return to Start Here', 'hth-rig-signal'); ?></a></li>
+        </ul>
+      </nav>
     </section>
     <?php return (string) ob_get_clean();
 });

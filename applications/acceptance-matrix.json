@@ -1,8 +1,9 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "effectiveDate": "2026-07-22",
   "publication": "Hook the Horizon",
   "controllingIssue": 96,
+  "parallelTemplateIssue": 86,
   "scope": "Unified source and installed-runtime acceptance contract for the five current Hook applications.",
   "requiredStates": [
     "initial",
@@ -45,6 +46,15 @@
     "requiredBehavior": "reject-private-input-and-recursively-redact-public-output",
     "sharedImplementation": "applications/_shared/privacy.mjs",
     "acceptanceTest": "applications/_shared/tests/freshness-and-location.mjs"
+  },
+  "readerJourneyContract": {
+    "primarySystemSource": "next-generation/PRIMARY_EDITORIAL_SYSTEMS.md",
+    "routeRegistry": "next-generation/migration/primary-sections.json",
+    "continuationRegistry": "applications/result-continuations.json",
+    "validator": "scripts/validate-reader-journeys.mjs",
+    "requiredEntrySurfaces": ["homepage", "start-here", "primary-navigation", "field-systems-studio"],
+    "requiredContinuationKinds": ["field-guide-or-resource", "current-check-or-next-decision", "start-here-return"],
+    "prohibitedPresentation": ["generic-dashboard", "dead-destination", "placeholder-destination"]
   },
   "applications": [
     {
@@ -97,5 +107,5 @@
     "runtime-readback",
     "print-evidence"
   ],
-  "releaseBoundary": "A green source matrix does not establish installed-runtime or publication readiness. Issues 37, 53, and 92 remain the runtime promotion and readback carriers."
+  "releaseBoundary": "A green source matrix does not establish installed-runtime or publication readiness. Issues 37, 53, and 92 remain the runtime promotion and readback carriers. Issue 86 remains the complete reusable child-page and template-library carrier."
 }

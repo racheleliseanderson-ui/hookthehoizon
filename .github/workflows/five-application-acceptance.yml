@@ -7,9 +7,12 @@ on:
       - 'wordpress-plugin/hook-content/**'
       - 'wordpress-plugin/honey-hole-condition-route/**'
       - 'wordpress-theme/**'
+      - 'next-generation/theme/**'
+      - 'next-generation/migration/primary-sections.json'
       - 'next-generation/plugins/hatch-match-preview/**'
       - 'next-generation/plugins/rig-signal-preview/**'
       - 'scripts/validate-five-application-acceptance.mjs'
+      - 'scripts/validate-reader-journeys.mjs'
       - '.github/workflows/five-application-acceptance.yml'
   push:
     branches: [main]
@@ -18,9 +21,12 @@ on:
       - 'wordpress-plugin/hook-content/**'
       - 'wordpress-plugin/honey-hole-condition-route/**'
       - 'wordpress-theme/**'
+      - 'next-generation/theme/**'
+      - 'next-generation/migration/primary-sections.json'
       - 'next-generation/plugins/hatch-match-preview/**'
       - 'next-generation/plugins/rig-signal-preview/**'
       - 'scripts/validate-five-application-acceptance.mjs'
+      - 'scripts/validate-reader-journeys.mjs'
       - '.github/workflows/five-application-acceptance.yml'
   workflow_dispatch:
 
@@ -48,6 +54,8 @@ jobs:
         run: node scripts/validate-five-application-acceptance.mjs
       - name: Validate freshness and sensitive-location protection
         run: node applications/_shared/tests/freshness-and-location.mjs
+      - name: Validate Start Here and result continuations
+        run: node scripts/validate-reader-journeys.mjs
       - name: Validate deterministic application sources
         shell: bash
         run: |
@@ -76,7 +84,7 @@ jobs:
           - honey-hole-intelligence
     steps:
       - uses: actions/checkout@v4
-      - name: Verify application-owned route, runtime, package, freshness, and privacy contracts
+      - name: Verify application-owned route, runtime, package, freshness, privacy, and continuation contracts
         shell: bash
         run: |
           set -euo pipefail
@@ -87,6 +95,8 @@ jobs:
               grep -q "add_shortcode('hth_system_compatibility'" wordpress-plugin/hook-content/hook-content.php
               grep -q 'Installed plugin version observed: 0.3.1' wordpress-plugin/hook-content/runtime-parity.txt
               grep -q 'Compatibility Builder runtime: renders' wordpress-plugin/hook-content/runtime-parity.txt
+              grep -q '/presentation-planner/' wordpress-theme/templates/page-compatibility-builder.html
+              grep -q '/start-here/' wordpress-theme/templates/page-compatibility-builder.html
               ;;
             hatch-match)
               test -s applications/hatch-match/application.yaml
@@ -100,11 +110,16 @@ jobs:
               grep -q "'plausibilityOnly' => true" next-generation/plugins/hatch-match-preview/hatch-match-preview.php
               grep -q "'currentHatchReport' => false" next-generation/plugins/hatch-match-preview/hatch-match-preview.php
               grep -q "'speciesLevelCertainty' => false" next-generation/plugins/hatch-match-preview/hatch-match-preview.php
+              grep -q '/presentation-planner/' next-generation/plugins/hatch-match-preview/hatch-match-preview.php
+              grep -q '/start-here/' next-generation/plugins/hatch-match-preview/hatch-match-preview.php
               ;;
             presentation-planner)
               test -s applications/presentation-planner/README.md
               test -d applications/presentation-planner/preview
               grep -q "add_shortcode('hth_presentation_planner'" wordpress-plugin/hook-content/hook-content.php
+              grep -q '/compatibility-builder/' wordpress-plugin/hook-content/hook-content.php
+              grep -q '/honey-hole-intelligence/' wordpress-plugin/hook-content/hook-content.php
+              grep -q '/start-here/' wordpress-plugin/hook-content/hook-content.php
               ;;
             rig-signal)
               test -s applications/rig-signal/application.yaml
@@ -112,6 +127,8 @@ jobs:
               test -s next-generation/plugins/rig-signal-preview/rig-signal-preview.php
               grep -q "add_shortcode('hth_rig_signal'" next-generation/plugins/rig-signal-preview/rig-signal-preview.php
               grep -q "'/rig-signal-status'" next-generation/plugins/rig-signal-preview/rig-signal-preview.php
+              grep -q '/research-and-standards/' next-generation/plugins/rig-signal-preview/rig-signal-preview.php
+              grep -q '/start-here/' next-generation/plugins/rig-signal-preview/rig-signal-preview.php
               ;;
             honey-hole-intelligence)
               test -s applications/honey-hole-intelligence/evaluate.mjs
@@ -123,6 +140,8 @@ jobs:
               grep -q "'requiredEvidenceFields'" wordpress-plugin/honey-hole-condition-route/honey-hole-condition-route.php
               grep -q 'sourceOwner' wordpress-theme/templates/page-honey-hole-intelligence.html
               grep -q 'nextReviewAt' wordpress-theme/templates/page-honey-hole-intelligence.html
+              grep -q '/presentation-planner/' wordpress-theme/templates/page-honey-hole-intelligence.html
+              grep -q '/start-here/' wordpress-theme/templates/page-honey-hole-intelligence.html
               ;;
           esac
 
@@ -135,7 +154,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Confirm evidence retention, freshness, privacy, and runtime boundary
+      - name: Confirm evidence retention, freshness, privacy, journey, and runtime boundary
         run: |
           node - <<'NODE'
           const matrix = require('./applications/acceptance-matrix.json');
@@ -147,7 +166,11 @@ jobs:
           for (const item of sourceFields) if (!matrix.freshnessContract.requiredEvidenceFields.includes(item)) throw new Error(`missing source field: ${item}`);
           const surfaces = ['rendered-pages','rest-responses','analytics-payloads','logs','exports','share-states'];
           for (const item of surfaces) if (!matrix.sensitiveLocationContract.requiredLeakSurfaces.includes(item)) throw new Error(`missing leak surface: ${item}`);
+          const entrySurfaces = ['homepage','start-here','primary-navigation','field-systems-studio'];
+          for (const item of entrySurfaces) if (!matrix.readerJourneyContract.requiredEntrySurfaces.includes(item)) throw new Error(`missing journey entry surface: ${item}`);
+          if (!matrix.readerJourneyContract.continuationRegistry.includes('result-continuations')) throw new Error('result continuation registry is missing');
           if (!matrix.applications.find((item) => item.applicationId === 'HTH-HM-001').readerBoundary.includes('not-current-hatch-report')) throw new Error('Hatch Match plausibility boundary is missing');
           if (!matrix.releaseBoundary.includes('Issues 37, 53, and 92')) throw new Error('runtime promotion boundary is missing');
-          console.log('Acceptance evidence, freshness, privacy, and runtime contracts are complete.');
+          if (!matrix.releaseBoundary.includes('Issue 86')) throw new Error('parallel reusable-template boundary is missing');
+          console.log('Acceptance evidence, freshness, privacy, journey, and runtime contracts are complete.');
           NODE
