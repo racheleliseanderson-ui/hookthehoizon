@@ -1,24 +1,24 @@
 {
-  "$schema": "https://schemas.wp.org/trunk/theme.json",
-  "version": 3,
-  "settings": {
-    "appearanceTools": true,
-    "color": {
-      "custom": false,
-      "palette": [
-        {"slug": "water", "name": "Water", "color": "#123f52"},
-        {"slug": "depth", "name": "Depth", "color": "#092532"},
-        {"slug": "mist", "name": "Mist", "color": "#edf2ef"},
-        {"slug": "reed", "name": "Reed", "color": "#66755c"},
-        {"slug": "signal", "name": "Signal", "color": "#d2763c"}
-      ]
-    },
-    "layout": {"contentSize": "760px", "wideSize": "1440px"},
-    "typography": {"fluid": true}
+  "$schema":"https://schemas.wp.org/trunk/theme.json",
+  "version":3,
+  "settings":{
+    "appearanceTools":true,
+    "useRootPaddingAwareAlignments":true,
+    "color":{"custom":false,"customDuotone":false,"customGradient":false,"defaultPalette":false,"defaultGradients":false,"palette":[
+      {"slug":"deep-navy","name":"Deep Navy","color":"#071827"},{"slug":"pearl","name":"Pearl","color":"#E3E1D9"},{"slug":"lake-blue","name":"Lake Blue","color":"#2E6F95"},{"slug":"teal","name":"Teal","color":"#176F78"},{"slug":"charcoal","name":"Charcoal","color":"#424546"},{"slug":"forest-green","name":"Forest Green","color":"#355133"},{"slug":"burnt-coral","name":"Burnt Coral","color":"#D55C3E"},{"slug":"champagne-gold","name":"Champagne Gold","color":"#C7A257"}
+    ]},
+    "layout":{"contentSize":"46rem","wideSize":"96rem"},
+    "typography":{"fluid":true,"lineHeight":true,"letterSpacing":true,"fontFamilies":[
+      {"slug":"display","name":"Bebas Neue Display","fontFamily":"'Bebas Neue', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif"},
+      {"slug":"body","name":"Montserrat Body and Interface","fontFamily":"Montserrat, 'Avenir Next', Avenir, 'Segoe UI', system-ui, sans-serif"},
+      {"slug":"data","name":"Montserrat Data","fontFamily":"Montserrat, 'Avenir Next', Avenir, 'Segoe UI', system-ui, sans-serif"}
+    ]},
+    "custom":{"hth":{"visualAuthority":"v3.0-2026-07-23","sourceHistoryPath":true,"releaseAuthority":false,"deprecated":"Use wordpress-theme/ for release"}}
   },
-  "styles": {"typography": {"lineHeight": "1.65"}},
-  "templateParts": [
-    {"name": "header", "title": "Hook Header", "area": "header"},
-    {"name": "footer", "title": "Hook Footer", "area": "footer"}
-  ]
+  "styles":{
+    "color":{"background":"var(--re-background-canvas)","text":"var(--re-text-primary)"},
+    "typography":{"fontFamily":"var:preset|font-family|body","lineHeight":"1.65"},
+    "elements":{"heading":{"typography":{"fontFamily":"var:preset|font-family|display","fontWeight":"400","lineHeight":"0.98"}},"link":{"color":{"text":"var(--re-link)"}},"button":{"typography":{"fontFamily":"var:preset|font-family|body","fontWeight":"700"}}}
+  },
+  "templateParts":[{"name":"header","title":"Hook the Horizon Header","area":"header"},{"name":"footer","title":"Hook the Horizon Footer","area":"footer"}]
 }
