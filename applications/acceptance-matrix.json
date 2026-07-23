@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "effectiveDate": "2026-07-22",
   "publication": "Hook the Horizon",
   "controllingIssue": 96,
@@ -31,6 +31,21 @@
     "forced-colors",
     "print"
   ],
+  "freshnessContract": {
+    "requiredOfficialFacts": ["regulation", "closure", "access", "hazard", "weather", "waterCondition"],
+    "requiredEvidenceFields": ["sourceOwner", "currentCheckUrl", "reviewedAt", "nextReviewAt", "status"],
+    "criticalStaleBehavior": "block-result-pending-current-official-verification",
+    "noncriticalStaleBehavior": "reduce-confidence-and-name-affected-field",
+    "unavailableBehavior": "preserve-unavailable-state-without-favorable-assumption",
+    "fixture": "applications/fixtures/official-source-freshness.json"
+  },
+  "sensitiveLocationContract": {
+    "prohibitedClasses": ["exact-coordinates", "map-links-or-codes", "private-access-instructions", "vulnerable-water-identifiers", "contributor-sensitive-information"],
+    "requiredLeakSurfaces": ["rendered-pages", "rest-responses", "analytics-payloads", "logs", "exports", "share-states"],
+    "requiredBehavior": "reject-private-input-and-recursively-redact-public-output",
+    "sharedImplementation": "applications/_shared/privacy.mjs",
+    "acceptanceTest": "applications/_shared/tests/freshness-and-location.mjs"
+  },
   "applications": [
     {
       "applicationId": "HTH-SC-001",
@@ -46,7 +61,8 @@
       "stateContract": "all-required-states",
       "saveDelete": "none-required",
       "printExport": "print-or-public-safe-reference-export",
-      "safetyStops": ["stale-biological-source", "conservation-stop", "protected-location-input"]
+      "safetyStops": ["stale-biological-source", "conservation-stop", "protected-location-input"],
+      "readerBoundary": "broad-plausibility-aid-not-current-hatch-report-or-species-certainty"
     },
     {
       "applicationId": "HTH-PP-001",

@@ -4,23 +4,25 @@
   <header class="honey-hole-intelligence__header">
     <p class="hhi-eyebrow">Hook the Horizon · Honey Hole Intelligence</p>
     <h1 id="hhi-title">Prepare the trip without exposing the place.</h1>
-    <p>Use a broad public region and current official facts. The tool checks closure, access, regulations, hazards, conditions, conservation, gear, and backup readiness.</p>
+    <p>Use a broad public region and current official facts. The tool checks closure, access, regulations, hazards, weather, water conditions, conservation, gear, and backup readiness.</p>
   </header>
-  <aside class="hhi-boundary" role="note">Do not enter coordinates, map links, private access points, protected habitat details, secret spots, or inference-enabling directions. Exact-location input is rejected.</aside>
+  <aside class="hhi-boundary" role="note">Do not enter coordinates, map links, private-access instructions, vulnerable-water identifiers, contributor-sensitive information, protected habitat details, secret spots, or inference-enabling directions. Protected input is rejected.</aside>
   <p class="hhi-runtime" data-runtime-status role="status">Validating the live Honey Hole Intelligence contract.</p>
   <form id="hhi-form" novalidate>
     <label>Broad public region <input name="publicRegion" required placeholder="Upper Colorado public-water region"></label>
     <label>Trip type <select name="tripType"><option value="day trip">Day trip</option><option value="overnight trip">Overnight trip</option><option value="shore access">Shore access</option><option value="boat access">Boat access</option></select></label>
-    <label>Official source page <input name="sourceUrl" type="url" placeholder="https://"></label>
-    <label>Facts last verified <input name="verifiedAt" type="date"></label>
+    <label>Official source owner <input name="sourceOwner" required placeholder="Agency or responsible land manager"></label>
+    <label>Current official check <input name="sourceUrl" type="url" required placeholder="https://"></label>
+    <label>Facts last reviewed <input name="verifiedAt" type="date" required></label>
+    <label>Review again by <input name="nextReviewAt" type="date" required></label>
     <div class="hhi-facts">
-      <label>Closure state <select name="closure"><option value="unknown">Unknown</option><option value="open">Open</option><option value="closed">Closed</option></select></label>
-      <label>Legal access <select name="access"><option value="unknown">Unknown</option><option value="public_access_confirmed">Public access confirmed</option><option value="not_permitted">Not permitted</option></select></label>
-      <label>Regulations <select name="regulation"><option value="unknown">Unknown</option><option value="reviewed">Reviewed</option><option value="contradicted">Contradicted sources</option></select></label>
-      <label>Hazard state <select name="hazard"><option value="unknown">Unknown</option><option value="normal">No severe alert recorded</option><option value="severe">Severe hazard recorded</option></select></label>
-      <label>Weather reviewed <select name="weather"><option value="unknown">Unknown</option><option value="reviewed">Reviewed</option></select></label>
-      <label>Water conditions reviewed <select name="waterCondition"><option value="unknown">Unknown</option><option value="reviewed">Reviewed</option></select></label>
-      <label>Conservation posture <select name="conservation"><option value="unknown">Unknown</option><option value="standard_controls">Standard controls</option><option value="avoid_pressure">Avoid additional pressure</option></select></label>
+      <label>Closure state <select name="closure"><option value="unknown">Unknown</option><option value="open">Open</option><option value="closed">Closed</option><option value="unavailable">Source unavailable</option></select></label>
+      <label>Legal access <select name="access"><option value="unknown">Unknown</option><option value="public_access_confirmed">Public access confirmed</option><option value="not_permitted">Not permitted</option><option value="unavailable">Source unavailable</option></select></label>
+      <label>Regulations <select name="regulation"><option value="unknown">Unknown</option><option value="reviewed">Reviewed</option><option value="contradicted">Contradicted sources</option><option value="unavailable">Source unavailable</option></select></label>
+      <label>Hazard state <select name="hazard"><option value="unknown">Unknown</option><option value="normal">No severe alert recorded</option><option value="severe">Severe hazard recorded</option><option value="unavailable">Source unavailable</option></select></label>
+      <label>Weather reviewed <select name="weather"><option value="unknown">Unknown</option><option value="reviewed">Reviewed</option><option value="unavailable">Source unavailable</option></select></label>
+      <label>Water conditions reviewed <select name="waterCondition"><option value="unknown">Unknown</option><option value="reviewed">Reviewed</option><option value="unavailable">Source unavailable</option></select></label>
+      <label>Conservation posture <select name="conservation"><option value="unknown">Unknown</option><option value="standard_controls">Standard controls</option><option value="avoid_pressure">Avoid additional pressure</option><option value="unavailable">Source unavailable</option></select></label>
     </div>
     <fieldset><legend>Readiness</legend><label class="hhi-check"><input type="checkbox" name="gearReady"> Gear and protective equipment are ready</label><label class="hhi-check"><input type="checkbox" name="backupPlanReady"> A public-safe backup plan is ready</label></fieldset>
     <button type="submit">Check trip readiness</button>

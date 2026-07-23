@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "applicationId": "HTH-HM-001",
   "publicationState": "approved_preview",
   "maintenanceState": "active",
@@ -15,6 +15,7 @@
   "reviewedDate": "2026-07-20",
   "nextReviewDate": "2026-10-18",
   "expiresDate": "2027-01-20",
+  "readerBoundary": "Hatch Match compares broad biological plausibility. It is not a current hatch report, species-level certainty engine, catch forecast, regulation source, or exact-location tool.",
   "records": [
     {
       "id": "hm-mayfly-reference-v1",
@@ -63,9 +64,9 @@
     }
   ],
   "sources": [
-    {"id": "NOAA-GLERL-WATER-LIFE-FIELD-GUIDE", "publisher": "NOAA Great Lakes Environmental Research Laboratory", "url": "https://www.glerl.noaa.gov/data/waterlife/fieldGuide.html"},
-    {"id": "MAINE-DEP-MAYFLY", "publisher": "Maine Department of Environmental Protection", "url": "https://www.maine.gov/dep/water/monitoring/biomonitoring/sampling/bugs/mayflies.html"},
-    {"id": "NPS-STONEFLY-ALPINE-AQUIFER", "publisher": "U.S. National Park Service", "url": "https://www.nps.gov/articles/alpine-to-aquifer.htm"},
-    {"id": "MAINE-DEP-STONEFLY", "publisher": "Maine Department of Environmental Protection", "url": "https://www.maine.gov/dep/water/monitoring/biomonitoring/sampling/bugs/stoneflies.html"}
+    {"id": "NOAA-GLERL-WATER-LIFE-FIELD-GUIDE", "sourceOwner": "NOAA Great Lakes Environmental Research Laboratory", "publisher": "NOAA Great Lakes Environmental Research Laboratory", "url": "https://www.glerl.noaa.gov/data/waterlife/fieldGuide.html", "reviewedAt": "2026-07-20", "nextReviewAt": "2026-10-18", "sourceClass": "government-biological-reference"},
+    {"id": "MAINE-DEP-MAYFLY", "sourceOwner": "Maine Department of Environmental Protection", "publisher": "Maine Department of Environmental Protection", "url": "https://www.maine.gov/dep/water/monitoring/biomonitoring/sampling/bugs/mayflies.html", "reviewedAt": "2026-07-20", "nextReviewAt": "2026-10-18", "sourceClass": "government-biological-reference"},
+    {"id": "NPS-STONEFLY-ALPINE-AQUIFER", "sourceOwner": "U.S. National Park Service", "publisher": "U.S. National Park Service", "url": "https://www.nps.gov/articles/alpine-to-aquifer.htm", "reviewedAt": "2026-07-20", "nextReviewAt": "2026-10-18", "sourceClass": "government-biological-reference"},
+    {"id": "MAINE-DEP-STONEFLY", "sourceOwner": "Maine Department of Environmental Protection", "publisher": "Maine Department of Environmental Protection", "url": "https://www.maine.gov/dep/water/monitoring/biomonitoring/sampling/bugs/stoneflies.html", "reviewedAt": "2026-07-20", "nextReviewAt": "2026-10-18", "sourceClass": "government-biological-reference"}
   ]
 }

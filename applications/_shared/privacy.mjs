@@ -1,9 +1,23 @@
-const LOCATION_KEYS = new Set([
-  'lat', 'latitude', 'lng', 'lon', 'longitude', 'coordinates', 'coordinate',
-  'exactlocation', 'exact_location', 'gps', 'geolocation', 'geojson',
-  'waypoint', 'waypointid', 'waypoint_id', 'privatewatername', 'private_water_name',
-  'accesspoint', 'access_point', 'parkingcoordinates', 'parking_coordinates',
-  'homewaterbodyids', 'home_waterbody_ids'
+const SENSITIVE_KEYS = new Map([
+  ['lat', 'sensitive_location_key'], ['latitude', 'sensitive_location_key'], ['lng', 'sensitive_location_key'],
+  ['lon', 'sensitive_location_key'], ['longitude', 'sensitive_location_key'], ['coordinates', 'sensitive_location_key'],
+  ['coordinate', 'sensitive_location_key'], ['exactlocation', 'sensitive_location_key'], ['exact_location', 'sensitive_location_key'],
+  ['gps', 'sensitive_location_key'], ['geolocation', 'sensitive_location_key'], ['geojson', 'sensitive_location_key'],
+  ['waypoint', 'sensitive_location_key'], ['waypointid', 'sensitive_location_key'], ['waypoint_id', 'sensitive_location_key'],
+  ['privatewatername', 'vulnerable_water_identifier'], ['private_water_name', 'vulnerable_water_identifier'],
+  ['vulnerablewaterid', 'vulnerable_water_identifier'], ['vulnerable_water_id', 'vulnerable_water_identifier'],
+  ['waterbodyid', 'vulnerable_water_identifier'], ['waterbody_id', 'vulnerable_water_identifier'],
+  ['homewaterbodyids', 'vulnerable_water_identifier'], ['home_waterbody_ids', 'vulnerable_water_identifier'],
+  ['accesspoint', 'private_access_instruction'], ['access_point', 'private_access_instruction'],
+  ['privateaccessinstructions', 'private_access_instruction'], ['private_access_instructions', 'private_access_instruction'],
+  ['gatecode', 'private_access_instruction'], ['gate_code', 'private_access_instruction'],
+  ['lockboxcode', 'private_access_instruction'], ['lockbox_code', 'private_access_instruction'],
+  ['parkingcoordinates', 'private_access_instruction'], ['parking_coordinates', 'private_access_instruction'],
+  ['contributoridentity', 'contributor_sensitive'], ['contributor_identity', 'contributor_sensitive'],
+  ['contributorname', 'contributor_sensitive'], ['contributor_name', 'contributor_sensitive'],
+  ['contributoremail', 'contributor_sensitive'], ['contributor_email', 'contributor_sensitive'],
+  ['contributorphone', 'contributor_sensitive'], ['contributor_phone', 'contributor_sensitive'],
+  ['privatecontact', 'contributor_sensitive'], ['private_contact', 'contributor_sensitive']
 ]);
 
 const PRIVACY_CLASSES = new Set(['public_safe', 'private', 'local_only', 'prohibited']);
@@ -16,10 +30,14 @@ function inspectString(value) {
   const text = String(value || '');
   const reasons = [];
   if (/\b-?\d{1,2}\.\d{4,}\s*[, ]\s*-?\d{1,3}\.\d{4,}\b/.test(text)) reasons.push('coordinate_pair');
-  if (/https?:\/\/(?:www\.)?(?:google\.[^/]+\/maps|maps\.apple\.com|maps\.google\.com)/i.test(text)) reasons.push('map_url');
+  if (/\b\d{1,2}[°º]\s*\d{1,2}['′]\s*\d{1,2}(?:\.\d+)?["″]?\s*[NS]\b.*\b\d{1,3}[°º]\s*\d{1,2}['′]\s*\d{1,2}(?:\.\d+)?["″]?\s*[EW]\b/i.test(text)) reasons.push('dms_coordinate_pair');
+  if (/https?:\/\/(?:www\.)?(?:google\.[^/]+\/maps|maps\.apple\.com|maps\.google\.com|what3words\.com)/i.test(text)) reasons.push('map_url');
   if (/\b(?:lat(?:itude)?|lon(?:gitude)?|lng)\s*[:=]\s*-?\d+(?:\.\d+)?/i.test(text)) reasons.push('coordinate_label');
   if (/\b[23456789CFGHJMPQRVWX]{4,}\+[23456789CFGHJMPQRVWX]{2,}\b/i.test(text)) reasons.push('plus_code');
-  return reasons;
+  if (/\b(?:gate|lockbox|door)\s*(?:code|combination)\s*[:=#-]?\s*[a-z0-9-]{3,}\b/i.test(text)) reasons.push('private_access_instruction');
+  if (/\b(?:use|take|follow)\s+(?:the\s+)?private\s+(?:road|drive|trail|gate)\b/i.test(text)) reasons.push('private_access_instruction');
+  if (/\b(?:vulnerable|protected|private)[-_ ]?water(?:body)?[-_ ]?id\s*[:=#-]?\s*[a-z0-9-]+\b/i.test(text)) reasons.push('vulnerable_water_identifier');
+  return [...new Set(reasons)];
 }
 
 export function inspectSensitiveLocation(value, path = '$', findings = []) {
@@ -35,7 +53,8 @@ export function inspectSensitiveLocation(value, path = '$', findings = []) {
   if (typeof value === 'object') {
     for (const [key, nested] of Object.entries(value)) {
       const nestedPath = `${path}.${key}`;
-      if (LOCATION_KEYS.has(normalizedKey(key))) findings.push({ path: nestedPath, reason: 'sensitive_location_key' });
+      const reason = SENSITIVE_KEYS.get(normalizedKey(key));
+      if (reason) findings.push({ path: nestedPath, reason });
       inspectSensitiveLocation(nested, nestedPath, findings);
     }
   }
@@ -48,7 +67,7 @@ function cloneRedacted(value, path, findings) {
     const reasons = inspectString(value);
     if (reasons.length) {
       reasons.forEach((reason) => findings.push({ path, reason }));
-      return '[redacted-location]';
+      return '[redacted-sensitive]';
     }
     return value;
   }
@@ -58,8 +77,9 @@ function cloneRedacted(value, path, findings) {
   const output = {};
   for (const [key, nested] of Object.entries(value)) {
     const nestedPath = `${path}.${key}`;
-    if (LOCATION_KEYS.has(normalizedKey(key))) {
-      findings.push({ path: nestedPath, reason: 'sensitive_location_key' });
+    const reason = SENSITIVE_KEYS.get(normalizedKey(key));
+    if (reason) {
+      findings.push({ path: nestedPath, reason });
       continue;
     }
     output[key] = cloneRedacted(nested, nestedPath, findings);

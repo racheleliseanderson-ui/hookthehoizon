@@ -16,8 +16,12 @@ legend { font-weight: 800; padding: 0 .4rem; }
 .check input { width: 1.25rem; height: 1.25rem; margin-top: .15rem; }
 button { padding: .65rem 1rem; border: 2px solid currentColor; background: Canvas; color: CanvasText; font-weight: 800; cursor: pointer; }
 #hhi-result { border-top: 4px double currentColor; margin-top: 2rem; padding-top: 1rem; }
+[role="region"][tabindex="0"] { max-width: 100%; overflow: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 44rem; }
+th, td { border-bottom: 1px solid currentColor; padding: .55rem; text-align: left; vertical-align: top; }
+thead th { font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; }
 :focus-visible { outline: 3px solid Highlight; outline-offset: 3px; }
 @media (max-width: 42rem) { .honey-hole { width: min(100% - 1rem, 70rem); padding-top: 1.25rem; } button { width: 100%; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
 @media (forced-colors: active) { .boundary, .error, fieldset, input, select, button { border-color: CanvasText; } }
-@media print { form, header + .boundary, #hhi-status, button { display: none !important; } .honey-hole { width: 100%; padding: 0; } #hhi-result { border: 0; } a::after { content: ' (' attr(href) ')'; } }
+@media print { form, header + .boundary, #hhi-status, button { display: none !important; } .honey-hole { width: 100%; padding: 0; } #hhi-result { border: 0; } [role="region"] { overflow: visible; } table { min-width: 0; } a::after { content: ' (' attr(href) ')'; } }
