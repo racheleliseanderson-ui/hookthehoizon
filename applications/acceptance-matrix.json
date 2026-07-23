@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "effectiveDate": "2026-07-22",
   "publication": "Hook the Horizon",
   "controllingIssue": 96,
@@ -56,6 +56,17 @@
     "requiredContinuationKinds": ["field-guide-or-resource", "current-check-or-next-decision", "start-here-return"],
     "prohibitedPresentation": ["generic-dashboard", "dead-destination", "placeholder-destination"]
   },
+  "installedHarness": {
+    "runner": "Playwright Chromium",
+    "accessibilityEngine": "Axe Core",
+    "configuration": "tests/installed-acceptance/playwright.config.mjs",
+    "specification": "tests/installed-acceptance/specs/five-applications.spec.mjs",
+    "workflow": ".github/workflows/five-application-acceptance.yml",
+    "runtime": "isolated-wp-env",
+    "projects": ["chromium", "mobile-chromium", "chromium-nojs", "print-chromium"],
+    "artifactRetentionDays": 30,
+    "failureRetention": "always-upload-even-when-tests-fail"
+  },
   "applications": [
     {
       "applicationId": "HTH-SC-001",
@@ -105,7 +116,10 @@
     "console-logs",
     "network-logs",
     "runtime-readback",
-    "print-evidence"
+    "print-evidence",
+    "rest-readback",
+    "downloaded-artifacts",
+    "sha256-manifests"
   ],
-  "releaseBoundary": "A green source matrix does not establish installed-runtime or publication readiness. Issues 37, 53, and 92 remain the runtime promotion and readback carriers. Issue 86 remains the complete reusable child-page and template-library carrier."
+  "releaseBoundary": "A green source matrix does not establish installed-runtime or publication readiness. Issues 37, 53, and 92 remain the runtime promotion and readback carriers. Issue 86 remains the complete reusable child-page and template-library carrier. Manual assistive-technology and physical-device verification remains required after the automated installed harness passes."
 }
