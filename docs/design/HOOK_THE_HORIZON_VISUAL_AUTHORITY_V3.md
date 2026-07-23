@@ -1,8 +1,8 @@
-# Hook the Horizon — Visual Authority, Design System, and Master Template Reconciliation — v3.0 — 2026-07-23
+# Hook the Horizon — Visual Authority, Design System, and Master Template Reconciliation — v3.1 — 2026-07-23
 **Status:** Current visual and implementation authority  
 **Effective:** 2026-07-23  
-**Visual source:** Owner-approved Google Drive reference folder  
-**Companion register:** `docs/design/master-template-register.csv` and `docs/design/component-catalog.csv`
+**Visual source:** Owner-approved Google Drive reference folder plus the complete live WordPress media library  
+**Companion register:** `docs/design/master-template-register.csv`, `docs/design/component-catalog.csv`, and `docs/design/asset-reference-map.csv`
 
 ## Controlling decision
 The approved eight-color palette, Bebas Neue / Montserrat hierarchy, and owner-approved fish-hook-horizon logo family supersede conflicting older palettes, serif-led systems, anti-logo language, and generic or austere implementations. Compatible field-truth, evidence, safety, regulation, privacy, stewardship, accessibility, performance, and physical-logic requirements remain active.
@@ -10,9 +10,10 @@ The approved eight-color palette, Bebas Neue / Montserrat hierarchy, and owner-a
 ## Source of truth
 1. Later explicit owner direction and the approved visual reference folder.
 2. This document and the single master register.
-3. `wordpress-theme/theme-tokens.json` as canonical machine source, synchronized to active runtime files.
-4. Existing active documents for compatible functional/editorial requirements.
-5. Exact runtime evidence for deployment status.
+3. The complete live WordPress media library as a production source pool that must be inventoried and reconciled, not ignored.
+4. `wordpress-theme/theme-tokens.json` as canonical machine source, synchronized to active runtime files.
+5. Existing active documents for compatible functional/editorial requirements.
+6. Exact runtime evidence for deployment status.
 
 ## Palette
 |Color|HEX|Class|Overall|Dark|Light|Role|
@@ -42,6 +43,18 @@ Pages follow immersion → orientation → evidence → explanation → decision
 ## Imagery and diagrams
 Every image has a job, provenance, rights state, focal point, crop family, alt purpose and location-sensitivity review. Avoid generic stock smiles, trophy-only/grip-and-grin defaults, impossible equipment/line paths, unsafe handling, fake live conditions and sensitive location disclosure. Diagrams label measured, estimated and inferred elements and provide text alternatives.
 
+## Live WordPress media library
+The Hook the Horizon WordPress site currently contains **240 image attachments**. The library is a first-class source pool alongside Drive and the repository; it is not a disposable staging area and must not be omitted from design or template planning.
+
+Current audit baseline as of 2026-07-23:
+- 219 images were uploaded on 2026-07-23, 20 on 2026-07-22, and 1 on 2026-07-20.
+- 229 images lack alt text.
+- 103 images lack captions.
+- 240 images lack descriptions.
+- All 240 images are currently unattached.
+
+These conditions are classification and metadata gaps, not grounds for deletion. Before an image is assigned to a route, template, product, application, email, social asset, or print output, record its WordPress attachment ID, filename, title, source, license or rights state, AI/generated status, approved job, focal point, desktop/mobile crop family, alt text, caption need, duplicate status, location-sensitivity status, and whether it is approved, restricted, reference-only, off-brand, or retired. Do not bulk-assign images merely because they are present. Do not remove images solely because they are unattached or lack metadata. Preview files, AI mockup text, novelty graphics, generic badges, unsafe handling scenes, and off-brand candidates require explicit visual review before use.
+
 ## Template and state coverage
 The single register maps all global, WordPress, institutional, editorial, archive, application, WooCommerce, newsletter, error, print and alternate renderings. An unstyled default is a gap, not completion.
 
@@ -52,7 +65,8 @@ The single register maps all global, WordPress, institutional, editorial, archiv
 - `wordpress-theme/style.css`
 - `wordpress-theme/styles/*.json`
 - `rebuild/template-system/template-catalog.json`
+- `docs/design/asset-reference-map.csv`
 - active templates, parts, patterns, application, WooCommerce, email and print assets
 
 ## Acceptance
-Reject any route that could belong to a generic fishing site after changing the logo, uses old active palette/type, lacks a clear reader job or evidence basis, creates an application/Woo visual fork, fails responsive/accessibility behavior, or claims parity without exact runtime evidence.
+Reject any route that could belong to a generic fishing site after changing the logo, uses old active palette/type, lacks a clear reader job or evidence basis, creates an application/Woo visual fork, fails responsive/accessibility behavior, ignores the live WordPress media corpus, uses an unreviewed or unclassified attachment, or claims parity without exact runtime evidence.
