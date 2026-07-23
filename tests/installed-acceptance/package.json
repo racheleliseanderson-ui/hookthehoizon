@@ -1,0 +1,14 @@
+{
+  "name": "hook-five-application-installed-acceptance",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:chromium": "playwright test --project=chromium",
+    "test:nojs": "playwright test --project=chromium-nojs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.55.0"
+  }
+}

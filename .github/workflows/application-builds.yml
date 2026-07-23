@@ -55,9 +55,11 @@ jobs:
           test -s applications/hatch-match/application.yaml
           test -s applications/hatch-match/BIOLOGICAL_SEED_AND_REVIEW_STANDARD.md
           grep -q 'id: HTH-HM-001' applications/hatch-match/application.yaml
+          grep -q 'current_version: 0.1.1-preview' applications/hatch-match/application.yaml
           grep -q 'Required negative evidence' applications/hatch-match/BIOLOGICAL_SEED_AND_REVIEW_STANDARD.md
           grep -q 'no exact location or vulnerable-water disclosure' applications/hatch-match/BIOLOGICAL_SEED_AND_REVIEW_STANDARD.md
-          grep -q 'maintenance_branch: operations/hatch-match-maintenance-activation-2026-07-20' applications/hatch-match/application.yaml
+          grep -q 'maintenance_branch: main' applications/hatch-match/application.yaml
+          grep -q 'delivery: verified-live-wordpress-page-bridge' applications/hatch-match/application.yaml
 
       - name: Validate maintenance and preview package when present
         run: |
@@ -92,7 +94,9 @@ jobs:
             "application": "Hatch Match",
             "repository": "${{ github.repository }}",
             "commit": "${{ github.sha }}",
-            "maintenanceActivationDependency": "PR 85",
+            "sourceVersion": "0.1.1-preview",
+            "liveDelivery": "verified-live-wordpress-page-bridge",
+            "canonicalPackagePromotionDependency": "Issue 92",
             "productionAuthorized": false
           }
           JSON

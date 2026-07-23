@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "fixtureType": "acceptance-only-official-source-contracts",
+  "effectiveDate": "2026-07-22T12:00:00Z",
+  "notice": "These records prove contract behavior only. example.invalid URLs are not production authorities or current field facts.",
+  "facts": {
+    "regulation": {
+      "value": "reviewed",
+      "status": "official_current",
+      "sourceOwner": "Jurisdictional fish and wildlife authority",
+      "currentCheckUrl": "https://regulations.example.invalid/current",
+      "reviewedAt": "2026-07-22T08:00:00Z",
+      "nextReviewAt": "2026-07-29T08:00:00Z"
+    },
+    "closure": {
+      "value": "open",
+      "status": "official_current",
+      "sourceOwner": "Jurisdictional closure-issuing authority",
+      "currentCheckUrl": "https://closures.example.invalid/current",
+      "reviewedAt": "2026-07-22T08:00:00Z",
+      "nextReviewAt": "2026-07-23T08:00:00Z"
+    },
+    "access": {
+      "value": "public_access_confirmed",
+      "status": "official_current",
+      "sourceOwner": "Responsible land manager or access authority",
+      "currentCheckUrl": "https://access.example.invalid/current",
+      "reviewedAt": "2026-07-22T08:00:00Z",
+      "nextReviewAt": "2026-08-21T08:00:00Z"
+    },
+    "hazard": {
+      "value": "normal",
+      "status": "official_current",
+      "sourceOwner": "Responsible emergency, fire, road, or land-management authority",
+      "currentCheckUrl": "https://hazards.example.invalid/current",
+      "reviewedAt": "2026-07-22T08:00:00Z",
+      "nextReviewAt": "2026-07-23T08:00:00Z"
+    },
+    "weather": {
+      "value": "reviewed",
+      "status": "official_current",
+      "sourceOwner": "National or jurisdictional weather authority",
+      "currentCheckUrl": "https://weather.example.invalid/current",
+      "reviewedAt": "2026-07-22T08:00:00Z",
+      "nextReviewAt": "2026-07-23T08:00:00Z"
+    },
+    "waterCondition": {
+      "value": "reviewed",
+      "status": "official_current",
+      "sourceOwner": "Responsible hydrology, water-management, or monitoring authority",
+      "currentCheckUrl": "https://conditions.example.invalid/current",
+      "reviewedAt": "2026-07-22T08:00:00Z",
+      "nextReviewAt": "2026-07-23T08:00:00Z"
+    },
+    "permit": {
+      "value": "not_required",
+      "status": "official_current",
+      "sourceOwner": "Responsible permitting authority",
+      "currentCheckUrl": "https://permits.example.invalid/current",
+      "reviewedAt": "2026-07-22T08:00:00Z",
+      "nextReviewAt": "2026-07-29T08:00:00Z"
+    },
+    "ownership": {
+      "value": "public",
+      "status": "official_current",
+      "sourceOwner": "Responsible land or property records authority",
+      "currentCheckUrl": "https://ownership.example.invalid/current",
+      "reviewedAt": "2026-07-22T08:00:00Z",
+      "nextReviewAt": "2026-08-21T08:00:00Z"
+    },
+    "conservation": {
+      "value": "standard_controls",
+      "status": "official_current",
+      "sourceOwner": "Responsible fisheries or conservation authority",
+      "currentCheckUrl": "https://conservation.example.invalid/current",
+      "reviewedAt": "2026-07-22T08:00:00Z",
+      "nextReviewAt": "2026-10-20T08:00:00Z"
+    }
+  }
+}

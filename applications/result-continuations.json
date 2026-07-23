@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "effectiveDate": "2026-07-22",
+  "publication": "Hook the Horizon",
+  "controllingIssues": [86, 96],
+  "rule": "Every application result names the next field decision, links to at least one relevant editorial or application route, and provides a clear return to Start Here. All routes must be source-controlled and non-placeholder.",
+  "applications": [
+    {
+      "applicationId": "HTH-SC-001",
+      "name": "Compatibility Builder",
+      "resultPrompt": "Use the weakest link to choose the next setup or field test.",
+      "continuations": [
+        {"label": "Open setup cards and printable field resources", "href": "/resources/", "kind": "setup-card"},
+        {"label": "Choose a presentation test", "href": "/presentation-planner/", "kind": "next-field-decision"},
+        {"label": "Read the equipment and field-file system", "href": "/field-files/", "kind": "field-guide"},
+        {"label": "Return to Start Here", "href": "/start-here/", "kind": "return"}
+      ]
+    },
+    {
+      "applicationId": "HTH-HM-001",
+      "name": "Hatch Match",
+      "resultPrompt": "Treat the candidate as a hypothesis and decide what visible cue or presentation variable to test next.",
+      "continuations": [
+        {"label": "Turn the hypothesis into a bounded presentation test", "href": "/presentation-planner/", "kind": "next-field-decision"},
+        {"label": "Read species, water, and conditions field files", "href": "/field-files/", "kind": "field-guide"},
+        {"label": "Inspect source and uncertainty standards", "href": "/research-and-standards/", "kind": "method"},
+        {"label": "Return to Start Here", "href": "/start-here/", "kind": "return"}
+      ]
+    },
+    {
+      "applicationId": "HTH-PP-001",
+      "name": "Presentation Planner",
+      "resultPrompt": "Confirm the setup, verify current conditions, and change one major variable during the field test.",
+      "continuations": [
+        {"label": "Check whether the complete setup works together", "href": "/compatibility-builder/", "kind": "setup-check"},
+        {"label": "Verify current trip conditions and access", "href": "/honey-hole-intelligence/", "kind": "conditions-source"},
+        {"label": "Open supporting field files", "href": "/field-files/", "kind": "field-guide"},
+        {"label": "Return to Start Here", "href": "/start-here/", "kind": "return"}
+      ]
+    },
+    {
+      "applicationId": "HTH-RS-001",
+      "name": "Rig Signal",
+      "resultPrompt": "Keep the event within its evidence limits before using it in a field decision.",
+      "continuations": [
+        {"label": "Open the field systems studio", "href": "/tools/", "kind": "next-field-decision"},
+        {"label": "Read the field-testing and evidence system", "href": "/field-files/", "kind": "field-guide"},
+        {"label": "Inspect source, privacy, and evidence standards", "href": "/research-and-standards/", "kind": "method"},
+        {"label": "Return to Start Here", "href": "/start-here/", "kind": "return"}
+      ]
+    },
+    {
+      "applicationId": "HHI-001",
+      "name": "Honey Hole Intelligence",
+      "resultPrompt": "Resolve blocked official facts first; when the trip remains responsible, choose the smallest field test and keep a public-safe fallback.",
+      "continuations": [
+        {"label": "Build a presentation test from owned inventory", "href": "/presentation-planner/", "kind": "next-field-decision"},
+        {"label": "Read conditions, destination, and trip field files", "href": "/field-files/", "kind": "field-guide"},
+        {"label": "Inspect current-source and location-protection standards", "href": "/research-and-standards/", "kind": "method"},
+        {"label": "Return to Start Here", "href": "/start-here/", "kind": "return"}
+      ]
+    }
+  ]
+}

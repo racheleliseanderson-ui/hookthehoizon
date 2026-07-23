@@ -1,0 +1,245 @@
+name: Hook Five-Application Acceptance
+
+on:
+  pull_request:
+    paths:
+      - 'applications/**'
+      - 'wordpress-plugin/hook-content/**'
+      - 'wordpress-plugin/honey-hole-condition-route/**'
+      - 'wordpress-theme/**'
+      - 'next-generation/theme/**'
+      - 'next-generation/migration/primary-sections.json'
+      - 'next-generation/plugins/hatch-match-preview/**'
+      - 'next-generation/plugins/rig-signal-preview/**'
+      - 'tests/installed-acceptance/**'
+      - 'scripts/validate-five-application-acceptance.mjs'
+      - 'scripts/validate-reader-journeys.mjs'
+      - '.github/workflows/five-application-acceptance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'applications/**'
+      - 'wordpress-plugin/hook-content/**'
+      - 'wordpress-plugin/honey-hole-condition-route/**'
+      - 'wordpress-theme/**'
+      - 'next-generation/theme/**'
+      - 'next-generation/migration/primary-sections.json'
+      - 'next-generation/plugins/hatch-match-preview/**'
+      - 'next-generation/plugins/rig-signal-preview/**'
+      - 'tests/installed-acceptance/**'
+      - 'scripts/validate-five-application-acceptance.mjs'
+      - 'scripts/validate-reader-journeys.mjs'
+      - '.github/workflows/five-application-acceptance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hook-five-application-acceptance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract-and-ownership:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+      - name: Validate unified ownership and acceptance contracts
+        run: node scripts/validate-five-application-acceptance.mjs
+      - name: Validate freshness and sensitive-location protection
+        run: node applications/_shared/tests/freshness-and-location.mjs
+      - name: Validate Start Here and result continuations
+        run: node scripts/validate-reader-journeys.mjs
+      - name: Validate deterministic application sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          node applications/system-compatibility/tests/run.mjs
+          node applications/rig-signal/tests/run.mjs
+          node applications/honey-hole-intelligence/tests/run.mjs
+          node applications/honey-hole-intelligence/preview/tests/run.mjs
+          find applications/presentation-planner -name '*.mjs' -print0 | xargs -0 -r -n1 node --check
+          find next-generation/plugins/hatch-match-preview -name '*.mjs' -print0 | xargs -0 -r -n1 node --check
+          find wordpress-theme/assets/honey-hole-intelligence -name '*.mjs' -print0 | xargs -0 -r -n1 node --check
+          find wordpress-plugin/hook-content wordpress-plugin/honey-hole-condition-route next-generation/plugins/hatch-match-preview next-generation/plugins/rig-signal-preview -name '*.php' -print0 | xargs -0 -r -n1 php -l
+
+  application-source-matrix:
+    needs: contract-and-ownership
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        application:
+          - compatibility-builder
+          - hatch-match
+          - presentation-planner
+          - rig-signal
+          - honey-hole-intelligence
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify application-owned route, runtime, package, freshness, privacy, and continuation contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          case '${{ matrix.application }}' in
+            compatibility-builder)
+              test -s applications/system-compatibility/evaluate.mjs
+              test -s wordpress-theme/templates/page-compatibility-builder.html
+              grep -q "add_shortcode('hth_system_compatibility'" wordpress-plugin/hook-content/hook-content.php
+              grep -q 'Installed plugin version observed: 0.3.1' wordpress-plugin/hook-content/runtime-parity.txt
+              grep -q 'Compatibility Builder runtime: renders' wordpress-plugin/hook-content/runtime-parity.txt
+              grep -q '/presentation-planner/' wordpress-theme/templates/page-compatibility-builder.html
+              grep -q '/start-here/' wordpress-theme/templates/page-compatibility-builder.html
+              ;;
+            hatch-match)
+              test -s applications/hatch-match/application.yaml
+              test -s applications/hatch-match/maintenance-policy.json
+              test -s next-generation/plugins/hatch-match-preview/hatch-match-preview.php
+              grep -q 'current_version: 0.1.1-preview' applications/hatch-match/application.yaml
+              grep -q 'maintenance_branch: main' applications/hatch-match/application.yaml
+              grep -q "add_shortcode('hth_hatch_match'" next-generation/plugins/hatch-match-preview/hatch-match-preview.php
+              grep -q '"readerBoundary"' next-generation/plugins/hatch-match-preview/data/seed-records.json
+              grep -q '"sourceOwner"' next-generation/plugins/hatch-match-preview/data/seed-records.json
+              grep -q "'plausibilityOnly' => true" next-generation/plugins/hatch-match-preview/hatch-match-preview.php
+              grep -q "'currentHatchReport' => false" next-generation/plugins/hatch-match-preview/hatch-match-preview.php
+              grep -q "'speciesLevelCertainty' => false" next-generation/plugins/hatch-match-preview/hatch-match-preview.php
+              grep -q '/presentation-planner/' next-generation/plugins/hatch-match-preview/hatch-match-preview.php
+              grep -q '/start-here/' next-generation/plugins/hatch-match-preview/hatch-match-preview.php
+              ;;
+            presentation-planner)
+              test -s applications/presentation-planner/README.md
+              test -d applications/presentation-planner/preview
+              grep -q "add_shortcode('hth_presentation_planner'" wordpress-plugin/hook-content/hook-content.php
+              grep -q '/compatibility-builder/' wordpress-plugin/hook-content/hook-content.php
+              grep -q '/honey-hole-intelligence/' wordpress-plugin/hook-content/hook-content.php
+              grep -q '/start-here/' wordpress-plugin/hook-content/hook-content.php
+              ;;
+            rig-signal)
+              test -s applications/rig-signal/application.yaml
+              test -s applications/rig-signal/validate.mjs
+              test -s next-generation/plugins/rig-signal-preview/rig-signal-preview.php
+              grep -q "add_shortcode('hth_rig_signal'" next-generation/plugins/rig-signal-preview/rig-signal-preview.php
+              grep -q "'/rig-signal-status'" next-generation/plugins/rig-signal-preview/rig-signal-preview.php
+              grep -q '/research-and-standards/' next-generation/plugins/rig-signal-preview/rig-signal-preview.php
+              grep -q '/start-here/' next-generation/plugins/rig-signal-preview/rig-signal-preview.php
+              ;;
+            honey-hole-intelligence)
+              test -s applications/honey-hole-intelligence/evaluate.mjs
+              test -s applications/fixtures/official-source-freshness.json
+              test -s wordpress-theme/templates/page-honey-hole-intelligence.html
+              test -s wordpress-plugin/honey-hole-condition-route/honey-hole-condition-route.php
+              grep -q "'/honey-hole-conditions'" wordpress-plugin/honey-hole-condition-route/honey-hole-condition-route.php
+              grep -q "'schemaVersion' => '0.2.0'" wordpress-plugin/honey-hole-condition-route/honey-hole-condition-route.php
+              grep -q "'requiredEvidenceFields'" wordpress-plugin/honey-hole-condition-route/honey-hole-condition-route.php
+              grep -q 'sourceOwner' wordpress-theme/templates/page-honey-hole-intelligence.html
+              grep -q 'nextReviewAt' wordpress-theme/templates/page-honey-hole-intelligence.html
+              grep -q '/presentation-planner/' wordpress-theme/templates/page-honey-hole-intelligence.html
+              grep -q '/start-here/' wordpress-theme/templates/page-honey-hole-intelligence.html
+              ;;
+          esac
+
+  installed-playwright-axe:
+    needs: application-source-matrix
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HTH_BASE_URL: http://localhost:8888
+      HTH_EVIDENCE_DIR: evidence/installed-five-application
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Start isolated WordPress runtime
+        run: |
+          npx --yes @wordpress/env@10.25.0 start
+          npx --yes @wordpress/env@10.25.0 run cli wp plugin activate hook-the-horizon-content honey-hole-condition-route hatch-match-preview rig-signal-preview || true
+          npx --yes @wordpress/env@10.25.0 run cli wp rewrite flush
+      - name: Create installed application pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          create_page() {
+            local title="$1"
+            local slug="$2"
+            local content="$3"
+            if ! npx --yes @wordpress/env@10.25.0 run cli wp post list --post_type=page --name="$slug" --field=ID | grep -q .; then
+              npx --yes @wordpress/env@10.25.0 run cli wp post create --post_type=page --post_status=publish --post_title="$title" --post_name="$slug" --post_content="$content"
+            fi
+          }
+          create_page 'Compatibility Builder' 'compatibility-builder' '[hth_system_compatibility]'
+          create_page 'Hatch Match' 'hatch-match' '[hth_hatch_match]'
+          create_page 'Presentation Planner' 'presentation-planner' '[hth_presentation_planner]'
+          create_page 'Rig Signal' 'rig-signal' '[hth_rig_signal]'
+          create_page 'Honey Hole Intelligence' 'honey-hole-intelligence' '<!-- wp:shortcode -->[hth_honey_hole_intelligence]<!-- /wp:shortcode -->'
+          create_page 'Start Here' 'start-here' '<p>Choose the field decision you need to make.</p>'
+      - name: Install Playwright and Axe harness
+        working-directory: tests/installed-acceptance
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Run installed five-application evidence matrix
+        working-directory: tests/installed-acceptance
+        run: npm test
+      - name: Collect WordPress runtime diagnostics
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p evidence/installed-five-application/runtime
+          npx --yes @wordpress/env@10.25.0 run cli wp core version > evidence/installed-five-application/runtime/wordpress-version.txt 2>&1 || true
+          npx --yes @wordpress/env@10.25.0 run cli wp plugin list --format=json > evidence/installed-five-application/runtime/plugins.json 2>&1 || true
+          npx --yes @wordpress/env@10.25.0 run cli wp theme list --format=json > evidence/installed-five-application/runtime/themes.json 2>&1 || true
+          npx --yes @wordpress/env@10.25.0 run cli wp option get siteurl > evidence/installed-five-application/runtime/siteurl.txt 2>&1 || true
+          npx --yes @wordpress/env@10.25.0 logs > evidence/installed-five-application/runtime/wp-env.log 2>&1 || true
+          find . -path '*/wp-content/debug.log' -type f -exec cp {} evidence/installed-five-application/runtime/debug.log \; || true
+          find evidence/installed-five-application -type f -print0 | sort -z | xargs -0 sha256sum > evidence/installed-five-application/SHA256SUMS.txt || true
+      - name: Upload installed acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hook-five-application-installed-evidence-${{ github.run_id }}
+          path: evidence/installed-five-application
+          if-no-files-found: error
+          retention-days: 30
+      - name: Stop isolated WordPress runtime
+        if: always()
+        run: npx --yes @wordpress/env@10.25.0 stop
+
+  acceptance-evidence-contract:
+    needs: [application-source-matrix, installed-playwright-axe]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Confirm evidence retention, freshness, privacy, journey, and runtime boundary
+        run: |
+          node - <<'NODE'
+          const matrix = require('./applications/acceptance-matrix.json');
+          const evidence = ['screenshots','axe-reports','console-logs','network-logs','runtime-readback','print-evidence','rest-readback','downloaded-artifacts','sha256-manifests'];
+          for (const item of evidence) if (!matrix.evidenceRetention.includes(item)) throw new Error(`missing evidence contract: ${item}`);
+          const facts = ['regulation','closure','access','hazard','weather','waterCondition'];
+          for (const item of facts) if (!matrix.freshnessContract.requiredOfficialFacts.includes(item)) throw new Error(`missing freshness fact: ${item}`);
+          const sourceFields = ['sourceOwner','currentCheckUrl','reviewedAt','nextReviewAt','status'];
+          for (const item of sourceFields) if (!matrix.freshnessContract.requiredEvidenceFields.includes(item)) throw new Error(`missing source field: ${item}`);
+          const surfaces = ['rendered-pages','rest-responses','analytics-payloads','logs','exports','share-states'];
+          for (const item of surfaces) if (!matrix.sensitiveLocationContract.requiredLeakSurfaces.includes(item)) throw new Error(`missing leak surface: ${item}`);
+          const entrySurfaces = ['homepage','start-here','primary-navigation','field-systems-studio'];
+          for (const item of entrySurfaces) if (!matrix.readerJourneyContract.requiredEntrySurfaces.includes(item)) throw new Error(`missing journey entry surface: ${item}`);
+          if (!matrix.readerJourneyContract.continuationRegistry.includes('result-continuations')) throw new Error('result continuation registry is missing');
+          if (!matrix.applications.find((item) => item.applicationId === 'HTH-HM-001').readerBoundary.includes('not-current-hatch-report')) throw new Error('Hatch Match plausibility boundary is missing');
+          if (!matrix.releaseBoundary.includes('Issues 37, 53, and 92')) throw new Error('runtime promotion boundary is missing');
+          if (!matrix.releaseBoundary.includes('Issue 86')) throw new Error('parallel reusable-template boundary is missing');
+          console.log('Acceptance evidence, freshness, privacy, journey, and runtime contracts are complete.');
+          NODE
