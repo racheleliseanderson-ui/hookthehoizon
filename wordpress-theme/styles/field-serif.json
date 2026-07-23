@@ -1,25 +1,25 @@
 {
   "$schema": "https://schemas.wp.org/trunk/theme.json",
   "version": 3,
-  "title": "Field Serif",
+  "title": "Brand Typography (legacy field-serif filename)",
   "settings": {
     "typography": {
       "fontFamilies": [
-        {"slug": "display", "name": "Field Display", "fontFamily": "Georgia, Times New Roman, serif"},
-        {"slug": "body", "name": "Field Body", "fontFamily": "Source Serif 4, Georgia, serif"},
-        {"slug": "data", "name": "Field Data", "fontFamily": "IBM Plex Mono, ui-monospace, monospace"}
+        {"slug":"display","name":"Bebas Neue Display","fontFamily":"'Bebas Neue', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif"},
+        {"slug":"body","name":"Montserrat Body and Interface","fontFamily":"Montserrat, 'Avenir Next', Avenir, 'Segoe UI', system-ui, sans-serif"},
+        {"slug":"data","name":"Montserrat Data","fontFamily":"Montserrat, 'Avenir Next', Avenir, 'Segoe UI', system-ui, sans-serif"}
       ]
     }
   },
   "styles": {
-    "typography": {"fontFamily": "var:preset|font-family|body", "lineHeight": "1.68"},
+    "typography":{"fontFamily":"var:preset|font-family|body","lineHeight":"1.65"},
     "elements": {
-      "heading": {"typography": {"fontFamily": "var:preset|font-family|display", "lineHeight": "1.02"}},
-      "button": {"typography": {"fontFamily": "var:preset|font-family|data"}}
+      "heading":{"typography":{"fontFamily":"var:preset|font-family|display","fontWeight":"400","lineHeight":"0.98","letterSpacing":"0.01em"}},
+      "button":{"typography":{"fontFamily":"var:preset|font-family|body","fontWeight":"700"}}
     },
     "blocks": {
-      "core/table": {"typography": {"fontFamily": "var:preset|font-family|data"}},
-      "core/code": {"typography": {"fontFamily": "var:preset|font-family|data"}}
+      "core/table":{"typography":{"fontFamily":"var:preset|font-family|data"}},
+      "core/code":{"typography":{"fontFamily":"var:preset|font-family|data"}}
     }
   }
 }
