@@ -1,11 +1,11 @@
-schema_version: 1.0.0
+schema_version: 1.1.0
 application:
   id: HTH-HM-001
   key: hatch-match
   public_name: Hatch Match
   parent_publication: Hook the Horizon
   class: biological-evidence-application
-  lifecycle: maintenance-preview-candidate
+  lifecycle: verified-live-bridge-canonical-package-candidate
   repository: racheleliseanderson-ui/hookthehorizon
   path: applications/hatch-match
   owner: Rachel Anderson
@@ -20,9 +20,17 @@ reader_contract:
     - regulation or access determination
 architecture:
   biological_standard: applications/hatch-match/BIOLOGICAL_SEED_AND_REVIEW_STANDARD.md
-  maintenance_branch: operations/hatch-match-maintenance-activation-2026-07-20
+  maintenance_branch: main
   parent_conditions: HHI-001
   presentation_consumer: HTH-PP-001
+  shortcode: hth_hatch_match
+  canonical_package: next-generation/plugins/hatch-match-preview
+  readiness_rest_contract: horizon-preview/v1/hatch-match-readiness
+runtime:
+  route: /hatch-match/
+  delivery: verified-live-wordpress-page-bridge
+  canonical_package_installed: false
+  bridge_replacement_issue: 92
 state:
   persistence_class: local-or-none
   prohibited_fields:
@@ -41,8 +49,10 @@ quality:
     - conservation-stop
     - source-failure
 release:
-  current_version: 0.1.0-preview
+  current_version: 0.1.1-preview
+  source_status: canonical-package-candidate
+  live_status: verified-reversible-bridge
   production_authorized: false
   known_limitations:
-    - maintenance and seed activation remain in PR 85 until reconciled to main
-    - installed WordPress reader verification remains pending
+    - canonical Hatch Match package installation and checksum readback remain open under issue 92
+    - the live bridge must remain until package parity, privacy, export, keyboard, and route checks pass

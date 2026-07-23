@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "effectiveDate": "2026-07-22",
+  "publication": "Hook the Horizon",
+  "repository": "racheleliseanderson-ui/hookthehorizon",
+  "sourceBase": "7e224473c13e7f4d9f4891a96a91857e23ad045a",
+  "controllingIssue": 96,
+  "accountableOwner": "Rachel Anderson",
+  "ownershipRule": "Each route, shortcode, evaluator, REST contract, package, and maintenance policy has one canonical source owner. Runtime installation and reader-facing acceptance remain separate evidence states.",
+  "applications": [
+    {
+      "applicationId": "HTH-SC-001",
+      "name": "Compatibility Builder",
+      "route": {"identifier": "/compatibility-builder/", "owner": "wordpress-theme/templates/page-compatibility-builder.html"},
+      "shortcode": {"identifier": "hth_system_compatibility", "owner": "wordpress-plugin/hook-content/hook-content.php"},
+      "evaluator": {"identifier": "system-compatibility-evaluator", "owner": "applications/system-compatibility/evaluate.mjs"},
+      "restContract": {"identifier": null, "owner": "not-applicable", "reason": "Local deterministic application with no public REST dependency."},
+      "packages": [
+        {"identifier": "hook-the-horizon-content", "owner": "wordpress-plugin/hook-content"}
+      ],
+      "maintenancePolicy": {"identifier": "application-release-profile", "owner": "docs/governance/AUTONOMOUS_APPLICATION_RELEASE_PROFILE.md"}
+    },
+    {
+      "applicationId": "HTH-HM-001",
+      "name": "Hatch Match",
+      "route": {"identifier": "/hatch-match/", "owner": "next-generation/plugins/hatch-match-preview/hatch-match-preview.php"},
+      "shortcode": {"identifier": "hth_hatch_match", "owner": "next-generation/plugins/hatch-match-preview/hatch-match-preview.php"},
+      "evaluator": {"identifier": "hatch-match-local-comparison", "owner": "next-generation/plugins/hatch-match-preview/assets/preview"},
+      "restContract": {"identifier": "horizon-preview/v1/hatch-match-readiness", "owner": "next-generation/plugins/hatch-match-preview/hatch-match-preview.php"},
+      "packages": [
+        {"identifier": "hatch-match-preview", "owner": "next-generation/plugins/hatch-match-preview"}
+      ],
+      "maintenancePolicy": {"identifier": "HTH-HM-MAINT-001", "owner": "applications/hatch-match/maintenance-policy.json"}
+    },
+    {
+      "applicationId": "HTH-PP-001",
+      "name": "Presentation Planner",
+      "route": {"identifier": "/presentation-planner/", "owner": "wordpress-plugin/hook-content/hook-content.php"},
+      "shortcode": {"identifier": "hth_presentation_planner", "owner": "wordpress-plugin/hook-content/hook-content.php"},
+      "evaluator": {"identifier": "presentation-planner-local-runtime", "owner": "applications/presentation-planner/preview"},
+      "restContract": {"identifier": null, "owner": "not-applicable", "reason": "Local-first application with no public REST dependency."},
+      "packages": [
+        {"identifier": "hook-the-horizon-content", "owner": "wordpress-plugin/hook-content"}
+      ],
+      "maintenancePolicy": {"identifier": "presentation-planner-release-profile", "owner": "applications/presentation-planner/README.md"}
+    },
+    {
+      "applicationId": "HTH-RS-001",
+      "name": "Rig Signal",
+      "route": {"identifier": "/rig-signal/", "owner": "next-generation/plugins/rig-signal-preview/rig-signal-preview.php"},
+      "shortcode": {"identifier": "hth_rig_signal", "owner": "next-generation/plugins/rig-signal-preview/rig-signal-preview.php"},
+      "evaluator": {"identifier": "device-event-validator", "owner": "applications/rig-signal/validate.mjs"},
+      "restContract": {"identifier": "horizon-preview/v1/rig-signal-status", "owner": "next-generation/plugins/rig-signal-preview/rig-signal-preview.php"},
+      "packages": [
+        {"identifier": "rig-signal-preview", "owner": "next-generation/plugins/rig-signal-preview"}
+      ],
+      "maintenancePolicy": {"identifier": "rig-signal-application-contract", "owner": "applications/rig-signal/application.yaml"}
+    },
+    {
+      "applicationId": "HHI-001",
+      "name": "Honey Hole Intelligence",
+      "route": {"identifier": "/honey-hole-intelligence/", "owner": "wordpress-theme/templates/page-honey-hole-intelligence.html"},
+      "shortcode": {"identifier": null, "owner": "not-applicable", "reason": "The reader is theme-bound rather than shortcode-owned."},
+      "evaluator": {"identifier": "honey-hole-trip-readiness-evaluator", "owner": "applications/honey-hole-intelligence/evaluate.mjs"},
+      "restContract": {"identifier": "horizon-intelligence/v1/honey-hole-conditions", "owner": "wordpress-plugin/honey-hole-condition-route/honey-hole-condition-route.php"},
+      "packages": [
+        {"identifier": "hook-the-horizon-theme-reader", "owner": "wordpress-theme"},
+        {"identifier": "honey-hole-condition-route", "owner": "wordpress-plugin/honey-hole-condition-route"}
+      ],
+      "maintenancePolicy": {"identifier": "honey-hole-daily-refresh", "owner": ".github/workflows/honey-hole-daily-refresh.yml"}
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+name: Hook Five-Application Acceptance
+
+on:
+  pull_request:
+    paths:
+      - 'applications/**'
+      - 'wordpress-plugin/hook-content/**'
+      - 'wordpress-plugin/honey-hole-condition-route/**'
+      - 'wordpress-theme/**'
+      - 'next-generation/plugins/hatch-match-preview/**'
+      - 'next-generation/plugins/rig-signal-preview/**'
+      - 'scripts/validate-five-application-acceptance.mjs'
+      - '.github/workflows/five-application-acceptance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'applications/**'
+      - 'wordpress-plugin/hook-content/**'
+      - 'wordpress-plugin/honey-hole-condition-route/**'
+      - 'wordpress-theme/**'
+      - 'next-generation/plugins/hatch-match-preview/**'
+      - 'next-generation/plugins/rig-signal-preview/**'
+      - 'scripts/validate-five-application-acceptance.mjs'
+      - '.github/workflows/five-application-acceptance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hook-five-application-acceptance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract-and-ownership:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+      - name: Validate unified ownership and acceptance contracts
+        run: node scripts/validate-five-application-acceptance.mjs
+      - name: Validate deterministic application sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          node applications/system-compatibility/tests/run.mjs
+          node applications/rig-signal/tests/run.mjs
+          node applications/honey-hole-intelligence/tests/run.mjs
+          node applications/honey-hole-intelligence/preview/tests/run.mjs
+          find applications/presentation-planner -name '*.mjs' -print0 | xargs -0 -r -n1 node --check
+          find next-generation/plugins/hatch-match-preview -name '*.mjs' -print0 | xargs -0 -r -n1 node --check
+          find wordpress-plugin/hook-content wordpress-plugin/honey-hole-condition-route next-generation/plugins/hatch-match-preview next-generation/plugins/rig-signal-preview -name '*.php' -print0 | xargs -0 -r -n1 php -l
+
+  application-source-matrix:
+    needs: contract-and-ownership
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        application:
+          - compatibility-builder
+          - hatch-match
+          - presentation-planner
+          - rig-signal
+          - honey-hole-intelligence
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify application-owned route, runtime, and package contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          case '${{ matrix.application }}' in
+            compatibility-builder)
+              test -s applications/system-compatibility/evaluate.mjs
+              test -s wordpress-theme/templates/page-compatibility-builder.html
+              grep -q "add_shortcode('hth_system_compatibility'" wordpress-plugin/hook-content/hook-content.php
+              grep -q 'Installed plugin version observed: 0.3.1' wordpress-plugin/hook-content/runtime-parity.txt
+              grep -q 'Compatibility Builder runtime: renders' wordpress-plugin/hook-content/runtime-parity.txt
+              ;;
+            hatch-match)
+              test -s applications/hatch-match/application.yaml
+              test -s applications/hatch-match/maintenance-policy.json
+              test -s next-generation/plugins/hatch-match-preview/hatch-match-preview.php
+              grep -q 'current_version: 0.1.1-preview' applications/hatch-match/application.yaml
+              grep -q 'maintenance_branch: main' applications/hatch-match/application.yaml
+              grep -q "add_shortcode('hth_hatch_match'" next-generation/plugins/hatch-match-preview/hatch-match-preview.php
+              ;;
+            presentation-planner)
+              test -s applications/presentation-planner/README.md
+              test -d applications/presentation-planner/preview
+              grep -q "add_shortcode('hth_presentation_planner'" wordpress-plugin/hook-content/hook-content.php
+              ;;
+            rig-signal)
+              test -s applications/rig-signal/application.yaml
+              test -s applications/rig-signal/validate.mjs
+              test -s next-generation/plugins/rig-signal-preview/rig-signal-preview.php
+              grep -q "add_shortcode('hth_rig_signal'" next-generation/plugins/rig-signal-preview/rig-signal-preview.php
+              grep -q "'/rig-signal-status'" next-generation/plugins/rig-signal-preview/rig-signal-preview.php
+              ;;
+            honey-hole-intelligence)
+              test -s applications/honey-hole-intelligence/evaluate.mjs
+              test -s wordpress-theme/templates/page-honey-hole-intelligence.html
+              test -s wordpress-plugin/honey-hole-condition-route/honey-hole-condition-route.php
+              grep -q "'/honey-hole-conditions'" wordpress-plugin/honey-hole-condition-route/honey-hole-condition-route.php
+              ;;
+          esac
+
+  acceptance-evidence-contract:
+    needs: application-source-matrix
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Confirm evidence retention and runtime boundary
+        run: |
+          node - <<'NODE'
+          const matrix = require('./applications/acceptance-matrix.json');
+          const required = ['screenshots','axe-reports','console-logs','network-logs','runtime-readback','print-evidence'];
+          for (const item of required) if (!matrix.evidenceRetention.includes(item)) throw new Error(`missing evidence contract: ${item}`);
+          if (!matrix.releaseBoundary.includes('Issues 37, 53, and 92')) throw new Error('runtime promotion boundary is missing');
+          console.log('Acceptance evidence contract is complete.');
+          NODE

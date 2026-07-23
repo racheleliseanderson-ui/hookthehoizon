@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "effectiveDate": "2026-07-22",
+  "publication": "Hook the Horizon",
+  "controllingIssue": 96,
+  "scope": "Unified source and installed-runtime acceptance contract for the five current Hook applications.",
+  "requiredStates": [
+    "initial",
+    "ordinary-success",
+    "incomplete",
+    "conflicting",
+    "stale",
+    "unsupported",
+    "no-result",
+    "source-failure",
+    "hard-stop",
+    "no-javascript",
+    "reset",
+    "recovery",
+    "save-delete-when-supported",
+    "print-export",
+    "return-path"
+  ],
+  "requiredModalities": [
+    "desktop",
+    "mobile",
+    "keyboard-only",
+    "screen-reader",
+    "zoom-reflow",
+    "reduced-motion",
+    "forced-colors",
+    "print"
+  ],
+  "applications": [
+    {
+      "applicationId": "HTH-SC-001",
+      "name": "Compatibility Builder",
+      "stateContract": "all-required-states",
+      "saveDelete": "local-save-and-clear",
+      "printExport": "print-and-json",
+      "safetyStops": ["hard-rating-conflict", "insufficient-identity-evidence", "protected-location-input"]
+    },
+    {
+      "applicationId": "HTH-HM-001",
+      "name": "Hatch Match",
+      "stateContract": "all-required-states",
+      "saveDelete": "none-required",
+      "printExport": "print-or-public-safe-reference-export",
+      "safetyStops": ["stale-biological-source", "conservation-stop", "protected-location-input"]
+    },
+    {
+      "applicationId": "HTH-PP-001",
+      "name": "Presentation Planner",
+      "stateContract": "all-required-states",
+      "saveDelete": "local-save-and-clear",
+      "printExport": "print-and-public-safe-share-card",
+      "safetyStops": ["equipment-mismatch", "unsupported-current-condition", "protected-location-input"]
+    },
+    {
+      "applicationId": "HTH-RS-001",
+      "name": "Rig Signal",
+      "stateContract": "all-required-states",
+      "saveDelete": "none-by-default",
+      "printExport": "print-and-location-free-json",
+      "safetyStops": ["prohibited-privacy-class", "unsupported-capability-claim", "precise-location-event"]
+    },
+    {
+      "applicationId": "HHI-001",
+      "name": "Honey Hole Intelligence",
+      "stateContract": "all-required-states",
+      "saveDelete": "local-only-when-supported",
+      "printExport": "public-safe-print-summary",
+      "safetyStops": ["expired-critical-source", "closure-or-access-stop", "protected-location-input"]
+    }
+  ],
+  "evidenceRetention": [
+    "screenshots",
+    "axe-reports",
+    "console-logs",
+    "network-logs",
+    "runtime-readback",
+    "print-evidence"
+  ],
+  "releaseBoundary": "A green source matrix does not establish installed-runtime or publication readiness. Issues 37, 53, and 92 remain the runtime promotion and readback carriers."
+}

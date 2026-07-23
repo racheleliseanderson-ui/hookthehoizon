@@ -1,6 +1,9 @@
 Hook the Horizon runtime parity validation
-Date: 2026-07-20
+Date: 2026-07-22
 Source plugin version: 0.3.1
-Installed plugin version observed: 0.2.2
+Installed plugin version observed: 0.3.1
 Required shortcodes: hth_system_compatibility, hth_presentation_planner
-Deployment remains manual and rollback-backed.
+Compatibility Builder runtime: renders the local deterministic application
+Presentation Planner runtime: active through Hook Content 0.3.1; installed-state acceptance remains governed by issues 37 and 53
+Runtime evidence source: GitHub issue 96 and its 2026-07-22 continuation record
+Deployment remains manual, bounded, and rollback-backed for subsequent package promotions.
