@@ -1,0 +1,26 @@
+name: P1 source and runtime reconciliation
+
+on:
+  pull_request:
+    paths:
+      - 'applications/hatch-match/**'
+      - 'next-generation/plugins/hatch-match-preview/**'
+      - 'governance/runtime/**'
+      - 'scripts/validate-p1-hatch-match-runtime-record.mjs'
+      - '.github/workflows/p1-source-runtime-reconciliation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/validate-p1-hatch-match-runtime-record.mjs
+      - run: node applications/hatch-match/tests/run.mjs
+      - run: node next-generation/preview/verify-hatch-match.mjs
