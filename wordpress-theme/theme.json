@@ -3,54 +3,77 @@
   "version": 3,
   "settings": {
     "appearanceTools": true,
+    "useRootPaddingAwareAlignments": true,
     "color": {
       "custom": false,
+      "customDuotone": false,
+      "customGradient": false,
+      "defaultPalette": false,
+      "defaultGradients": false,
       "palette": [
-        {"slug":"depth-black","name":"Depth Black","color":"#0C1112"},
-        {"slug":"graphite-water","name":"Graphite Water","color":"#1F2828"},
-        {"slug":"deep-silt","name":"Deep Silt","color":"#3C4038"},
-        {"slug":"mineral-fog","name":"Mineral Fog","color":"#D8D6CC"},
-        {"slug":"foam-white","name":"Foam White","color":"#F5F3EC"},
-        {"slug":"cork-tan","name":"Cork Tan","color":"#A98962"},
-        {"slug":"oxidized-metal","name":"Oxidized Metal","color":"#55766D"},
-        {"slug":"signal-vermilion","name":"Signal Vermilion","color":"#D85B3F"},
-        {"slug":"brass-marker","name":"Brass Marker","color":"#B89A58"},
-        {"slug":"cold-sky","name":"Cold Sky","color":"#AEBCC0"}
+        {"slug":"deep-navy","name":"Deep Navy","color":"#071827"},
+        {"slug":"pearl","name":"Pearl","color":"#E3E1D9"},
+        {"slug":"lake-blue","name":"Lake Blue","color":"#2E6F95"},
+        {"slug":"teal","name":"Teal","color":"#176F78"},
+        {"slug":"charcoal","name":"Charcoal","color":"#424546"},
+        {"slug":"forest-green","name":"Forest Green","color":"#355133"},
+        {"slug":"burnt-coral","name":"Burnt Coral","color":"#D55C3E"},
+        {"slug":"champagne-gold","name":"Champagne Gold","color":"#C7A257"}
+      ],
+      "gradients": [
+        {"slug":"open-water","name":"Open Water","gradient":"linear-gradient(180deg,#E3E1D9 0%,#2E6F95 38%,#176F78 68%,#071827 100%)"},
+        {"slug":"horizon-light","name":"Horizon Light","gradient":"linear-gradient(135deg,#071827 0%,#2E6F95 62%,#C7A257 100%)"}
       ]
     },
-    "layout": {"contentSize":"704px","wideSize":"1440px"},
+    "layout": {"contentSize":"46rem","wideSize":"96rem"},
     "spacing": {
-      "units":["px","rem","vw","vh","%"],
+      "units":["px","rem","em","vw","vh","%"],
       "spacingSizes":[
-        {"slug":"30","name":"Small","size":"0.75rem"},
-        {"slug":"40","name":"Medium","size":"1.25rem"},
-        {"slug":"50","name":"Large","size":"2rem"},
-        {"slug":"60","name":"Section","size":"clamp(3rem, 7vw, 6rem)"},
-        {"slug":"70","name":"Route","size":"clamp(4rem, 9vw, 8rem)"}
+        {"slug":"20","name":"2XS","size":"0.5rem"},
+        {"slug":"30","name":"XS","size":"0.75rem"},
+        {"slug":"40","name":"S","size":"1.25rem"},
+        {"slug":"50","name":"M","size":"2rem"},
+        {"slug":"60","name":"L","size":"clamp(3.5rem,8vw,8rem)"},
+        {"slug":"70","name":"XL","size":"clamp(5rem,10vw,10rem)"}
       ]
     },
     "typography": {
       "fluid": true,
+      "lineHeight": true,
+      "letterSpacing": true,
       "fontFamilies": [
-        {"slug":"display","name":"Display","fontFamily":"Georgia, 'Times New Roman', serif"},
-        {"slug":"editorial","name":"Editorial","fontFamily":"ui-serif, Georgia, serif"},
-        {"slug":"ui","name":"Interface","fontFamily":"system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"}
+        {"slug":"display","name":"Bebas Neue Display","fontFamily":"'Bebas Neue', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif"},
+        {"slug":"body","name":"Montserrat Body and Interface","fontFamily":"Montserrat, 'Avenir Next', Avenir, 'Segoe UI', system-ui, sans-serif"},
+        {"slug":"data","name":"Montserrat Data","fontFamily":"Montserrat, 'Avenir Next', Avenir, 'Segoe UI', system-ui, sans-serif"}
       ],
       "fontSizes": [
         {"slug":"small","name":"Small","size":"0.875rem"},
-        {"slug":"body","name":"Body","size":"1.0625rem"},
-        {"slug":"lead","name":"Lead","size":"clamp(1.2rem, 2vw, 1.45rem)"},
-        {"slug":"display","name":"Display","size":"clamp(3.5rem, 9vw, 8rem)"}
+        {"slug":"body","name":"Body","size":"clamp(1rem, .35vw + .94rem, 1.125rem)"},
+        {"slug":"lead","name":"Lead","size":"clamp(1.15rem, 1.6vw, 1.45rem)"},
+        {"slug":"h3","name":"Heading 3","size":"clamp(1.5rem, 2.5vw, 2.25rem)"},
+        {"slug":"h2","name":"Heading 2","size":"clamp(2.25rem, 4.5vw, 4.25rem)"},
+        {"slug":"h1","name":"Heading 1","size":"clamp(3rem, 7vw, 6.5rem)"},
+        {"slug":"display","name":"Display","size":"clamp(3.75rem, 10vw, 9rem)"}
       ]
-    }
+    },
+    "custom": {"hth":{"visualAuthority":"v3.0-2026-07-23","colorAloneProhibited":true,"locationPrivacyRequired":true,"fontFilesBundled":false,"logoSource":"owner-approved Drive and WordPress media library"}}
   },
   "styles": {
-    "color": {"background":"var(--re-background-canvas)","text":"var(--re-text-primary)"},
-    "typography": {"fontFamily":"var(--wp--preset--font-family--editorial)","lineHeight":"1.65"},
-    "elements": {"heading":{"color":{"text":"var(--re-heading)"},"typography":{"fontFamily":"var(--wp--preset--font-family--display)"}},"link":{"color":{"text":"var(--re-link)"}}}
+    "color":{"background":"var(--re-background-canvas)","text":"var(--re-text-primary)"},
+    "spacing":{"blockGap":"1.5rem","padding":{"left":"clamp(1rem,3vw,2.75rem)","right":"clamp(1rem,3vw,2.75rem)"}},
+    "typography":{"fontFamily":"var:preset|font-family|body","fontSize":"var:preset|font-size|body","lineHeight":"1.65"},
+    "elements": {
+      "heading":{"color":{"text":"var(--re-heading)"},"typography":{"fontFamily":"var:preset|font-family|display","fontWeight":"400","lineHeight":"0.98","letterSpacing":"0.01em"}},
+      "link":{"color":{"text":"var(--re-link)"},"typography":{"textDecoration":"underline"},":hover":{"color":{"text":"var(--re-link-hover)"}}},
+      "button":{"border":{"radius":"0.125rem"},"color":{"background":"var(--re-action-primary)","text":"var(--re-action-primary-text)"},"typography":{"fontFamily":"var:preset|font-family|body","fontSize":"0.9rem","fontWeight":"700","letterSpacing":"0.04em"}}
+    },
+    "blocks": {
+      "core/table":{"typography":{"fontFamily":"var:preset|font-family|data"}},
+      "core/code":{"typography":{"fontFamily":"var:preset|font-family|data"}}
+    }
   },
   "templateParts": [
-    {"name":"header","title":"Hook Header","area":"header"},
-    {"name":"footer","title":"Hook Footer","area":"footer"}
+    {"name":"header","title":"Hook the Horizon Header","area":"header"},
+    {"name":"footer","title":"Hook the Horizon Footer","area":"footer"}
   ]
 }
