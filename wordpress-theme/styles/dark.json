@@ -1,17 +1,17 @@
 {
   "$schema": "https://schemas.wp.org/trunk/theme.json",
   "version": 3,
-  "title": "Dark Water",
+  "title": "Open Water — Dark",
   "styles": {
-    "color": {"background": "#0C1112", "text": "#F5F3EC"},
+    "color": {"background":"#071827","text":"#E3E1D9"},
     "elements": {
-      "link": {"color": {"text": "#EE765C"}},
-      "button": {"color": {"background": "#D85B3F", "text": "#0C1112"}},
-      "heading": {"color": {"text": "#F5F3EC"}}
+      "link":{"color":{"text":"#C7A257"}},
+      "button":{"color":{"background":"#D55C3E","text":"#071827"}},
+      "heading":{"color":{"text":"#E3E1D9"}}
     },
     "blocks": {
-      "core/group": {"color": {"background": "#1F2828", "text": "#F5F3EC"}},
-      "core/table": {"color": {"text": "#F5F3EC"}}
+      "core/group":{"color":{"background":"#102D3A","text":"#E3E1D9"}},
+      "core/table":{"color":{"text":"#E3E1D9"}}
     }
   }
 }
