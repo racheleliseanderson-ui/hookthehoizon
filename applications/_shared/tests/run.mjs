@@ -57,10 +57,18 @@ test('recursive privacy inspection rejects nested coordinates and map links', ()
   assert.ok(result.findings.length >= 2);
 });
 
-test('public sanitizer removes sensitive keys and redacts coordinate strings', () => {
+test('public sanitizer removes sensitive keys and redacts sensitive strings', () => {
   const result = sanitizePublicPayload({ private_water_name: 'secret', notes: 'lat: 39.12345' });
   assert.equal(result.sanitized.private_water_name, undefined);
-  assert.equal(result.sanitized.notes, '[redacted-location]');
+  assert.equal(result.sanitized.notes, '[redacted-sensitive]');
+});
+
+test('public sanitizer removes private access and contributor-sensitive fields', () => {
+  const result = sanitizePublicPayload({ privateAccessInstructions: 'Gate code 4812', contributorEmail: 'private@example.test' });
+  assert.equal(result.sanitized.privateAccessInstructions, undefined);
+  assert.equal(result.sanitized.contributorEmail, undefined);
+  assert.ok(result.findings.some((item) => item.reason === 'private_access_instruction'));
+  assert.ok(result.findings.some((item) => item.reason === 'contributor_sensitive'));
 });
 
 test('unknown privacy classes fail closed', () => {
