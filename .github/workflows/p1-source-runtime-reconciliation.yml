@@ -6,6 +6,7 @@ on:
       - 'applications/hatch-match/**'
       - 'next-generation/plugins/hatch-match-preview/**'
       - 'governance/runtime/**'
+      - 'scripts/sync-hatch-match-preview.mjs'
       - 'scripts/validate-p1-hatch-match-runtime-record.mjs'
       - '.github/workflows/p1-source-runtime-reconciliation.yml'
   workflow_dispatch:
@@ -22,5 +23,5 @@ jobs:
         with:
           node-version: '22'
       - run: node scripts/validate-p1-hatch-match-runtime-record.mjs
-      - run: node applications/hatch-match/tests/run.mjs
+      - run: node scripts/sync-hatch-match-preview.mjs
       - run: node next-generation/preview/verify-hatch-match.mjs
