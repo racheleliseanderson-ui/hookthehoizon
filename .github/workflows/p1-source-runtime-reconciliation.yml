@@ -24,4 +24,6 @@ jobs:
           node-version: '22'
       - run: node scripts/validate-p1-hatch-match-runtime-record.mjs
       - run: node scripts/sync-hatch-match-preview.mjs
-      - run: node next-generation/preview/verify-hatch-match.mjs
+      - run: cmp applications/hatch-match/data/approved-preview-seed-records.json next-generation/plugins/hatch-match-preview/data/seed-records.json
+      - run: cmp applications/hatch-match/maintenance-policy.json next-generation/plugins/hatch-match-preview/data/maintenance-policy.json
+      - run: cmp applications/hatch-match/maintenance-log.json next-generation/plugins/hatch-match-preview/data/maintenance-log.json
