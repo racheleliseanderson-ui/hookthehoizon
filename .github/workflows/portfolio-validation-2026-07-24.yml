@@ -35,4 +35,6 @@ jobs:
         if: ${{ hashFiles('package-lock.json', 'npm-shrinkwrap.json') != '' }}
         run: npm audit --audit-level=high
       - name: Basic secret and privacy scan
-        run: "! git grep -nEI '(sk_live_|sk-proj-|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY)' -- ':!*.md' ':!*.txt' ':!*.lock'"
+        run: |
+          ! git grep -nEI '(sk_live_|sk-proj-|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY)' -- \
+            ':!*.md' ':!*.txt' ':!*.lock' ':!.github/workflows/portfolio-validation-2026-07-24.yml'
