@@ -1,1 +1,0 @@
-{"core":null,"themes":["../theme"],"plugins":["../plugins/horizon-experience-core","../plugins/hatch-match-preview","../../dist/hook-the-horizon-content"],"mappings":{"wp-content/nlh-migration":"../migration","wp-content/nlh-qa":"../qa"},"port":8899,"testsPort":8900,"config":{"WP_DEBUG":true,"SCRIPT_DEBUG":true}}

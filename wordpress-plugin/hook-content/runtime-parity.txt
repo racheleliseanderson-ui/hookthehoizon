@@ -1,6 +1,0 @@
-Hook the Horizon runtime parity validation
-Date: 2026-07-20
-Source plugin version: 0.3.1
-Installed plugin version observed: 0.2.2
-Required shortcodes: hth_system_compatibility, hth_presentation_planner
-Deployment remains manual and rollback-backed.
