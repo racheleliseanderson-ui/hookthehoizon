@@ -1,22 +1,66 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://hookthehorizon.blog/schemas/current-region-condition-packets.v0.1.json",
+  "$id": "https://hookthehorizon.blog/schemas/current-region-condition-packets.v0.2.json",
   "type": "object",
   "additionalProperties": true,
-  "required": ["schemaVersion", "applicationId", "generatedAt", "publicationBoundary", "packets"],
+  "required": ["schemaVersion", "applicationId", "generatedAt", "lastOperationsReviewAt", "publicationBoundary", "operations", "packets"],
   "properties": {
-    "schemaVersion": {"const": "0.1.0"},
+    "schemaVersion": {"const": "0.2.0"},
     "applicationId": {"const": "HHI-001"},
     "generatedAt": {"type": "string", "format": "date-time"},
-    "publicationBoundary": {"type": "string", "minLength": 30},
-    "lastAutomatedCheckAt": {"type": "string", "format": "date-time"},
+    "lastOperationsReviewAt": {"type": "string", "format": "date-time"},
+    "publicationBoundary": {"type": "string", "minLength": 60},
+    "operations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recordCarrierId", "sourceAuthority", "maintenanceOwner", "accountableOwner", "fieldVolatilityDays", "expiryBehavior", "conflictPreservation", "correctionHistory"],
+      "properties": {
+        "recordCarrierId": {"const": "HHI-DATA-001"},
+        "sourceAuthority": {"type": "string", "minLength": 30},
+        "maintenanceOwner": {"type": "string", "minLength": 10},
+        "accountableOwner": {"type": "string", "minLength": 3},
+        "fieldVolatilityDays": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["closure", "hazard", "weather", "waterCondition", "regulation", "permit", "access", "ownership", "conservation"],
+          "properties": {
+            "closure": {"type": "integer", "minimum": 0},
+            "hazard": {"type": "integer", "minimum": 0},
+            "weather": {"type": "integer", "minimum": 0},
+            "waterCondition": {"type": "integer", "minimum": 0},
+            "regulation": {"type": "integer", "minimum": 0},
+            "permit": {"type": "integer", "minimum": 0},
+            "access": {"type": "integer", "minimum": 0},
+            "ownership": {"type": "integer", "minimum": 0},
+            "conservation": {"type": "integer", "minimum": 0}
+          }
+        },
+        "expiryBehavior": {"type": "string", "minLength": 60},
+        "conflictPreservation": {"type": "string", "minLength": 60},
+        "correctionHistory": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["date", "type", "summary"],
+            "properties": {
+              "date": {"type": "string", "format": "date"},
+              "type": {"type": "string", "minLength": 3},
+              "summary": {"type": "string", "minLength": 20}
+            }
+          }
+        }
+      }
+    },
     "packets": {
       "type": "array",
       "minItems": 3,
+      "maxItems": 3,
       "items": {
         "type": "object",
         "additionalProperties": true,
-        "required": ["id", "publicRegion", "conditionType", "sourceAuthority", "officialSourceUrl", "retrievedAt", "effectiveWindow", "nextReviewAt", "status", "facts", "criticalUnknowns", "privacy", "publicationEligibility"],
+        "required": ["id", "publicRegion", "conditionType", "sourceAuthority", "officialSourceUrl", "retrievedAt", "effectiveAt", "reviewedAt", "effectiveWindow", "nextReviewAt", "fieldVolatilityClass", "status", "freshnessState", "facts", "criticalUnknowns", "conflicts", "correctionHistory", "privacy", "publicationEligibility"],
         "properties": {
           "id": {"type": "string", "pattern": "^HHI-COND-[0-9]{3}$"},
           "publicRegion": {"type": "string", "minLength": 2},
@@ -24,11 +68,39 @@
           "sourceAuthority": {"type": "string", "minLength": 2},
           "officialSourceUrl": {"type": "string", "format": "uri", "pattern": "^https://"},
           "retrievedAt": {"type": "string", "format": "date-time"},
-          "effectiveWindow": {"type": ["string", "object"]},
+          "effectiveAt": {"type": "string", "format": "date-time"},
+          "reviewedAt": {"type": "string", "format": "date-time"},
+          "effectiveWindow": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["start", "end"],
+            "properties": {
+              "start": {"type": "string", "format": "date"},
+              "end": {"type": "string", "format": "date"}
+            }
+          },
           "nextReviewAt": {"type": "string", "format": "date"},
+          "fieldVolatilityClass": {"type": "string", "minLength": 5},
           "status": {"type": "string", "minLength": 2},
-          "facts": {"type": "array", "minItems": 1},
-          "criticalUnknowns": {"type": "array", "minItems": 1},
+          "freshnessState": {"enum": ["current_within_review_window", "expired_requires_official_refresh"]},
+          "facts": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["fieldKey", "status", "claim", "sourceUrl"],
+              "properties": {
+                "fieldKey": {"type": "string", "minLength": 2},
+                "status": {"const": "verified_at_retrieval"},
+                "claim": {"type": "string", "minLength": 20},
+                "sourceUrl": {"type": "string", "format": "uri", "pattern": "^https://"}
+              }
+            }
+          },
+          "criticalUnknowns": {"type": "array", "minItems": 4},
+          "conflicts": {"type": "array"},
+          "correctionHistory": {"type": "array"},
           "privacy": {
             "type": "object",
             "additionalProperties": true,
@@ -38,7 +110,7 @@
               "preciseLocationIncluded": {"const": false}
             }
           },
-          "publicationEligibility": {"enum": ["eligible_until_review", "expired_requires_official_refresh"]},
+          "publicationEligibility": {"enum": ["eligible_until_review", "withheld_pending_refresh"]},
           "refresh": {
             "type": "object",
             "additionalProperties": false,
