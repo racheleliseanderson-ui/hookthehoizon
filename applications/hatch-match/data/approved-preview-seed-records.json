@@ -1,8 +1,11 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "applicationId": "HTH-HM-001",
+  "recordCarrierId": "HTH-HM-DATA-001",
   "publicationState": "approved_preview",
   "maintenanceState": "active",
+  "recordCount": 3,
+  "sourceCount": 4,
   "maintenancePolicyId": "HTH-HM-MAINT-001",
   "maintenanceOwner": "Rachel Anderson",
   "operationalMaintainer": "Hook the Horizon field intelligence operations",
@@ -12,9 +15,33 @@
   "maintenanceLogPath": "applications/hatch-match/maintenance-log.json",
   "reviewCadenceDays": 90,
   "hardExpiryDays": 184,
+  "effectiveDate": "2026-07-20",
   "reviewedDate": "2026-07-20",
   "nextReviewDate": "2026-10-18",
   "expiresDate": "2027-01-20",
+  "fieldVolatilityDays": {
+    "sourceAvailability": 30,
+    "broadIdentificationCues": 184,
+    "lifeStageReference": 184,
+    "limitationsAndDisconfirmingCues": 90,
+    "currentHatchConditions": 0,
+    "siteSpecificConditions": 0,
+    "regulationsAndAccess": 0
+  },
+  "expiryBehavior": "Withhold an affected record after hard expiry or source failure. Scheduled-review overdue records move to review_required. Current hatch conditions, site-specific conditions, regulations, access, and catch predictions are never owned by this carrier and require separate current authority.",
+  "conflictPreservation": "Retain the conflicting source IDs, source URLs, date, affected cue or limitation, and unresolved state. Do not choose the more convenient identification; move the record to review_required until reconciled.",
+  "correctionHistory": [
+    {
+      "date": "2026-07-20",
+      "type": "maintenance-activation",
+      "summary": "Activated the three-record approved preview with four official sources."
+    },
+    {
+      "date": "2026-07-24",
+      "type": "operations-carrier-formalized",
+      "summary": "Recorded exact seed and source counts, effective/review/expiry dates, field-level volatility, expiry behavior, conflict preservation, and accountable maintenance ownership."
+    }
+  ],
   "records": [
     {
       "id": "hm-mayfly-reference-v1",
@@ -28,6 +55,7 @@
       "disconfirmingCues": ["a portable case points toward caddis rather than mayfly", "two tails alone do not establish mayfly because stonefly nymphs also have two tails"],
       "sourceIds": ["NOAA-GLERL-WATER-LIFE-FIELD-GUIDE", "MAINE-DEP-MAYFLY"],
       "evidenceState": "verified_reference",
+      "conflicts": [],
       "limitations": ["This record establishes broad identification and life-stage plausibility, not a current hatch.", "Species-level identification requires more detail than this preview collects."],
       "publicationState": "approved_preview"
     },
@@ -43,6 +71,7 @@
       "disconfirmingCues": ["three tail filaments point away from caddis larva", "a winged insect near water is not sufficient for a caddis identification"],
       "sourceIds": ["NOAA-GLERL-WATER-LIFE-FIELD-GUIDE"],
       "evidenceState": "verified_reference",
+      "conflicts": [],
       "limitations": ["Case-building behavior varies and absence of a visible case does not rule out caddis.", "This preview does not claim a current emergence or recommend a specific pattern."],
       "publicationState": "approved_preview"
     },
@@ -58,6 +87,7 @@
       "disconfirmingCues": ["three tail filaments point toward many mayfly nymphs rather than stonefly", "a two-tail observation without body and gill detail remains ambiguous"],
       "sourceIds": ["NPS-STONEFLY-ALPINE-AQUIFER", "MAINE-DEP-STONEFLY"],
       "evidenceState": "verified_reference",
+      "conflicts": [],
       "limitations": ["Habitat and emergence timing vary by species.", "This record cannot establish a current observation, site-specific water status, or fishing success."],
       "publicationState": "approved_preview"
     }
