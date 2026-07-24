@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
       - name: Validate and synchronize maintained artifacts
         run: |
           python -m json.tool applications/hatch-match/data/approved-preview-seed-records.json >/dev/null
@@ -32,17 +32,28 @@ jobs:
           cmp applications/hatch-match/data/approved-preview-seed-records.json next-generation/plugins/hatch-match-preview/data/seed-records.json
           cmp applications/hatch-match/maintenance-policy.json next-generation/plugins/hatch-match-preview/data/maintenance-policy.json
           cmp applications/hatch-match/maintenance-log.json next-generation/plugins/hatch-match-preview/data/maintenance-log.json
-      - name: Check source availability, review dates, and ownership boundaries
+      - name: Check source availability, review dates, exact counts, and ownership boundaries
         run: |
           mkdir -p maintenance-evidence
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           const seed=JSON.parse(fs.readFileSync('applications/hatch-match/data/approved-preview-seed-records.json','utf8'));
           const policy=JSON.parse(fs.readFileSync('applications/hatch-match/maintenance-policy.json','utf8'));
+          const log=JSON.parse(fs.readFileSync('applications/hatch-match/maintenance-log.json','utf8'));
           const now=new Date();
           const nextReview=new Date(`${seed.nextReviewDate}T23:59:59Z`);
           const expiry=new Date(`${seed.expiresDate}T23:59:59Z`);
-          const report={checkedAt:now.toISOString(),applicationId:seed.applicationId,policyId:policy.policyId,seedSchemaVersion:seed.schemaVersion,recordCount:seed.records.length,sourceCount:seed.sources.length,nextReviewDate:seed.nextReviewDate,expiresDate:seed.expiresDate,sources:[],failures:[]};
+          const report={checkedAt:now.toISOString(),applicationId:seed.applicationId,recordCarrierId:seed.recordCarrierId,policyId:policy.policyId,seedSchemaVersion:seed.schemaVersion,recordCount:seed.records.length,declaredRecordCount:seed.recordCount,sourceCount:seed.sources.length,declaredSourceCount:seed.sourceCount,nextReviewDate:seed.nextReviewDate,expiresDate:seed.expiresDate,sources:[],failures:[]};
+          if(seed.recordCarrierId!=='HTH-HM-DATA-001')report.failures.push('record carrier identity is missing');
+          if(seed.recordCount!==seed.records.length)report.failures.push('declared record count does not match records array');
+          if(seed.sourceCount!==seed.sources.length)report.failures.push('declared source count does not match sources array');
+          if(seed.recordCount!==3||seed.sourceCount!==4)report.failures.push('approved preview exact count changed without maintenance review');
+          if(seed.maintenanceOwner!=='Rachel Anderson')report.failures.push('accountable maintenance owner changed');
+          if(!seed.fieldVolatilityDays||seed.fieldVolatilityDays.currentHatchConditions!==0)report.failures.push('field-level volatility contract is incomplete');
+          if(!/Withhold/i.test(seed.expiryBehavior||''))report.failures.push('expiry behavior is incomplete');
+          if(!/Retain the conflicting/i.test(seed.conflictPreservation||''))report.failures.push('conflict preservation is incomplete');
+          if(!Array.isArray(seed.correctionHistory)||seed.correctionHistory.length<2)report.failures.push('correction history is incomplete');
+          if(!Array.isArray(log.entries)||!log.entries.some(entry=>entry.recordCount===3&&entry.sourceCount===4&&entry.date==='2026-07-24'))report.failures.push('maintenance log omits exact count record');
           if(policy.status!=='active-maintenance-authority')report.failures.push('maintenance policy is not active');
           if(policy.secondaryOperationalOwner?.state!=='active')report.failures.push('secondary operational owner is not active');
           if(now>expiry)report.failures.push('seed register passed hard expiry');
