@@ -1,11 +1,16 @@
 import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 
+const evidenceDir = fileURLToPath(new URL('../../preview-evidence/', import.meta.url));
+fs.mkdirSync(evidenceDir, { recursive: true });
+const evidencePath = path.join(evidenceDir, 'presentation-planner-verification.json');
 const evidence = { applicationId: 'HTH-PP-001', smartModeId: 'HTH-SM-001', checkpoints: [] };
 const mark = (name, details = {}) => {
   evidence.checkpoints.push({ name, ...details });
-  fs.writeFileSync('preview-evidence/presentation-planner-verification.json', JSON.stringify(evidence, null, 2));
+  fs.writeFileSync(evidencePath, JSON.stringify(evidence, null, 2));
 };
 
 const browser = await chromium.launch({ headless: true });
@@ -17,6 +22,7 @@ try {
   await page.locator('iframe.hth-application-embed__frame').waitFor({ state: 'visible' });
   const frame = page.frames().find((candidate) => candidate.url().includes('/assets/presentation-planner/preview/index.html'));
   assert.ok(frame, 'Presentation Planner iframe did not load the packaged runtime.');
+  const frameUrl = frame.url();
   await frame.locator('h1').waitFor();
   assert.match(await frame.locator('h1').innerText(), /smarter field test/i);
   mark('runtime-loaded');
@@ -82,15 +88,15 @@ try {
   assert.equal(await frame.locator('#save-consent').isChecked(), false, 'Clear-local-data did not reset consent.');
   mark('local-data-and-consent-cleared');
 
-  await page.screenshot({ path: 'preview-evidence/presentation-planner-desktop.png', fullPage: true });
+  await page.screenshot({ path: path.join(evidenceDir, 'presentation-planner-desktop.png'), fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload({ waitUntil: 'networkidle' });
-  await page.screenshot({ path: 'preview-evidence/presentation-planner-mobile.png', fullPage: true });
+  await page.screenshot({ path: path.join(evidenceDir, 'presentation-planner-mobile.png'), fullPage: true });
   mark('responsive-evidence-captured');
 
   const noJsContext = await browser.newContext({ javaScriptEnabled: false });
   const noJsPage = await noJsContext.newPage();
-  await noJsPage.goto(frame.url(), { waitUntil: 'domcontentloaded' });
+  await noJsPage.goto(frameUrl, { waitUntil: 'domcontentloaded' });
   const noJsText = await noJsPage.locator('noscript').innerText();
   assert.match(noJsText, /field worksheet/i);
   assert.match(noJsText, /Do not record an exact location/i);
@@ -98,7 +104,7 @@ try {
   mark('no-javascript-worksheet-verified');
 } catch (error) {
   evidence.error = error instanceof Error ? { message: error.message, stack: error.stack } : { message: String(error) };
-  fs.writeFileSync('preview-evidence/presentation-planner-verification.json', JSON.stringify(evidence, null, 2));
+  fs.writeFileSync(evidencePath, JSON.stringify(evidence, null, 2));
   throw error;
 } finally {
   await browser.close();
