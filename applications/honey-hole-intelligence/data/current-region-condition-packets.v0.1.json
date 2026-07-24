@@ -1,8 +1,35 @@
 {
-  "schemaVersion": "0.1.0",
+  "schemaVersion": "0.2.0",
   "applicationId": "HHI-001",
   "generatedAt": "2026-07-17T07:10:00Z",
+  "lastOperationsReviewAt": "2026-07-24T14:30:00Z",
   "publicationBoundary": "Broad-region condition packets are time-bounded authority snapshots. They do not authorize a trip, disclose precise locations, guarantee access or safety, or replace same-day official verification.",
+  "operations": {
+    "recordCarrierId": "HHI-DATA-001",
+    "sourceAuthority": "Current controlling government, land-manager, weather, water, hazard, licensing, fisheries, and conservation authorities",
+    "maintenanceOwner": "Hook the Horizon field intelligence operations",
+    "accountableOwner": "Rachel Anderson",
+    "fieldVolatilityDays": {
+      "closure": 1,
+      "hazard": 1,
+      "weather": 1,
+      "waterCondition": 1,
+      "regulation": 7,
+      "permit": 7,
+      "access": 30,
+      "ownership": 30,
+      "conservation": 90
+    },
+    "expiryBehavior": "When nextReviewAt passes, the packet is withheld from trip authorization and named current claims. The reader receives the known baseline, explicit stale fields, and direct official verification links. Closure, severe hazard, not-permitted access, conservation stop, and unresolved regulation conflict remain hard stops.",
+    "conflictPreservation": "Retain every materially conflicting official statement with source authority, URL, retrieved date, effective window, jurisdiction, and affected field. Do not choose the more permissive or favorable statement.",
+    "correctionHistory": [
+      {
+        "date": "2026-07-24",
+        "type": "expiry-state-reconciliation",
+        "summary": "Marked the three broad-region packets withheld pending official refresh because each next-review date had passed; preserved the dated baseline and direct source URLs."
+      }
+    ]
+  },
   "packets": [
     {
       "id": "HHI-COND-001",
@@ -11,16 +38,22 @@
       "sourceAuthority": "Washington Department of Fish and Wildlife",
       "officialSourceUrl": "https://wdfw.wa.gov/fishing/regulations",
       "retrievedAt": "2026-07-17T07:10:00Z",
+      "effectiveAt": "2026-07-01T00:00:00Z",
+      "reviewedAt": "2026-07-17T07:10:00Z",
       "effectiveWindow": {"start": "2026-07-01", "end": "2027-06-30"},
       "nextReviewAt": "2026-07-24",
-      "status": "current_authority_snapshot",
+      "fieldVolatilityClass": "weekly_and_same_cycle",
+      "status": "authority_snapshot_at_retrieval",
+      "freshnessState": "expired_requires_official_refresh",
       "facts": [
-        {"fieldKey": "regulation", "status": "verified_current", "claim": "WDFW identifies the 2026-2027 sport fishing rules as covering July 1, 2026 through June 30, 2027.", "sourceUrl": "https://wdfw.wa.gov/fishing/regulations"},
-        {"fieldKey": "verification_process", "status": "verified_current", "claim": "WDFW directs anglers to review the annual rules and check emergency rule changes before fishing.", "sourceUrl": "https://wdfw.wa.gov/fishing/regulations"}
+        {"fieldKey": "regulation", "status": "verified_at_retrieval", "claim": "WDFW identified the 2026-2027 sport fishing rules as covering July 1, 2026 through June 30, 2027 at the recorded retrieval time.", "sourceUrl": "https://wdfw.wa.gov/fishing/regulations"},
+        {"fieldKey": "verification_process", "status": "verified_at_retrieval", "claim": "WDFW directed anglers to review the annual rules and check emergency rule changes before fishing at the recorded retrieval time.", "sourceUrl": "https://wdfw.wa.gov/fishing/regulations"}
       ],
       "criticalUnknowns": ["specific waterbody rule", "species-specific rule", "current emergency amendment", "access route", "weather and fire conditions"],
+      "conflicts": [],
+      "correctionHistory": [],
       "privacy": {"classification": "public_region_only", "preciseLocationIncluded": false},
-      "publicationEligibility": "eligible_until_review"
+      "publicationEligibility": "withheld_pending_refresh"
     },
     {
       "id": "HHI-COND-002",
@@ -29,16 +62,22 @@
       "sourceAuthority": "Washington Department of Fish and Wildlife",
       "officialSourceUrl": "https://wdfw.wa.gov/fishing/regulations/emergency-rules",
       "retrievedAt": "2026-07-17T07:10:00Z",
+      "effectiveAt": "2026-06-01T00:00:00Z",
+      "reviewedAt": "2026-07-17T07:10:00Z",
       "effectiveWindow": {"start": "2026-06-01", "end": "2026-10-15"},
       "nextReviewAt": "2026-07-18",
-      "status": "volatile_current_authority_snapshot",
+      "fieldVolatilityClass": "daily_and_same_cycle",
+      "status": "volatile_authority_snapshot_at_retrieval",
+      "freshnessState": "expired_requires_official_refresh",
       "facts": [
-        {"fieldKey": "regulation", "status": "verified_current", "claim": "The current emergency-rule index lists multiple active 2026 changes affecting Puget Sound, Skagit, Columbia River, coastal marine areas, and other fisheries.", "sourceUrl": "https://wdfw.wa.gov/fishing/regulations/emergency-rules"},
-        {"fieldKey": "closure", "status": "verified_current", "claim": "The emergency-rule index includes active closures or delayed openings for some fisheries and requires waterbody-specific review.", "sourceUrl": "https://wdfw.wa.gov/fishing/regulations/emergency-rules"}
+        {"fieldKey": "regulation", "status": "verified_at_retrieval", "claim": "The emergency-rule index listed multiple active 2026 changes affecting public fisheries at the recorded retrieval time.", "sourceUrl": "https://wdfw.wa.gov/fishing/regulations/emergency-rules"},
+        {"fieldKey": "closure", "status": "verified_at_retrieval", "claim": "The emergency-rule index included active closures or delayed openings for some fisheries and required waterbody-specific review at the recorded retrieval time.", "sourceUrl": "https://wdfw.wa.gov/fishing/regulations/emergency-rules"}
       ],
       "criticalUnknowns": ["rules effective for intended date", "waterbody and species match", "new rule issued after retrieval", "current access and hazards"],
+      "conflicts": [],
+      "correctionHistory": [],
       "privacy": {"classification": "public_region_only", "preciseLocationIncluded": false},
-      "publicationEligibility": "eligible_until_review"
+      "publicationEligibility": "withheld_pending_refresh"
     },
     {
       "id": "HHI-COND-003",
@@ -47,15 +86,21 @@
       "sourceAuthority": "National Park Service",
       "officialSourceUrl": "https://www.nps.gov/noca/planyourvisit/fishing-regulations.htm",
       "retrievedAt": "2026-07-17T07:10:00Z",
+      "effectiveAt": "2026-07-17T00:00:00Z",
+      "reviewedAt": "2026-07-17T07:10:00Z",
       "effectiveWindow": {"start": "2026-07-17", "end": "2026-07-24"},
       "nextReviewAt": "2026-07-18",
-      "status": "current_reference_requires_alert_check",
+      "fieldVolatilityClass": "daily_alert_check",
+      "status": "reference_snapshot_at_retrieval",
+      "freshnessState": "expired_requires_official_refresh",
       "facts": [
-        {"fieldKey": "regulation", "status": "verified_current", "claim": "NPS publishes park-specific fishing regulations and directs visitors to applicable state and federal requirements.", "sourceUrl": "https://www.nps.gov/noca/planyourvisit/fishing-regulations.htm"}
+        {"fieldKey": "regulation", "status": "verified_at_retrieval", "claim": "NPS published park-specific fishing regulations and directed visitors to applicable state and federal requirements at the recorded retrieval time.", "sourceUrl": "https://www.nps.gov/noca/planyourvisit/fishing-regulations.htm"}
       ],
       "criticalUnknowns": ["same-day park alert", "road and trail access", "fire restriction", "water condition", "specific fishery status"],
+      "conflicts": [],
+      "correctionHistory": [],
       "privacy": {"classification": "public_region_only", "preciseLocationIncluded": false},
-      "publicationEligibility": "eligible_until_review"
+      "publicationEligibility": "withheld_pending_refresh"
     }
   ]
 }
