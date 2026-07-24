@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "publication": "Hook the Horizon",
+  "domain": "hookthehorizon.blog",
+  "repository": "racheleliseanderson-ui/hookthehorizon",
+  "themeSlug": "hook-the-horizon",
+  "themeVersion": "0.3.1-intelligence",
+  "commit": "c0ba3038a2ddea0180e7b844542609c299dda35d",
+  "builtAt": "2026-07-24T14:03:06.246Z",
+  "files": [
+    {
+      "path": "assets/honey-hole-intelligence/app.mjs",
+      "sha256": "761bfc99223aaf4f1e97b7c8536410c0176c07bd6a3f0973a2e8ea2bfa9f4e62"
+    },
+    {
+      "path": "assets/honey-hole-intelligence/evaluate.mjs",
+      "sha256": "900c6960dcbd533384d4c1022e1b4086fdde263398c04e52336edf2e92c31cbd"
+    },
+    {
+      "path": "assets/honey-hole-intelligence/privacy.mjs",
+      "sha256": "9226e88ee9cc20378df67b834e3d49bb6db3ab1904ce9cae9dec039cad4090af"
+    },
+    {
+      "path": "assets/honey-hole-intelligence/styles.css",
+      "sha256": "a8628abfa9fa710e2ce3f050a8b75c5167ec541befafc0b2eeefa119135012eb"
+    },
+    {
+      "path": "assets/system-compatibility/index.html",
+      "sha256": "91580158fbad83a036026ce54cc0250e0fc62a9808b5ddd7f627e8b2dd052d82"
+    },
+    {
+      "path": "assets/tokens.css",
+      "sha256": "024b62e510fc8211768938d666281179d53c4d8496e2716ffe286f16692e23e8"
+    },
+    {
+      "path": "functions.php",
+      "sha256": "4558a2800c3ae6a9d3b321e6e9bc2a912b33f73505c8c5d5aacab8ecae9a20f5"
+    },
+    {
+      "path": "inc/system-compatibility.php",
+      "sha256": "6feed27374c7c70c0f33b2dc4eebbb2b007825c43be158dbd8cdac49ca6743e9"
+    },
+    {
+      "path": "parts/footer.html",
+      "sha256": "55dda0ee6a5c903a2867b1c9a18d06f8c7b73f2b15c0fed5c98d686cc0107b1a"
+    },
+    {
+      "path": "parts/header.html",
+      "sha256": "19ed8a0d825a669e4e09c0db8c3a3011a56c2d1167579a5b51588cabc33661b4"
+    },
+    {
+      "path": "patterns/living-fly-bench-hub.php",
+      "sha256": "e193450885381aac042fd8f83c02f55c93aaca06acad5cd07f3e48b3f8d744d2"
+    },
+    {
+      "path": "patterns/presentation-lab-hub.php",
+      "sha256": "646b320312fc946e971681bd4a4f545e7cf38e30418d79eca0a61a2852e409e5"
+    },
+    {
+      "path": "patterns/presentation-planner-application.php",
+      "sha256": "f2e19c405797a8690bc14e577e7ec7754e91ff93374233acd395549cd48ce5c6"
+    },
+    {
+      "path": "patterns/prototype-field-home.php",
+      "sha256": "fb9fa3793762bdc2a0f93eeefd4e50ed13a7712f23f41d8208439f9f6d057d54"
+    },
+    {
+      "path": "patterns/system-compatibility-application.php",
+      "sha256": "450a33d4df89edbce9dc2b54c5438d42d8ec9b47af8448d3f4fba4dbdea59e87"
+    },
+    {
+      "path": "style.css",
+      "sha256": "11942b5b20cc5fd0190aa1eb106490fcb8cd32ce3bee0056516e0bfdb20e7278"
+    },
+    {
+      "path": "styles/dark.json",
+      "sha256": "cbd6f15e120bd28eb9d0684c2d6f792859b2ed270696ad6b7918e348e5fe915a"
+    },
+    {
+      "path": "styles/field-serif.json",
+      "sha256": "12b6b7dacf3672e9675a98edfd64ab4873092e863636ab282d7d65e8f3d5a576"
+    },
+    {
+      "path": "templates/404.html",
+      "sha256": "b72690bbca7a603305fdcf997d27d1ff1e6f6c31f2dd47cfa813b4ebe67b315b"
+    },
+    {
+      "path": "templates/archive.html",
+      "sha256": "f87f0907a43da74dcc80b914d019d4d914047d560ec3bd8ea05cdb087baf5966"
+    },
+    {
+      "path": "templates/front-page.html",
+      "sha256": "982cb394e07b49dd2c57c6e0b53ddb945ddf01c156e7e33830009295dd08497e"
+    },
+    {
+      "path": "templates/index.html",
+      "sha256": "5fc4eeee9219bd7e7df337867ee25ad8aa93146ba00947c25688650e8a047452"
+    },
+    {
+      "path": "templates/page-compatibility-builder.html",
+      "sha256": "7bdad6a4d82810da487a36f7bf3f27cec758b689298fe150e270a3c3ae2cbece"
+    },
+    {
+      "path": "templates/page-compatibility-result.html",
+      "sha256": "a89bc572cc1b15b3740053006f18431fb18adb1d257f802d49a2531345dca336"
+    },
+    {
+      "path": "templates/page-honey-hole-intelligence.html",
+      "sha256": "ebaf237d2f205d9f58b85878a3438fc5d72d71040fe9ae84f527b17c45a5d8bb"
+    },
+    {
+      "path": "templates/page.html",
+      "sha256": "89ebfbcc40ac45304182cdd42c336f20f4672403e62bc0e118a3df5f5d5bbb95"
+    },
+    {
+      "path": "templates/search.html",
+      "sha256": "10aee347edac49457b6beabd0548720df0b708f249d760fe19daed0296fbc2aa"
+    },
+    {
+      "path": "templates/single.html",
+      "sha256": "764586c320a4bc6cff989366a6b71db80a8f9ed7b2451ca12c65fb6f6c226d5e"
+    },
+    {
+      "path": "theme-tokens.json",
+      "sha256": "5a9da360d77d90a7b6d5e5eb36266a45fcf1ef824426798782f774ab089e5ebf"
+    },
+    {
+      "path": "theme.json",
+      "sha256": "45ec2f2f3e858a6ac3c604e183dbe2bc61400cfa1fb4a75534751e7c3d987c28"
+    }
+  ]
+}

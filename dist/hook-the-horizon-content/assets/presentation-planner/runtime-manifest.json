@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 2,
+  "applicationId": "HTH-PP-001",
+  "personalizationLayer": "HTH-SM-001",
+  "source": "applications/presentation-planner",
+  "generatedAt": "2026-07-24T14:03:05.367Z",
+  "runtimeImportAdjustment": "preview/app.mjs uses ../_shared inside the packaged plugin",
+  "representativeMedia": {
+    "id": "hth-water-column-decision-map-001",
+    "runtime": "preview/water-column-decision-map.svg",
+    "ownership": "project-owned-original",
+    "provenance": "Original project SVG; no third-party image or protected interface copied.",
+    "alt": "Field diagram connecting surface, middle, and bottom water zones to observation, presentation choice, and the next test.",
+    "responsiveTreatment": "Complete 2:1 diagram scales within the application width without a destructive crop.",
+    "performance": "Inline-free SVG, lazy loaded, async decoded, no external dependency."
+  },
+  "files": [
+    {
+      "source": "applications/presentation-planner/preview/index.html",
+      "runtime": "preview/index.html"
+    },
+    {
+      "source": "applications/presentation-planner/preview/app.mjs",
+      "runtime": "preview/app.mjs"
+    },
+    {
+      "source": "applications/presentation-planner/preview/sw.js",
+      "runtime": "preview/sw.js"
+    },
+    {
+      "source": "applications/presentation-planner/preview/manifest.webmanifest",
+      "runtime": "preview/manifest.webmanifest"
+    },
+    {
+      "source": "applications/presentation-planner/preview/water-column-decision-map.svg",
+      "runtime": "preview/water-column-decision-map.svg"
+    },
+    {
+      "source": "applications/presentation-planner/data/seed-presentations.mjs",
+      "runtime": "data/seed-presentations.mjs"
+    },
+    {
+      "source": "applications/_shared/personalization.mjs",
+      "runtime": "_shared/personalization.mjs"
+    },
+    {
+      "source": "applications/_shared/privacy.mjs",
+      "runtime": "_shared/privacy.mjs"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "publication": "Hook the Horizon",
+  "palette": {
+    "depth-black": "#0C1112",
+    "graphite-water": "#1F2828",
+    "deep-silt": "#3C4038",
+    "mineral-fog": "#D8D6CC",
+    "foam-white": "#F5F3EC",
+    "cork-tan": "#A98962",
+    "oxidized-metal": "#55766D",
+    "signal-vermilion": "#D85B3F",
+    "brass-marker": "#B89A58",
+    "cold-sky": "#AEBCC0"
+  },
+  "semantic": {
+    "light": {
+      "background-canvas": "#F5F3EC",
+      "background-surface": "#D8D6CC",
+      "background-elevated": "#FFFFFF",
+      "background-inverse": "#1F2828",
+      "text-primary": "#1F2828",
+      "text-secondary": "#3C4038",
+      "text-inverse": "#F5F3EC",
+      "heading": "#0C1112",
+      "link": "#1F5A51",
+      "link-hover": "#A63F2D",
+      "accent": "#D85B3F",
+      "secondary": "#55766D",
+      "border-default": "#8C938C",
+      "focus": "#D85B3F",
+      "warning": "#8B4A24"
+    },
+    "dark": {
+      "background-canvas": "#0C1112",
+      "background-surface": "#1F2828",
+      "background-elevated": "#293333",
+      "background-inverse": "#F5F3EC",
+      "text-primary": "#F5F3EC",
+      "text-secondary": "#AEBCC0",
+      "text-inverse": "#0C1112",
+      "heading": "#F5F3EC",
+      "link": "#D7B778",
+      "link-hover": "#F18A6E",
+      "accent": "#F06D50",
+      "secondary": "#7FA497",
+      "border-default": "#66706D",
+      "focus": "#F18A6E",
+      "warning": "#E1B071"
+    }
+  }
+}
