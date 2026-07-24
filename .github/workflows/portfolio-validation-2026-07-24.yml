@@ -1,0 +1,38 @@
+name: Portfolio Validation 2026-07-24
+on: [push, pull_request, workflow_dispatch]
+permissions: {contents: read}
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: oven-sh/setup-bun@v2
+      - run: echo "repository=${GITHUB_REPOSITORY} commit=${GITHUB_SHA}"
+      - name: Validate JSON and PHP syntax
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, pathlib
+          for p in pathlib.Path('.').rglob('*.json'):
+              if any(x in {'.git','node_modules','vendor'} for x in p.parts): continue
+              with p.open(encoding='utf-8') as f: json.load(f)
+          PY
+          while IFS= read -r -d '' f; do php -l "$f" >/dev/null; done < <(find . -type f -name '*.php' -not -path './vendor/*' -not -path './node_modules/*' -print0)
+      - name: Install dependencies
+        if: ${{ hashFiles('package.json') != '' }}
+        run: |
+          if [ -f bun.lock ] || [ -f bun.lockb ]; then bun install --frozen-lockfile; elif [ -f pnpm-lock.yaml ]; then corepack enable && pnpm install --frozen-lockfile; elif [ -f yarn.lock ]; then corepack enable && yarn install --immutable; elif [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then npm ci; else npm install; fi
+      - name: Run declared validation scripts
+        if: ${{ hashFiles('package.json') != '' }}
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),{spawnSync}=require('child_process');const p=JSON.parse(fs.readFileSync('package.json','utf8'));const ns=['check','test','lint','build','privacy','privacy-check','static-analysis','validate'];const pm=fs.existsSync('bun.lock')||fs.existsSync('bun.lockb')?'bun run':fs.existsSync('pnpm-lock.yaml')?'pnpm run':fs.existsSync('yarn.lock')?'yarn':'npm run';for(const n of ns){if(!p.scripts?.[n])continue;const [c,...a]=pm.split(' ');const r=spawnSync(c,[...a,n],{stdio:'inherit'});if(r.status!==0)process.exit(r.status||1)}
+          NODE
+      - name: Dependency audit
+        if: ${{ hashFiles('package-lock.json', 'npm-shrinkwrap.json') != '' }}
+        run: npm audit --audit-level=high
+      - name: Basic secret and privacy scan
+        run: "! git grep -nEI '(sk_live_|sk-proj-|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY)' -- ':!*.md' ':!*.txt' ':!*.lock'"
