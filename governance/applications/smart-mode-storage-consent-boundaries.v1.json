@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0.0",
+  "applicationId": "HTH-SM-001",
+  "canonicalName": "Horizon Smart Mode",
+  "effectiveDate": "2026-07-24",
+  "accountableOwner": "Rachel Anderson",
+  "operationalOwner": "Hook the Horizon application operations",
+  "currentConsumers": [
+    {
+      "applicationId": "HTH-PP-001",
+      "name": "Presentation Planner",
+      "status": "active_preview_consumer",
+      "storageKeys": [
+        "hth-smart-mode-consent-v1",
+        "hth-smart-mode-state-v1",
+        "hth-smart-mode-outcomes-v1",
+        "hth-smart-mode-recommendations-v1"
+      ]
+    }
+  ],
+  "notCurrentConsumers": ["HTH-SC-001", "HTH-HM-001", "HTH-RS-001", "HHI-001"],
+  "storage": {
+    "default": "session_only_no_persistence",
+    "persistenceMechanism": "browser localStorage after explicit opt-in",
+    "consentRequired": true,
+    "consentMayBeWithdrawn": true,
+    "withdrawalBehavior": "Delete every Smart Mode localStorage key immediately while allowing the current on-screen result to remain session-only.",
+    "clearDataBehavior": "Delete consent, profile/form state, recommendation history, and outcomes; reset the interface and output actions.",
+    "retention": {
+      "recommendationHistoryMaximum": 50,
+      "outcomeHistoryMaximum": 200,
+      "automaticExpiry": "not implemented; user-controlled deletion is mandatory and visible",
+      "remoteBackup": false
+    },
+    "prohibitedFields": [
+      "exact location",
+      "coordinates",
+      "private access instructions",
+      "gate or access codes",
+      "sensitive-water identifiers",
+      "health data",
+      "payment data"
+    ]
+  },
+  "sharingAndExports": {
+    "printOrPDF": "Public-safe plan fields only; browser print may be used for PDF.",
+    "copySummary": "Public-safe plan fields only.",
+    "jsonExport": "Public-safe plan fields only; excludes profile, exact location, inventory list, history, and outcomes.",
+    "shareCard": "Public-safe presentation label and plan fields only.",
+    "noJavaScript": "Static field worksheet and boundary guidance; no persistence or evaluation claim."
+  },
+  "analytics": {
+    "currentState": "disabled_for_private_state",
+    "rule": "No new Smart Mode analytics event may be added until a named product decision defines the exact reader job, event, payload, retention, consent, deletion, and exclusion rules.",
+    "prohibitedPayloads": ["profile", "inventory", "conditions", "history", "outcomes", "location", "source URLs", "free text"]
+  },
+  "deferredArchitecture": {
+    "accounts": "Deferred until local-first repeat use demonstrates a genuine need and an approved privacy, support, recovery, and deletion model exists.",
+    "crossProductIdentity": "Deferred; Smart Mode state may not become a shared ecosystem identity profile.",
+    "remoteSavedWorkspace": "Deferred until local-first utility and recovery needs justify remote persistence.",
+    "nativeWrapper": "Deferred unless tested native utility such as secure local settings, device-authenticated lock, user-controlled notifications, or native share/file behavior is required. Wrapper-only packaging is not sufficient."
+  },
+  "releaseEvidence": [
+    "no persistence before consent",
+    "persistence after consent",
+    "withdrawal deletes all keys",
+    "clear data deletes all keys and consent",
+    "no sensitive-location keys or payloads",
+    "copy, JSON, print/PDF, share-card, and no-JavaScript behavior",
+    "consumer list remains explicit",
+    "no remote requests containing private state"
+  ]
+}

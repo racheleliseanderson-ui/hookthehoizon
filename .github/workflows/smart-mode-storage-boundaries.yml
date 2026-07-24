@@ -1,0 +1,44 @@
+name: Smart Mode storage boundaries
+
+on:
+  pull_request:
+    paths:
+      - 'applications/presentation-planner/**'
+      - 'applications/_shared/personalization.mjs'
+      - 'governance/applications/smart-mode-storage-consent-boundaries.v1.json'
+      - 'scripts/validate-smart-mode-storage-boundaries.mjs'
+      - 'next-generation/preview/verify-presentation-planner.mjs'
+      - '.github/workflows/smart-mode-storage-boundaries.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'applications/presentation-planner/**'
+      - 'applications/_shared/personalization.mjs'
+      - 'governance/applications/smart-mode-storage-consent-boundaries.v1.json'
+      - 'scripts/validate-smart-mode-storage-boundaries.mjs'
+      - 'next-generation/preview/verify-presentation-planner.mjs'
+      - '.github/workflows/smart-mode-storage-boundaries.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --check applications/presentation-planner/preview/app.mjs
+      - run: node scripts/validate-smart-mode-storage-boundaries.mjs
+      - run: node applications/_shared/tests/run.mjs
+      - name: Reject remote persistence and sensitive-location implementation fields
+        run: |
+          if grep -n -E 'Firebase|Supabase|HealthKit|Health Connect|exactLocation|coordinates|latitude|longitude|accessCode|gateCode' \
+            applications/presentation-planner/preview/app.mjs \
+            applications/presentation-planner/preview/index.html \
+            applications/presentation-planner/preview/sw.js; then
+            echo 'Smart Mode executable preview contains prohibited remote-persistence or sensitive-location coupling.' >&2
+            exit 1
+          fi

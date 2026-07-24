@@ -65,38 +65,55 @@ function hth_hatch_match_read_data(string $name): array
     return is_array($decoded) ? $decoded : [];
 }
 
+/**
+ * Return the exact installed package readback used by REST and WP-CLI evidence.
+ *
+ * @return array<string,mixed>
+ */
+function hth_hatch_match_runtime_readback(): array
+{
+    $seed = hth_hatch_match_read_data('seed-records.json');
+    $policy = hth_hatch_match_read_data('maintenance-policy.json');
+    $log = hth_hatch_match_read_data('maintenance-log.json');
+    $manifest = hth_hatch_match_read_data('runtime-manifest.json');
+
+    global $shortcode_tags;
+
+    return [
+        'applicationId' => 'HTH-HM-001',
+        'pluginVersion' => HTH_HATCH_MATCH_PREVIEW_VERSION,
+        'shortcodeRegistered' => isset($shortcode_tags['hth_hatch_match']),
+        'publicationState' => $seed['publicationState'] ?? 'unavailable',
+        'productionActivationAuthorized' => false,
+        'dataOwner' => 'HTH-HM-001',
+        'conditionsOwner' => 'HHI-001',
+        'seedSchemaVersion' => $seed['schemaVersion'] ?? null,
+        'recordCount' => isset($seed['records']) && is_array($seed['records']) ? count($seed['records']) : 0,
+        'sourceCount' => isset($seed['sources']) && is_array($seed['sources']) ? count($seed['sources']) : 0,
+        'reviewedDate' => $seed['reviewedDate'] ?? null,
+        'nextReviewDate' => $seed['nextReviewDate'] ?? null,
+        'expiresDate' => $seed['expiresDate'] ?? null,
+        'maintenanceState' => $seed['maintenanceState'] ?? null,
+        'policyId' => $policy['policyId'] ?? null,
+        'policySchemaVersion' => $policy['schemaVersion'] ?? null,
+        'policyStatus' => $policy['status'] ?? null,
+        'primaryOwner' => is_array($policy['primaryOwner'] ?? null) ? ($policy['primaryOwner']['name'] ?? null) : ($policy['primaryOwner'] ?? null),
+        'secondaryOperationalOwner' => is_array($policy['secondaryOperationalOwner'] ?? null) ? ($policy['secondaryOperationalOwner']['role'] ?? null) : ($policy['secondaryOperationalOwner'] ?? null),
+        'maintenanceEntryCount' => isset($log['entries']) && is_array($log['entries']) ? count($log['entries']) : 0,
+        'runtimeManifestSchemaVersion' => $manifest['schemaVersion'] ?? null,
+        'runtimeArtifacts' => array_keys(is_array($manifest['artifacts'] ?? null) ? $manifest['artifacts'] : []),
+        'migrationCount' => 0,
+        'customDatabaseSchema' => false,
+        'productionAuthorized' => false,
+    ];
+}
+
 add_action('rest_api_init', static function (): void {
     register_rest_route('horizon-preview/v1', '/hatch-match-readiness', [
         'methods' => 'GET',
         'permission_callback' => static fn (): bool => current_user_can('edit_posts'),
         'callback' => static function (): WP_REST_Response {
-            $seed = hth_hatch_match_read_data('seed-records.json');
-            $policy = hth_hatch_match_read_data('maintenance-policy.json');
-            $log = hth_hatch_match_read_data('maintenance-log.json');
-            $manifest = hth_hatch_match_read_data('runtime-manifest.json');
-            $response = new WP_REST_Response([
-                'applicationId' => 'HTH-HM-001',
-                'pluginVersion' => HTH_HATCH_MATCH_PREVIEW_VERSION,
-                'publicationState' => $seed['publicationState'] ?? 'unavailable',
-                'productionActivationAuthorized' => false,
-                'dataOwner' => 'HTH-HM-001',
-                'conditionsOwner' => 'HHI-001',
-                'seedSchemaVersion' => $seed['schemaVersion'] ?? null,
-                'recordCount' => isset($seed['records']) && is_array($seed['records']) ? count($seed['records']) : 0,
-                'sourceCount' => isset($seed['sources']) && is_array($seed['sources']) ? count($seed['sources']) : 0,
-                'reviewedDate' => $seed['reviewedDate'] ?? null,
-                'nextReviewDate' => $seed['nextReviewDate'] ?? null,
-                'expiresDate' => $seed['expiresDate'] ?? null,
-                'maintenanceState' => $seed['maintenanceState'] ?? null,
-                'policyId' => $policy['policyId'] ?? null,
-                'policySchemaVersion' => $policy['schemaVersion'] ?? null,
-                'policyStatus' => $policy['status'] ?? null,
-                'primaryOwner' => is_array($policy['primaryOwner'] ?? null) ? ($policy['primaryOwner']['name'] ?? null) : ($policy['primaryOwner'] ?? null),
-                'secondaryOperationalOwner' => is_array($policy['secondaryOperationalOwner'] ?? null) ? ($policy['secondaryOperationalOwner']['role'] ?? null) : ($policy['secondaryOperationalOwner'] ?? null),
-                'maintenanceEntryCount' => isset($log['entries']) && is_array($log['entries']) ? count($log['entries']) : 0,
-                'runtimeManifestSchemaVersion' => $manifest['schemaVersion'] ?? null,
-                'runtimeArtifacts' => array_keys(is_array($manifest['artifacts'] ?? null) ? $manifest['artifacts'] : []),
-            ]);
+            $response = new WP_REST_Response(hth_hatch_match_runtime_readback());
             $response->header('Cache-Control', 'no-store, private, max-age=0');
             return $response;
         },
