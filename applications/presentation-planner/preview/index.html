@@ -50,6 +50,9 @@
     .check-card small { color: var(--muted); font-weight: 500; }
     .inline-checks { display: flex; flex-wrap: wrap; gap: .45rem; }
     .inline-checks label { display: inline-flex; align-items: center; gap: .35rem; border-radius: 999px; border: 1px solid var(--line); background: white; padding: .45rem .65rem; font-weight: 650; }
+    .consent-card { display: flex; align-items: flex-start; gap: .65rem; margin-block: .8rem 1rem; border: 1px solid var(--line); border-radius: .75rem; background: var(--mist); padding: .8rem; font-weight: 650; }
+    .consent-card input { width: 1.25rem; height: 1.25rem; margin-top: .15rem; flex: 0 0 auto; accent-color: var(--signal); }
+    .consent-card small { display: block; color: var(--muted); font-weight: 500; }
     .actions { display: flex; flex-wrap: wrap; gap: .65rem; }
     button { border: 0; border-radius: 999px; padding: .68rem 1rem; font-weight: 800; cursor: pointer; }
     button.primary { background: var(--signal); color: var(--depth); }
@@ -115,11 +118,17 @@
       <span class="pill">No account</span>
       <span class="pill">No exact location</span>
       <span class="pill">Offline capable</span>
+      <span class="pill">Save only by consent</span>
       <span class="pill" id="network-status">Checking network state</span>
     </div>
     <div class="notice" role="note">
       This is a governed preview using synthetic presentation records. It does not predict fish activity, guarantee a catch, establish legal access, or replace regulations and safety judgment.
     </div>
+    <noscript>
+      <div class="notice" role="alert">
+        Smart Mode needs JavaScript for its deterministic comparison. Without JavaScript, use this field worksheet: list the method, water type, goal, structure, depth, owned options, current official-source checks, and one variable to change. Do not record an exact location. Print this page for the boundary and worksheet guidance.
+      </div>
+    </noscript>
   </header>
 
   <main class="layout">
@@ -206,6 +215,13 @@
           <div class="check-grid" id="inventory"></div>
         </fieldset>
 
+        <label class="consent-card" for="save-consent">
+          <input type="checkbox" id="save-consent" name="saveConsent">
+          <span>Save my profile, selected inventory, recommendation history, and outcomes on this device.
+            <small>Optional. Nothing is stored until selected. Turning this off or using Clear local data deletes all Smart Mode keys.</small>
+          </span>
+        </label>
+
         <div class="actions">
           <button class="primary" type="submit">Build my plan</button>
           <button class="ghost" type="button" id="clear-data">Clear local data</button>
@@ -219,7 +235,9 @@
         <div class="plan-heading">
           <h2 id="plan-results">Explainable field-test plan</h2>
           <div class="actions">
-            <button class="secondary" type="button" id="print-plan" disabled>Print</button>
+            <button class="secondary" type="button" id="print-plan" disabled>Print / PDF</button>
+            <button class="ghost" type="button" id="copy-plan" disabled>Copy summary</button>
+            <button class="ghost" type="button" id="export-plan" disabled>Download JSON</button>
             <button class="ghost" type="button" id="share-plan" disabled>Download share card</button>
           </div>
         </div>
@@ -240,7 +258,7 @@
   </main>
 
   <footer>
-    <p>All profile, inventory, recommendation history, and outcome records stay in this browser. The downloadable card contains only public-safe plan fields.</p>
+    <p>Smart Mode is currently consumed by Presentation Planner only. Nothing is saved unless you opt in. Saved profile, inventory, recommendation history, and outcome records stay in this browser. Copy, JSON, print/PDF, and share-card outputs exclude exact location and private history.</p>
   </footer>
 
   <script type="module" src="./app.mjs"></script>
