@@ -1,0 +1,16 @@
+name: Publication Envelope Guard
+on:
+  pull_request:
+  push:
+    branches: [production]
+  workflow_dispatch:
+jobs:
+  guard:
+    name: Publication Envelope Guard
+    uses: racheleliseanderson-ui/Master-of-The-Universe-/.github/workflows/publication-envelope-guard.yml@main
+    with:
+      repository: racheleliseanderson-ui/hookthehorizon
+      target_site: https://hookthehorizon.blog
+      target_record: repository-change
+      operation: ${{ github.ref_name == 'production' && 'production_promotion' || 'pull_request' }}
+    secrets: inherit
