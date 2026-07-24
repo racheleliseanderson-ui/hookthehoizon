@@ -33,9 +33,9 @@ jobs:
       - run: node --check applications/presentation-planner/preview/app.mjs
       - run: node scripts/validate-smart-mode-storage-boundaries.mjs
       - run: node applications/_shared/tests/run.mjs
-      - name: Reject remote persistence and sensitive-location coupling
+      - name: Reject remote persistence and sensitive-location implementation fields
         run: |
-          if grep -R -n -E 'Firebase|Supabase|HealthKit|Health Connect|exactLocation|coordinates|latitude|longitude|accessCode|gateCode' applications/presentation-planner governance/applications/smart-mode-storage-consent-boundaries.v1.json; then
-            echo 'Smart Mode contains prohibited remote-persistence or sensitive-location coupling.' >&2
+          if grep -R -n -E 'Firebase|Supabase|HealthKit|Health Connect|exactLocation|coordinates|latitude|longitude|accessCode|gateCode' applications/presentation-planner; then
+            echo 'Smart Mode implementation contains prohibited remote-persistence or sensitive-location coupling.' >&2
             exit 1
           fi
