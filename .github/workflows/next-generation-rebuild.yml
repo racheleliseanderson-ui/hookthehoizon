@@ -98,10 +98,8 @@ jobs:
           node scripts/sync-hatch-match-preview.mjs
           bash scripts/build-wordpress-release.sh
       - name: Install preview tooling
-        working-directory: next-generation/preview
-        run: npm ci
+        run: npm install --no-save @wordpress/env playwright @axe-core/playwright
       - name: Install Chromium
-        working-directory: next-generation/preview
         run: npx playwright install --with-deps chromium
       - name: Start isolated WordPress
         working-directory: next-generation/preview
