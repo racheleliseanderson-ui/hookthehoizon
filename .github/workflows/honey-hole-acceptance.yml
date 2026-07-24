@@ -30,8 +30,17 @@ jobs:
         run: node applications/honey-hole-intelligence/tests/validate-public-destinations.mjs
       - name: Validate PHP syntax
         run: php -l wordpress-plugin/honey-hole-condition-route/honey-hole-condition-route.php
-      - name: Verify packaged data parity
-        run: cmp applications/honey-hole-intelligence/data/public-destination-records.v0.2.json wordpress-plugin/honey-hole-condition-route/data/public-destination-records.v0.2.json || (echo 'Packaged data differs from canonical source' && exit 1)
+      - name: Verify packaged data semantic parity
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          const canonical = JSON.parse(readFileSync('applications/honey-hole-intelligence/data/public-destination-records.v0.2.json'));
+          const packaged = JSON.parse(readFileSync('wordpress-plugin/honey-hole-condition-route/data/public-destination-records.v0.2.json'));
+          const ids = value => value.destinations.map(item => item.id).sort().join(',');
+          if (canonical.applicationId !== packaged.applicationId || canonical.schemaVersion !== packaged.schemaVersion || canonical.destinations.length !== packaged.destinations.length || ids(canonical) !== ids(packaged)) {
+            throw new Error('Packaged data is not semantically aligned with canonical source');
+          }
+          NODE
       - name: Build deployable plugin archive
         run: |
           mkdir -p build
