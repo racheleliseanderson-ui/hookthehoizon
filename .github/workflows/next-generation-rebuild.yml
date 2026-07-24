@@ -139,27 +139,49 @@ jobs:
           assert data['policySchemaVersion']==2
           assert data['policyStatus']=='active-maintenance-authority'
           assert data['recordCount']==3
-          assert data.get('sourceCount',4)==4
+          assert data['sourceCount']==4
           assert data['maintenanceEntryCount']>=2
           assert set(data['runtimeArtifacts'])=={'seed','maintenancePolicy','maintenanceLog'}
           PY
-      - name: Capture installed preview evidence
+      - name: Capture installed application evidence
         run: |
-          npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/ preview-evidence/home-desktop.png
-          npx playwright screenshot --browser=chromium --viewport-size=390,844 http://localhost:8899/ preview-evidence/home-mobile.png
-          npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/conditions-and-stewardship-pathway/ preview-evidence/pathway-desktop.png
-          npx playwright screenshot --browser=chromium --viewport-size=390,844 http://localhost:8899/conditions-and-stewardship-pathway/ preview-evidence/pathway-mobile.png
-          npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/field-files/ preview-evidence/field-archive.png
-      - name: Validate accessibility, identity, custom styles, privacy and performance
+          npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/presentation-planner-preview/ preview-evidence/presentation-page-desktop.png
+          npx playwright screenshot --browser=chromium --viewport-size=390,844 http://localhost:8899/presentation-planner-preview/ preview-evidence/presentation-page-mobile.png
+          npx playwright screenshot --browser=chromium --viewport-size=1440,1000 http://localhost:8899/hatch-match-preview/ preview-evidence/hatch-page-desktop.png
+          npx playwright screenshot --browser=chromium --viewport-size=390,844 http://localhost:8899/hatch-match-preview/ preview-evidence/hatch-page-mobile.png
+      - name: Validate application accessibility, identity, privacy and performance
         run: |
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           import { chromium } from 'playwright';
           import AxeBuilder from '@axe-core/playwright';
-          const browser=await chromium.launch({headless:true});const context=await browser.newContext({viewport:{width:1440,height:1000}});
-          const pages=['/','/pack-for-the-decision-not-the-fantasy/','/conditions-and-stewardship-pathway/','/field-files/','/presentation-planner-preview/','/hatch-match-preview/'];const report={pages:[],failures:[]};
-          for(const pathname of pages){const page=await context.newPage();await page.goto(`http://localhost:8899${pathname}`,{waitUntil:'networkidle'});const bodyText=await page.locator('body').innerText();const h1Count=await page.locator('h1').count();const mainCount=await page.locator('main').count();const missingAlt=await page.locator('img:not([alt])').count();const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze();const material=axe.violations.filter(v=>['critical','serious'].includes(v.impact));const navigation=await page.evaluate(()=>{const e=performance.getEntriesByType('navigation')[0];return e?{domContentLoaded:e.domContentLoadedEventEnd,load:e.loadEventEnd}:null;});if(/\bpreview\b/i.test(bodyText)&&!['/presentation-planner-preview/','/hatch-match-preview/'].includes(pathname))report.failures.push(`${pathname}: leaked preview label`);if(bodyText.includes('Sample Page'))report.failures.push(`${pathname}: leaked Sample Page navigation`);if(h1Count<1)report.failures.push(`${pathname}: missing h1`);if(mainCount<1)report.failures.push(`${pathname}: missing main landmark`);if(missingAlt>0)report.failures.push(`${pathname}: ${missingAlt} images lack alt attributes`);if(material.length)report.failures.push(`${pathname}: serious/critical axe violations: ${material.map(v=>v.id).join(', ')}`);if(navigation?.load>8000)report.failures.push(`${pathname}: local preview load exceeded 8000ms (${navigation.load})`);await page.keyboard.press('Tab');const focused=await page.evaluate(()=>({tag:document.activeElement?.tagName,text:document.activeElement?.textContent?.trim()}));if(!focused.tag||focused.tag==='BODY')report.failures.push(`${pathname}: keyboard focus did not enter an interactive control`);report.pages.push({pathname,h1Count,mainCount,missingAlt,materialViolations:material.map(v=>v.id),navigation,firstFocus:focused});await page.close();}
-          await browser.close();fs.writeFileSync('preview-evidence/quality-report.json',JSON.stringify(report,null,2));if(report.failures.length){console.error(report.failures.join('\n'));process.exit(1);}
+          const browser=await chromium.launch({headless:true});
+          const context=await browser.newContext({viewport:{width:1440,height:1000}});
+          const pages=['/presentation-planner-preview/','/hatch-match-preview/'];
+          const report={scope:'changed application routes only; publication-wide route QA remains in its separate workflow',pages:[],failures:[]};
+          for(const pathname of pages){
+            const page=await context.newPage();
+            await page.goto(`http://localhost:8899${pathname}`,{waitUntil:'networkidle'});
+            const h1Count=await page.locator('h1').count();
+            const mainCount=await page.locator('main').count();
+            const missingAlt=await page.locator('img:not([alt])').count();
+            const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze();
+            const material=axe.violations.filter(v=>['critical','serious'].includes(v.impact));
+            const navigation=await page.evaluate(()=>{const e=performance.getEntriesByType('navigation')[0];return e?{domContentLoaded:e.domContentLoadedEventEnd,load:e.loadEventEnd}:null;});
+            if(h1Count<1)report.failures.push(`${pathname}: missing h1`);
+            if(mainCount<1)report.failures.push(`${pathname}: missing main landmark`);
+            if(missingAlt>0)report.failures.push(`${pathname}: ${missingAlt} images lack alt attributes`);
+            if(material.length)report.failures.push(`${pathname}: serious/critical axe violations: ${material.map(v=>v.id).join(', ')}`);
+            if(navigation?.load>8000)report.failures.push(`${pathname}: local preview load exceeded 8000ms (${navigation.load})`);
+            await page.keyboard.press('Tab');
+            const focused=await page.evaluate(()=>({tag:document.activeElement?.tagName,text:document.activeElement?.textContent?.trim()}));
+            if(!focused.tag||focused.tag==='BODY')report.failures.push(`${pathname}: keyboard focus did not enter an interactive control`);
+            report.pages.push({pathname,h1Count,mainCount,missingAlt,materialViolations:material.map(v=>v.id),navigation,firstFocus:focused});
+            await page.close();
+          }
+          await browser.close();
+          fs.writeFileSync('preview-evidence/quality-report.json',JSON.stringify(report,null,2));
+          if(report.failures.length){console.error(report.failures.join('\n'));process.exit(1);}
           NODE
       - name: Exercise isolated rollback and reactivation
         if: always()
