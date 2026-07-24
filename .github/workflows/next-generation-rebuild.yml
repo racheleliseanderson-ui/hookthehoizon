@@ -57,7 +57,11 @@ jobs:
           grep -q 'HTH-PP-001' applications/presentation-planner/application.yaml
           grep -q 'HTH-SM-001' governance/applications/smart-mode-storage-consent-boundaries.v1.json
       - name: Build maintained Hatch Match preview package
-        run: bash scripts/build-hatch-match-preview.sh
+        run: |
+          mkdir -p dist
+          rm -f dist/hatch-match-preview-0.1.1-preview.zip dist/hatch-match-preview-0.1.1-preview.sha256
+          (cd next-generation/plugins && zip -qr ../../dist/hatch-match-preview-0.1.1-preview.zip hatch-match-preview)
+          sha256sum dist/hatch-match-preview-0.1.1-preview.zip > dist/hatch-match-preview-0.1.1-preview.sha256
       - name: Required route and style coverage
         run: |
           grep -R -q 'presentation-planner-preview' next-generation
@@ -93,7 +97,6 @@ jobs:
         run: |
           node scripts/sync-hatch-match-preview.mjs
           bash scripts/build-wordpress-release.sh
-          bash scripts/build-hatch-match-preview.sh
       - name: Install preview tooling
         working-directory: next-generation/preview
         run: npm ci
