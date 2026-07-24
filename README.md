@@ -18,6 +18,14 @@ Hook the Horizon is the fifth independent publication in the Five-Brand Editoria
 
 Public brand text must always spell **Hook the Horizon** correctly. The repository locator is `hookthehorizon`; retired spellings such as `Hook the Forizon` and `hookthehoizon` are invalid in active source, governance, packaging, and deployment records.
 
+## Visual authority v3
+
+The current visual source is the owner-approved Hook the Horizon Drive reference folder. The repository-readable authority is `docs/design/HOOK_THE_HORIZON_VISUAL_AUTHORITY_V3.md`; the complete route/state register begins at `docs/design/master-template-register.csv`; the component contract is `docs/design/component-catalog.csv`; and the asset map is `docs/design/asset-reference-map.csv`.
+
+`wordpress-theme/theme-tokens.json` is the canonical machine-readable visual-token source. It defines the approved eight-color system—Deep Navy `#071827`, Pearl `#E3E1D9`, Lake Blue `#2E6F95`, Teal `#176F78`, Charcoal `#424546`, Forest Green `#355133`, Burnt Coral `#D55C3E`, and Champagne Gold `#C7A257`—plus light/dark semantic roles, distributions, typography, and compatibility aliases. Bebas Neue is the display family; Montserrat is the body, interface, and data family. No font binaries are stored in the repository.
+
+The owner-approved fish-hook-horizon logo family is active. Older anti-logo language, ten-color palettes, serif-led systems, and near-match values are superseded. Compatible field-truth, evidence, safety, regulation, location-privacy, stewardship, accessibility, performance, and physical-logic requirements remain active.
+
 ## Neutral-platform boundary
 
 `Master-of-The-Universe-` and Rachel Editorial Core provide brand-neutral contracts, schemas, accessibility primitives, evidence behavior, and release controls. They are not a WordPress parent theme and do not own Hook the Horizon's palette, typography, homepage composition, field modules, fishing logic, imagery, or editorial voice.
@@ -103,8 +111,8 @@ The public homepage is field-led and people-free by default. Homepage featured m
 
 ## Current implementation
 
-The normalized Hook theme includes its canonical field palette, independent light and dark semantic mappings, Hook-owned template parts, a water-intelligence homepage, governed article/archive/search/error routes, accessible focus and target behavior, reduced-motion and forced-colors handling, print behavior, package validation, checksums, manifests, and automated release evidence.
+The reconciliation branch aligns the canonical Hook theme with Visual Authority v3: exact approved tokens, independent light and dark semantic mappings, Bebas Neue/Montserrat font stacks, approved responsive logo assets, a cinematic but people-free homepage treatment, Hook-owned template parts, accessible focus and target behavior, reduced-motion and forced-colors handling, print behavior, initial WooCommerce identity rules, the 260-row master template/state register, and repository-readable asset and component maps.
 
 The intelligence application layer includes shared local-first contracts, recursive sensitive-location controls, explainable Smart Mode ranking, a local knowledge graph, outcome and mastery records, a Presentation Planner PWA preview, Hatch Match record-level evidence governance, Rig Signal device-event contracts, editorial hub patterns for The Living Fly Bench and Presentation Lab, and a packaged WordPress shortcode route for Presentation Planner.
 
-Live WordPress parity remains a runtime fact to verify from the exact installed artifact; it is not inferred from a matching version label.
+Live WordPress parity remains a runtime fact to verify from the exact installed artifact; it is not inferred from a matching version label. The current reconciliation is staged in a GitHub branch and WPVibe draft and is not a production publication or theme activation.

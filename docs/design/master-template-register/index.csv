@@ -1,0 +1,11 @@
+Category,File,Rows
+A. Global template parts,01-a-global-template-parts.csv,26
+B. Core WordPress templates,02-b-core-wordpress-templates.csv,26
+C. Institutional and trust pages,03-c-institutional-and-trust-pages.csv,19
+D. Editorial and publication-specific,04-d-editorial-and-publication-specific.csv,32
+E. Archive and discovery,05-e-archive-and-discovery.csv,20
+F. Intelligence and application,06-f-intelligence-and-application.csv,31
+G. WooCommerce and commercial,07-g-woocommerce-and-commercial.csv,48
+"H. Newsletter, lead generation and distribution",08-h-newsletter-lead-generation-and-distribution.csv,22
+"I. Error, maintenance and system states",09-i-error-maintenance-and-system-states.csv,20
+J. Responsive and alternate renderings,10-j-responsive-and-alternate-renderings.csv,16

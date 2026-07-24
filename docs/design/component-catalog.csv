@@ -1,0 +1,48 @@
+Component,Purpose,Required Content,Palette Behavior,Accessibility,Implementation Status
+Hero,Orient and establish one decisive reader action,kicker; headline; lead; primary action; optional secondary action; image/source state,Deep Navy or Pearl dominant; Coral action; Gold detail,semantic H1; alt/caption; contrast scrim; reduced motion,Specified — implementation varies
+Image-led feature,Pair a strong image with editorial thesis,image; title; summary; metadata; action,Adaptive,link names; alt text; no text embedded only in image,Specified — implementation varies
+Category pathway,Help users choose a subject route,label; benefit; example; action,Pearl surface or dark section,landmark/list semantics,Specified — implementation varies
+Species feature,Foreground identification and responsible context,species name; ID cues; habitat; season; handling; source,Blue/Teal water + Green habitat,alt/long description; regulation label,Specified — implementation varies
+Gear comparison,Compare systems and tradeoffs,verified identity; specs; compatibility; evidence; limits; value,Pearl technical surface; Navy header; Coral warnings,table headers; captions; status labels,Specified — implementation varies
+Conditions panel,Summarize environmental variables without fake live data,source; timestamp; variables; confidence; limitation,Navy/Blue/Teal with Pearl text,timestamp; source; units; text labels,Specified — implementation varies
+Water / map panel,Show region-safe spatial context,public region; water type; legend; privacy label; sources,Lake Blue water; Forest land; Gold horizon,text alternative; non-color legend,Specified — implementation varies
+Weather / environmental panel,Explain weather relation to field decision,condition; trend; timestamp; source; safety note,Blue/Teal info; Coral warning,labels/units; no color-only,Specified — implementation varies
+Article card,Preview a genuinely parallel article set,image optional; type; title; summary; date/status,Pearl; Navy border; content-type accents,focus; link purpose; alt,Specified — implementation varies
+Archive entry,Support scanning and choice,title; type; summary; date; evidence/review; image,Pearl with Navy rules,list/article semantics,Specified — implementation varies
+Field note,Record observation and limit,timestamp; conditions; observation; limitation; next question,Navy or Pearl with Gold marker,time/units labels,Specified — implementation varies
+Evidence strip,"Expose source, date and confidence",source class; date; method; limitation,Charcoal/Pearl or Navy/Pearl,not dependent on color,Specified — implementation varies
+Source panel,List sources and review behavior,sources; access/review dates; conflicts; corrections,Pearl or Navy,semantic list; readable URLs,Specified — implementation varies
+Review-date panel,Show freshness and required action,last reviewed; next review; stale state; action,Gold conditional; Coral stale,text state + icon,Specified — implementation varies
+Gear verdict,Summarize earned decision,problem; best fit; evidence; compatibility; limits; alternatives; disclosure,Navy/Pearl with Coral action,status labels; source links,Specified — implementation varies
+Compatibility matrix,"Show required, compatible, conditional and incompatible relations",row/column headers; labels; rationale; sources,semantic colors plus icons/patterns,caption; headers; non-color state,Specified — implementation varies
+Species facts,Present verified factual profile,ID; range; habitat; season; handling; regulation source,Pearl; Blue/Green accents,definition semantics,Specified — implementation varies
+Technique sequence,Teach ordered action,setup; numbered steps; cues; failures; adaptations,Pearl; Teal active; Coral failure,ordered list; text alternatives,Specified — implementation varies
+Rig diagram,Show physical connections and ratings,components; line path; knots; ratings; measured/estimated labels,Navy/Blue/Gold/Coral with redundancy,long description; labels,Specified — implementation varies
+Safety note,Surface immediate hazard and action,hazard; preparation; stop/emergency action; source,Coral marker with Navy/Pearl,role/heading; text instruction,Specified — implementation varies
+Stewardship note,Support conservation behavior,practice; reason; source/authority,Forest Green with Pearl/Navy,text label,Specified — implementation varies
+Regulation notice,Require current jurisdiction verification,jurisdiction; effective/review date; known limits; official authority action,Gold conditional or Coral stop,not color-only; current date,Specified — implementation varies
+Quotation,Present a sourced quote,quote; speaker; source,Pearl/Navy,blockquote/cite,Specified — implementation varies
+Pull quote,Create pacing from existing article text,short excerpt; context,Gold rule; Navy/Pearl,not duplicate information for screen readers without care,Specified — implementation varies
+Callout,Emphasize a useful aside,label; concise content; optional action,semantic token based,role only when appropriate,Specified — implementation varies
+Table,Present comparable structured information,caption; headers; units; source,Pearl/Navy rules,caption; scope; keyboard,Specified — implementation varies
+Chart,Show quantitative relationships,title; source; units; legend; notes,palette with patterns and sufficient distinction,data table/description,Specified — implementation varies
+Data display,Show one or several values with context,value; unit; label; timestamp/source,"Navy/Pearl, Blue/Teal series",spoken unit/context,Specified — implementation varies
+Filter,Narrow content or results,label; options; active summary; clear action,Pearl with Teal active,labels; keyboard; status announcement,Specified — implementation varies
+Search result,Help choose the right destination,title; type; excerpt; date/status; matched context,Pearl,result count and query announced,Specified — implementation varies
+Form field,Collect one understandable value,label; help; control; required/optional; error,Pearl surface; Navy text; Coral error; Gold focus,persistent label; describedby; errors,Specified — implementation varies
+Button,Trigger a clear action,specific verb; state,Coral primary on Navy; Navy primary on Pearl; Teal secondary with tested contrast,focus ring; state text,Specified — implementation varies
+Tabs,Switch among parallel views,tab labels; active panel,Teal active with text/underline,ARIA tab pattern,Specified — implementation varies
+Accordion,Progressively disclose secondary details,button heading; panel,Pearl/Navy,button state and relationships,Specified — implementation varies
+Modal,"Handle focused, interruptive task",title; content; actions; close,Pearl elevated over Navy scrim,dialog semantics,Specified — implementation varies
+Drawer,Provide mobile navigation/filter/history,title; content; close,Deep Navy or Pearl,dialog/navigation semantics,Specified — implementation varies
+Toast / notice,Confirm noncritical transient state,message; optional action,semantic color + icon/text,live region appropriate,Specified — implementation varies
+Product card,Preview a product without becoming catalog wall,image; title; format; price; availability; disclosure,Pearl; Navy; Coral commerce action,price/availability text,Specified — implementation varies
+Cart summary,"Show items, quantities and total",items; quantity; subtotal; notices; action,Pearl,announced updates,Specified — implementation varies
+Checkout summary,Confirm order and consequential totals,items; shipping; tax; discount; total; terms,Pearl/Navy,headings; live updates,Specified — implementation varies
+Application input,Collect explainable application data,question; reason; control; unknown option; validation,Pearl work surface in Navy shell,labels; errors; keyboard,Specified — implementation varies
+Application result,Explain result and evidence,result; basis; limits; conflicts; next action; export,Navy/Pearl with semantic states,not color-only; sources,Specified — implementation varies
+Loading,Show bounded progress,task label; progress if known; cancel/recovery,Navy/Pearl,status announcement,Specified — implementation varies
+Empty,Explain absence and next action,reason; suggestions; action,Pearl,not just decorative illustration,Specified — implementation varies
+Error,Explain failure and recovery,plain-language error; retained data; retry/support,Coral + label/icon,error summary and field association,Specified — implementation varies
+Offline,Explain offline capacity,offline label; available actions; sync behavior,Gold/Navy,live status,Specified — implementation varies
+Print card,Provide compact field-ready reference,title; setup/result; warnings; sources/date,white/black with controlled accents,print semantics,Specified — implementation varies

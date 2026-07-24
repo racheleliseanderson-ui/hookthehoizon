@@ -1,0 +1,25 @@
+Path / Area,Role,Correction / Mapping,Status
+wordpress-theme/theme-tokens.json,"Canonical machine-readable palette, semantic colors, typography, mode distributions and deprecated aliases",Replace old ten-color palette and semantic mappings,Updated in reconciliation branch
+wordpress-theme/assets/tokens.css,Generated CSS custom properties for theme/editor/app/Woo/email/print,Regenerate from canonical token JSON,Updated in reconciliation branch
+wordpress-theme/theme.json,"WordPress palette, font families, sizes and global element styles",Replace old palette and Georgia/system hierarchy,Updated in reconciliation branch
+wordpress-theme/style.css,"Frontend composition, typography, focus, light/dark, responsive and print rules",Apply v3 tokens and Bebas/Montserrat hierarchy; preserve accessible structure,Updated in reconciliation branch
+wordpress-theme/styles/dark.json,Dark style variation,Replace old colors with v3 semantic roles,Updated in reconciliation branch
+wordpress-theme/styles/field-serif.json,Legacy-named style variation,Convert to v3 typography and mark filename as deprecated compatibility alias,Updated in reconciliation branch
+next-generation/theme/theme.json,Candidate next-generation theme palette/type,Normalize exact values/names and typography; remove near-match colors,Updated in reconciliation branch
+theme/theme.json,Retained legacy/source-history theme,Map exact current palette and declare deprecated compatibility role,Updated in reconciliation branch
+scripts/sync-wordpress-tokens.mjs,Token synchronization,"Generate palette, semantic, typography and alias variables consistently",Updated in reconciliation branch
+rebuild/template-system/template-catalog.json,Machine-readable template coverage and visual contract,Replace old visual contract; link v3 register and complete state coverage,Updated in reconciliation branch
+wordpress-theme/parts/header.html,Primary site header,Integrate approved responsive logo family and v3 navigation hierarchy,Mapped; draft implementation started
+wordpress-theme/parts/footer.html,Primary footer,Integrate approved logo/monogram and v3 trust/pathway architecture,Mapped; draft implementation started
+wordpress-theme/templates/front-page.html,Homepage composition,"Recompose around approved mockup grammar, current assets and v3 tokens",Mapped; draft implementation started
+wordpress-theme/templates/*.html,Core/editorial routes,Apply template matrix and content-type differentiation,Mapped; staged by priority
+wordpress-theme/patterns/*.php,Reusable block patterns,Replace old token references and implement catalog components,Mapped; staged by priority
+applications/**,Application interfaces,Consume semantic application tokens and complete input/result/stop/recovery states,Mapped; staged by application risk
+WooCommerce block/templates,Commerce surfaces,Use Hook tokens/type/header/footer; eliminate default visual fork,Mapped; implementation required
+editor styles,Gutenberg editor parity,Ensure author palette/type/pattern restrictions match frontend,Mapped; implementation required
+email and print styles,"MailPoet, Woo email, exports and print","Add v3 compact logo, typography, contrast and source/review behavior",Mapped; implementation required
+docs/design/HOOK_THE_HORIZON_VISUAL_AUTHORITY_V3.md,Repository-readable visual authority,Add complete reconciled design specification,Added in reconciliation branch
+docs/design/master-template-register.csv,Machine-readable template matrix,Add all route/state rows,Added in reconciliation branch
+docs/design/component-catalog.csv,Machine-readable component catalog,Add purpose/variation/accessibility/misuse fields,Added in reconciliation branch
+README.md,Repository source-of-truth and implementation direction,Point to v3 authority/tokens/register and runtime status,Pending in reconciliation branch
+QA / visual regression files,Acceptance evidence,Add representative desktop/tablet/mobile targets and token drift checks,Mapped; implementation required
