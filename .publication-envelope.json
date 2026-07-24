@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0.0",
+  "entity_id": "PUB-HTH-001",
+  "adapter_id": "hook",
+  "publication": "Hook the Horizon",
+  "repository": "racheleliseanderson-ui/hookthehorizon",
+  "canonical_domain": "https://hookthehorizon.blog",
+  "wordpress_site": "https://hookthehorizon.blog",
+  "immutable": true
+}
