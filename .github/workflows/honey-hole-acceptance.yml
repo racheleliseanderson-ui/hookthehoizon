@@ -1,0 +1,44 @@
+name: Honey Hole acceptance
+
+on:
+  push:
+    paths:
+      - 'applications/honey-hole-intelligence/**'
+      - 'wordpress-plugin/honey-hole-condition-route/**'
+      - '.github/workflows/honey-hole-acceptance.yml'
+  pull_request:
+    paths:
+      - 'applications/honey-hole-intelligence/**'
+      - 'wordpress-plugin/honey-hole-condition-route/**'
+      - '.github/workflows/honey-hole-acceptance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate destination data, privacy, expiry, duplicates, filters, and reader contract
+        env:
+          HHI_TEST_DATE: '2026-07-24'
+        run: node applications/honey-hole-intelligence/tests/validate-public-destinations.mjs
+      - name: Validate PHP syntax
+        run: php -l wordpress-plugin/honey-hole-condition-route/honey-hole-condition-route.php
+      - name: Verify packaged data parity
+        run: cmp applications/honey-hole-intelligence/data/public-destination-records.v0.2.json wordpress-plugin/honey-hole-condition-route/data/public-destination-records.v0.2.json || (echo 'Packaged data differs from canonical source' && exit 1)
+      - name: Build deployable plugin archive
+        run: |
+          mkdir -p build
+          cd wordpress-plugin
+          zip -r ../build/honey-hole-condition-route-0.3.0.zip honey-hole-condition-route
+      - uses: actions/upload-artifact@v4
+        with:
+          name: honey-hole-condition-route-0.3.0
+          path: build/honey-hole-condition-route-0.3.0.zip
+          if-no-files-found: error
