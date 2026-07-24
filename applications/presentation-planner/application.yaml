@@ -1,0 +1,42 @@
+schema_version: 1.0.0
+application:
+  id: HTH-PP-001
+  key: presentation-planner
+  public_name: Presentation Planner
+  parent_publication: Hook the Horizon
+  class: field-experiment-planner
+  lifecycle: installed-preview-under-acceptance
+  owner: Rachel Anderson
+smart_mode:
+  id: HTH-SM-001
+  role: optional local personalization layer
+  current_consumers:
+    - HTH-PP-001
+  persistence_default: session-only
+  persistence_requires_explicit_consent: true
+  withdrawal_deletes_all_keys: true
+architecture:
+  evaluator: applications/_shared/personalization.mjs
+  preview_ui: applications/presentation-planner/preview
+  wordpress_runtime_sync: scripts/sync-presentation-planner-runtime.mjs
+outputs:
+  required:
+    - print-or-pdf
+    - copy-summary
+    - json-export
+    - public-safe-share-card
+    - no-javascript-worksheet
+privacy:
+  prohibited:
+    - exact-location
+    - coordinates
+    - private-access-instructions
+    - gate-or-access-codes
+    - remote-private-state
+  analytics: disabled-for-private-state
+routes:
+  preview: /presentation-planner-preview/
+release:
+  production_change_authorized: false
+  native_wrapper_authorized: false
+  account_or_remote_workspace_authorized: false
