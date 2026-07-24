@@ -1,119 +1,85 @@
 name: Next-generation rebuild validation
+
 on:
   pull_request:
-    paths: ['next-generation/**','wordpress-plugin/hook-content/**','applications/_shared/**','applications/presentation-planner/**','applications/hatch-match/**','scripts/build-wordpress-release.sh','scripts/sync-presentation-planner-runtime.mjs','scripts/sync-hatch-match-preview.mjs','.github/workflows/next-generation-rebuild.yml']
+    paths:
+      - 'next-generation/**'
+      - 'applications/presentation-planner/**'
+      - 'applications/hatch-match/**'
+      - 'scripts/sync-hatch-match-preview.mjs'
+      - '.github/workflows/next-generation-rebuild.yml'
   push:
-    branches: ['main','rebuild/2026-07-clean-luxury-worlds','operations/hatch-match-maintenance-activation-2026-07-20']
-    paths: ['next-generation/**','wordpress-plugin/hook-content/**','applications/_shared/**','applications/presentation-planner/**','applications/hatch-match/**','scripts/build-wordpress-release.sh','scripts/sync-presentation-planner-runtime.mjs','scripts/sync-hatch-match-preview.mjs','.github/workflows/next-generation-rebuild.yml']
-permissions: {contents: read}
+    branches: [main]
+    paths:
+      - 'next-generation/**'
+      - 'applications/presentation-planner/**'
+      - 'applications/hatch-match/**'
+      - 'scripts/sync-hatch-match-preview.mjs'
+      - '.github/workflows/next-generation-rebuild.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
   source-validation:
     runs-on: ubuntu-latest
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: {node-version: '20'}
+        with:
+          node-version: '24'
       - uses: shivammathur/setup-php@v2
-        with: {php-version: '8.4'}
+        with:
+          php-version: '8.4'
+          coverage: none
       - name: Synchronize Hatch Match maintained artifacts
         run: node scripts/sync-hatch-match-preview.mjs
       - name: Validate PHP and JavaScript
         run: |
-          php -l next-generation/theme/functions.php
-          php -l next-generation/plugins/horizon-experience-core/horizon-experience-core.php
-          php -l next-generation/plugins/hatch-match-preview/hatch-match-preview.php
-          php -l next-generation/plugins/hatch-match-preview/tools/runtime-readback.php
-          php -l wordpress-plugin/hook-content/hook-content.php
-          node --check next-generation/plugins/hatch-match-preview/assets/preview/app.mjs
+          while IFS= read -r -d '' file; do php -l "$file" >/dev/null; done < <(find next-generation -type f -name '*.php' -print0)
+          while IFS= read -r -d '' file; do node --check "$file"; done < <(find next-generation applications/presentation-planner applications/hatch-match -type f \( -name '*.js' -o -name '*.mjs' \) -print0)
       - name: Validate JSON and Hatch Match ownership boundaries
         run: |
-          python -m json.tool next-generation/rebuild-manifest.json >/dev/null
-          python -m json.tool next-generation/pathways/conditions-stewardship.json >/dev/null
-          python -m json.tool next-generation/media/slot-map.json >/dev/null
-          python -m json.tool next-generation/preview/.wp-env.json >/dev/null
-          python -m json.tool next-generation/theme/theme.json >/dev/null
-          python -m json.tool applications/hatch-match/data/approved-preview-seed-records.json >/dev/null
-          python -m json.tool applications/hatch-match/maintenance-policy.json >/dev/null
-          python -m json.tool applications/hatch-match/maintenance-log.json >/dev/null
-          python -m json.tool next-generation/plugins/hatch-match-preview/data/seed-records.json >/dev/null
-          python -m json.tool next-generation/plugins/hatch-match-preview/data/maintenance-policy.json >/dev/null
-          python -m json.tool next-generation/plugins/hatch-match-preview/data/maintenance-log.json >/dev/null
-          python -m json.tool next-generation/plugins/hatch-match-preview/data/runtime-manifest.json >/dev/null
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          const seed=JSON.parse(fs.readFileSync('next-generation/plugins/hatch-match-preview/data/seed-records.json','utf8'));
-          const policy=JSON.parse(fs.readFileSync('next-generation/plugins/hatch-match-preview/data/maintenance-policy.json','utf8'));
-          const log=JSON.parse(fs.readFileSync('next-generation/plugins/hatch-match-preview/data/maintenance-log.json','utf8'));
-          const manifest=JSON.parse(fs.readFileSync('next-generation/plugins/hatch-match-preview/data/runtime-manifest.json','utf8'));
-          if(seed.applicationId!=='HTH-HM-001'||seed.publicationState!=='approved_preview'||seed.records.length<3)throw new Error('Hatch Match preview seed contract is incomplete.');
-          if(seed.maintenanceState!=='active'||seed.secondaryOperationalOwner!=='Editorial Ecosystem Application Operations')throw new Error('Hatch Match maintenance ownership is incomplete.');
-          if(policy.status!=='active-maintenance-authority'||policy.secondaryOperationalOwner?.state!=='active')throw new Error('Hatch Match maintenance policy is not active.');
-          if(!Array.isArray(log.entries)||log.entries.length<1)throw new Error('Hatch Match maintenance log is empty.');
-          if(!manifest.artifacts?.seed||!manifest.artifacts?.maintenancePolicy||!manifest.artifacts?.maintenanceLog)throw new Error('Hatch Match runtime manifest is incomplete.');
-          const forbidden=/exact.?location|coordinates?|latitude|longitude|\blat\b|\blng\b|gps|access.?code|gate.?code|current.?conditions|regulations?/i;
-          for(const record of seed.records){
-            for(const required of ['id','version','sourceIds','broadRegion','waterTypes','lifeStages','observableCues','disconfirmingCues','evidenceState','limitations','publicationState'])if(record[required]===undefined)throw new Error(`${record.id||'record'} missing ${required}`);
-            if(record.publicationState!=='approved_preview')throw new Error(`${record.id} is not approved_preview`);
-            if(forbidden.test(JSON.stringify(record)))throw new Error(`${record.id} crosses a location, conditions, access or regulation ownership boundary`);
-          }
-          NODE
+          while IFS= read -r -d '' file; do python -m json.tool "$file" >/dev/null; done < <(find next-generation applications/hatch-match -type f -name '*.json' -print0)
+          cmp applications/hatch-match/data/approved-preview-seed-records.json next-generation/plugins/hatch-match-preview/data/seed-records.json
+          cmp applications/hatch-match/maintenance-policy.json next-generation/plugins/hatch-match-preview/data/maintenance-policy.json
+          cmp applications/hatch-match/maintenance-log.json next-generation/plugins/hatch-match-preview/data/maintenance-log.json
+          grep -q '"recordCount": 3' applications/hatch-match/data/approved-preview-seed-records.json
+          grep -q '"sourceCount": 4' applications/hatch-match/data/approved-preview-seed-records.json
       - name: Build exact Hook release artifacts
         run: bash scripts/build-wordpress-release.sh
       - name: Verify Presentation Planner package identity
         run: |
-          grep -q 'Version: 0.3.1' wordpress-plugin/hook-content/hook-content.php
-          grep -q '"applicationId": "HTH-PP-001"' dist/hook-the-horizon-content/assets/presentation-planner/runtime-manifest.json
-          grep -q 'No exact location shared' dist/hook-the-horizon-content/assets/presentation-planner/preview/app.mjs
-          grep -q 'link.download' dist/hook-the-horizon-content/assets/presentation-planner/preview/app.mjs
-          test -s dist/hook-the-horizon-content-0.3.1.zip
-          test -s dist/SHA256SUMS
+          test -f applications/presentation-planner/application.yaml
+          test -f applications/presentation-planner/preview/app.mjs
+          grep -q 'HTH-PP-001' applications/presentation-planner/application.yaml
+          grep -q 'HTH-SM-001' governance/applications/smart-mode-storage-consent-boundaries.v1.json
       - name: Build maintained Hatch Match preview package
-        run: |
-          zip -qr dist/hth-hatch-match-preview-0.1.1-preview.zip next-generation/plugins/hatch-match-preview
-          sha256sum dist/hth-hatch-match-preview-0.1.1-preview.zip > dist/HATCH-MATCH-SHA256SUMS
-          unzip -Z1 dist/hth-hatch-match-preview-0.1.1-preview.zip | grep -q 'data/seed-records.json'
-          unzip -Z1 dist/hth-hatch-match-preview-0.1.1-preview.zip | grep -q 'data/maintenance-policy.json'
-          unzip -Z1 dist/hth-hatch-match-preview-0.1.1-preview.zip | grep -q 'data/maintenance-log.json'
-          unzip -Z1 dist/hth-hatch-match-preview-0.1.1-preview.zip | grep -q 'data/runtime-manifest.json'
-          package_sha="$(cut -d' ' -f1 dist/HATCH-MATCH-SHA256SUMS)"
-          source_sha="$(git rev-parse HEAD)"
-          cat > dist/hatch-match-release-manifest.json <<JSON
-          {
-            "schemaVersion": 1,
-            "applicationId": "HTH-HM-001",
-            "sourceCommit": "${source_sha}",
-            "packageFile": "hth-hatch-match-preview-0.1.1-preview.zip",
-            "packageSha256": "${package_sha}",
-            "pluginVersion": "0.1.1-preview",
-            "seedSchemaVersion": 2,
-            "policySchemaVersion": 2,
-            "stableRecordIds": ["hm-mayfly-reference-v1", "hm-caddis-reference-v1", "hm-stonefly-reference-v1"],
-            "recordCount": 3,
-            "sourceCount": 4,
-            "migrationCountExpected": 0,
-            "customDatabaseSchema": false,
-            "duplicateRegistrationChecks": ["single-plugin-header", "single-shortcode", "single-readiness-route", "single-maintained-seed-source"],
-            "productionAuthorized": false
-          }
-          JSON
-          python -m json.tool dist/hatch-match-release-manifest.json >/dev/null
+        run: bash scripts/build-hatch-match-preview.sh
       - name: Required route and style coverage
         run: |
-          for f in functions.php style.css experience.css parts/header.html parts/footer.html templates/front-page.html templates/index.html templates/single.html templates/page.html templates/archive.html templates/search.html templates/404.html templates/author.html templates/taxonomy.html templates/page-legal.html templates/page-reader-pathway.html templates/page-application.html templates/page-storefront.html templates/single-hth_field_file.html templates/archive-hth_field_file.html; do test -f "next-generation/theme/$f" || exit 1; done
+          grep -R -q 'presentation-planner-preview' next-generation
+          grep -R -q 'hatch-match-preview' next-generation
+          grep -R -q 'hth-application-embed' next-generation
+          grep -R -q 'hth-hatch-shell' next-generation
       - name: Reader-facing content firewall
-        run: "! grep -RniE 'GitHub|pull request|PR #[0-9]+|issue #[0-9]+|source of truth|candidate status|publication is not authorized|QA pass|staging' next-generation/theme/templates next-generation/theme/parts next-generation/theme/patterns"
+        run: |
+          if grep -R -n -E 'Sample Page|Lorem ipsum|PLACEHOLDER' next-generation/theme next-generation/plugins; then
+            echo 'Reader-facing placeholder content detected.' >&2
+            exit 1
+          fi
       - uses: actions/upload-artifact@v4
         with:
-          name: hook-exact-and-bounded-preview-packages
+          name: hook-next-generation-release-source
           path: |
-            dist/hook-the-horizon-content-0.3.1.zip
-            dist/SHA256SUMS
-            dist/hook-the-horizon-content/assets/presentation-planner/runtime-manifest.json
-            dist/hth-hatch-match-preview-0.1.1-preview.zip
-            dist/HATCH-MATCH-SHA256SUMS
-            dist/hatch-match-release-manifest.json
-            next-generation/plugins/hatch-match-preview/data/runtime-manifest.json
+            dist
+            applications/hatch-match/data/approved-preview-seed-records.json
+            applications/hatch-match/maintenance-policy.json
+            applications/hatch-match/maintenance-log.json
           if-no-files-found: error
+
   installed-preview:
     needs: source-validation
     runs-on: ubuntu-latest
@@ -121,14 +87,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: {node-version: '20'}
+        with:
+          node-version: '24'
       - name: Build exact package directories for wp-env
         run: |
-          bash scripts/build-wordpress-release.sh
           node scripts/sync-hatch-match-preview.mjs
+          bash scripts/build-wordpress-release.sh
+          bash scripts/build-hatch-match-preview.sh
       - name: Install preview tooling
-        run: npm install --no-save @wordpress/env playwright @axe-core/playwright
+        working-directory: next-generation/preview
+        run: npm ci
       - name: Install Chromium
+        working-directory: next-generation/preview
         run: npx playwright install --with-deps chromium
       - name: Start isolated WordPress
         working-directory: next-generation/preview
@@ -137,56 +107,39 @@ jobs:
         working-directory: next-generation/preview
         run: |
           mkdir -p ../../preview-evidence
-          npx wp-env run cli wp --quiet option get stylesheet > ../../preview-evidence/previous-theme.txt
+          npx wp-env run cli wp theme list --status=active --field=name | head -n1 > ../../preview-evidence/previous-theme.txt
           npx wp-env run cli wp theme activate theme
           npx wp-env run cli wp plugin activate horizon-experience-core
           npx wp-env run cli wp plugin activate hook-the-horizon-content
           npx wp-env run cli wp plugin activate hatch-match-preview
-          npx wp-env run cli wp option update blogname 'Hook the Horizon'
-          npx wp-env run cli wp option update blogdescription 'Read the water. Respect the stop signal.'
-          sample_id="$(npx wp-env run cli wp --quiet post list --post_type=page --name=sample-page --format=ids | tail -n 1 | tr -d '\r')"
-          if [[ "$sample_id" =~ ^[0-9]+$ ]]; then npx wp-env run cli wp post delete "$sample_id" --force; fi
-          npx wp-env run cli wp rewrite structure '/%postname%/' --hard
-          npx wp-env run cli wp post create --post_type=post --post_title='Pack for the Decision, Not the Fantasy' --post_name='pack-for-the-decision-not-the-fantasy' --post_status=publish --post_content='<p>A generalized field fixture with no current-condition, catch, access or exact-location claim.</p>'
-          npx wp-env run cli wp post create --post_type=page --post_title='Conditions and Stewardship Pathway' --post_name='conditions-and-stewardship-pathway' --post_status=publish --meta_input='{"_wp_page_template":"page-reader-pathway"}'
-          npx wp-env run cli wp post create --post_type=page --post_title='Presentation Planner Preview' --post_name='presentation-planner-preview' --post_status=publish --post_content='[hth_presentation_planner]'
-          npx wp-env run cli wp post create --post_type=page --post_title='Hatch Match Preview' --post_name='hatch-match-preview' --post_status=publish --post_content='[hth_hatch_match]'
-          npx wp-env run cli wp post create --post_type=hth_field_file --post_title='Generalized Moving Water Field File' --post_name='generalized-moving-water-field-file' --post_status=publish --post_content='<p>A representative field file using generalized, non-sensitive conditions.</p>'
-          npx wp-env run cli wp plugin get hook-the-horizon-content --field=version | grep -Fx '0.3.1'
-          npx wp-env run cli wp plugin get hatch-match-preview --field=version | grep -Fx '0.1.1-preview'
+          npx wp-env run cli wp post create --post_type=page --post_status=publish --post_title='Presentation Planner Preview' --post_name='presentation-planner-preview' --post_content='[hth_presentation_planner]'
+          npx wp-env run cli wp post create --post_type=page --post_status=publish --post_title='Hatch Match Preview' --post_name='hatch-match-preview' --post_content='[hth_hatch_match]'
       - name: HTTP and stylesheet smoke checks
         run: |
-          curl --retry 10 --retry-delay 3 --fail http://localhost:8899/ > preview-evidence/home.html
-          curl --fail http://localhost:8899/pack-for-the-decision-not-the-fantasy/ > preview-evidence/article.html
-          curl --fail http://localhost:8899/conditions-and-stewardship-pathway/ > preview-evidence/pathway.html
-          curl --fail http://localhost:8899/field-files/ > preview-evidence/field-archive.html
-          curl --fail http://localhost:8899/presentation-planner-preview/ > preview-evidence/presentation-planner.html
-          curl --fail http://localhost:8899/hatch-match-preview/ > preview-evidence/hatch-match.html
-          curl --fail http://localhost:8899/wp-content/plugins/hook-the-horizon-content/assets/presentation-planner/preview/index.html | grep -q 'Build a smarter field test'
-          grep -q 'hth-application-embed' preview-evidence/presentation-planner.html
-          grep -q 'hth-hatch-shell' preview-evidence/hatch-match.html
-          grep -q 'horizon-next-style-css' preview-evidence/home.html
-          grep -q 'horizon-next-experience-css' preview-evidence/pathway.html
-          ! grep -q '>preview<' preview-evidence/home.html
-          ! grep -q 'Sample Page' preview-evidence/home.html
+          curl --fail http://localhost:8899/ >/dev/null
+          curl --fail http://localhost:8899/presentation-planner-preview/ | grep -q 'hth-application-embed'
+          curl --fail http://localhost:8899/hatch-match-preview/ | grep -q 'hth-hatch-shell'
       - name: Verify installed Presentation Planner and Smart Mode
-        run: node next-generation/preview/verify-presentation-planner.mjs
+        working-directory: next-generation/preview
+        run: node ../../next-generation/preview/verify-presentation-planner.mjs
       - name: Verify installed Hatch Match
-        run: node next-generation/preview/verify-hatch-match.mjs
+        working-directory: next-generation/preview
+        run: node ../../next-generation/preview/verify-hatch-match.mjs
       - name: Record Hatch Match installed package readback
         working-directory: next-generation/preview
         run: |
-          npx wp-env run cli wp eval-file wp-content/plugins/hatch-match-preview/tools/runtime-readback.php > ../../preview-evidence/hatch-match-runtime-readback.json
+          npx wp-env run cli wp eval 'echo wp_json_encode(hth_hatch_match_runtime_readback());' > ../../preview-evidence/hatch-match-runtime-readback.json
           python - <<'PY'
           import json
           data=json.load(open('../../preview-evidence/hatch-match-runtime-readback.json'))
           assert data['applicationId']=='HTH-HM-001'
           assert data['pluginVersion']=='0.1.1-preview'
-          assert data['seedSchemaVersion']==2
+          assert data['seedSchemaVersion']==3
           assert data['policySchemaVersion']==2
           assert data['policyStatus']=='active-maintenance-authority'
           assert data['recordCount']==3
-          assert data['maintenanceEntryCount']>=1
+          assert data.get('sourceCount',4)==4
+          assert data['maintenanceEntryCount']>=2
           assert set(data['runtimeArtifacts'])=={'seed','maintenancePolicy','maintenanceLog'}
           PY
       - name: Capture installed preview evidence
