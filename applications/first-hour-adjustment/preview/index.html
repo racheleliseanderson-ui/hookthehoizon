@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>First-Hour Adjustment Guide | Hook the Horizon</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">Hook the Horizon Field Tool</p>
+      <h1>The First-Hour Adjustment Guide</h1>
+      <p>Turn a slow opening hour into one controlled field test. Change one major variable, define what evidence would matter, and keep the result on this device.</p>
+    </header>
+
+    <form id="adjustment-form">
+      <fieldset>
+        <legend>What is the clearest problem?</legend>
+        <label><input type="radio" name="problem" value="no_contact" required> No contact or visible response</label>
+        <label><input type="radio" name="problem" value="follows_no_commit"> Follows, flashes, or looks without committing</label>
+        <label><input type="radio" name="problem" value="poor_control"> Poor depth, drift, retrieve, or line control</label>
+        <label><input type="radio" name="problem" value="missed_connections"> Strikes or takes are not becoming solid connections</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>What evidence is strongest?</legend>
+        <label><input type="radio" name="evidence" value="none" required> No observable fish or forage signal</label>
+        <label><input type="radio" name="evidence" value="fish_present"> Fish appear present, but presentation is being rejected</label>
+        <label><input type="radio" name="evidence" value="wrong_zone"> Presentation is not holding the intended zone</label>
+        <label><input type="radio" name="evidence" value="contact_without_control"> Contact occurs, but control or connection is weak</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>What can you change without buying anything?</legend>
+        <label><input type="checkbox" name="available" value="depth"> Depth or weight</label>
+        <label><input type="checkbox" name="available" value="speed"> Speed or cadence</label>
+        <label><input type="checkbox" name="available" value="angle"> Cast, drift, or retrieve angle</label>
+        <label><input type="checkbox" name="available" value="profile"> Size, silhouette, or profile</label>
+        <label><input type="checkbox" name="available" value="connection"> Leader, knot, hook, drag, or connection setup</label>
+      </fieldset>
+
+      <button type="submit">Build the next test</button>
+      <button type="button" id="reset">Reset local record</button>
+    </form>
+
+    <section id="result" aria-live="polite" class="result empty">Choose the strongest observable evidence. The tool will recommend one variable to test first.</section>
+  </main>
+  <script type="module" src="app.mjs"></script>
+</body>
+</html>
